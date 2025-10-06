@@ -2,16 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import RunwayML from "@runwayml/sdk";
 import OpenAI from "openai";
 
-const runway = new RunwayML({
-  apiKey: process.env.RUNWAYML_API_KEY,
-});
-
-const deepseek = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
-  baseURL: "https://api.deepseek.com/v1",
-});
-
 export async function POST(request: NextRequest) {
+  // Initialize clients (lazy load to avoid build-time errors)
+  const runway = new RunwayML({
+    apiKey: process.env.RUNWAYML_API_KEY || "",
+  });
+
+  const deepseek = new OpenAI({
+    apiKey: process.env.DEEPSEEK_API_KEY || "",
+    baseURL: "https://api.deepseek.com/v1",
+  });
   try {
     const { goals, generatedImages, userImages } = await request.json();
 

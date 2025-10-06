@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-// Initialize DeepSeek client
-const deepseek = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
-  baseURL: "https://api.deepseek.com/v1",
-});
-
 export async function POST(request: NextRequest) {
+  // Initialize DeepSeek client (lazy load to avoid build-time errors)
+  const deepseek = new OpenAI({
+    apiKey: process.env.DEEPSEEK_API_KEY || "",
+    baseURL: "https://api.deepseek.com/v1",
+  });
   try {
     const { goals, userImages } = await request.json();
 

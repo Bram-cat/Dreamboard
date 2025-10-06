@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import RunwayML from "@runwayml/sdk";
 
-const runway = new RunwayML({
-  apiKey: process.env.RUNWAYML_API_KEY,
-});
-
 export async function POST(request: NextRequest) {
+  // Initialize Runway client (lazy load to avoid build-time errors)
+  const runway = new RunwayML({
+    apiKey: process.env.RUNWAYML_API_KEY || "",
+  });
   try {
     const { prompts, userImages } = await request.json();
 
