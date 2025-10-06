@@ -4,16 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@runwayml/sdk": "^3.0.0",
     "html2canvas": "^1.4.1",
     "next": "15.5.4",
+    "openai": "^6.1.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "replicate": "^1.2.0"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

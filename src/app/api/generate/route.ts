@@ -1,22 +1,15 @@
-import Replicate from "replicate";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
     const { goals } = await request.json();
+    console.log("Received goals:", goals);
 
     if (!goals || typeof goals !== "string") {
+      console.error("Invalid goals input");
       return NextResponse.json(
         { error: "Goals text is required" },
         { status: 400 }
-      );
-    }
-
-    // Check for API token
-    if (!process.env.REPLICATE_API_TOKEN) {
-      return NextResponse.json(
-        { error: "REPLICATE_API_TOKEN not configured" },
-        { status: 500 }
       );
     }
 
@@ -27,6 +20,8 @@ export async function POST(request: NextRequest) {
       .filter((g: string) => g.length > 0)
       .slice(0, 6);
 
+    console.log("Parsed keywords:", keywords);
+
     if (keywords.length === 0) {
       return NextResponse.json(
         { error: "No valid goals found" },
@@ -34,35 +29,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const replicate = new Replicate({
-      auth: process.env.REPLICATE_API_TOKEN,
+    console.log("Generating images for keywords:", keywords);
+
+    // Generate multiple variations for each keyword (2-3 images per goal)
+    const images: string[] = [];
+    const imageKeywords: string[] = [];
+
+    keywords.forEach((keyword: string) => {
+      // Generate 2-3 variations of each keyword for variety
+      const variations = [
+        `${keyword}, vision board aesthetic, inspirational`,
+        `${keyword}, motivational poster style, beautiful`,
+        `${keyword}, dreamy aesthetic, high quality`,
+      ];
+
+      variations.forEach((variation, index) => {
+        const prompt = encodeURIComponent(variation);
+        // Add seed for variety but consistency
+        const seed = Math.floor(Math.random() * 10000);
+        const imageUrl = `https://image.pollinations.ai/prompt/${prompt}?width=512&height=512&seed=${seed}&nologo=true`;
+        console.log(`Generated image ${index + 1} for "${keyword}":`, imageUrl);
+        images.push(imageUrl);
+        imageKeywords.push(keyword);
+      });
     });
 
-    // Generate images for each keyword using Stable Diffusion
-    const imagePromises = keywords.map(async (keyword: string) => {
-      const output = await replicate.run(
-        "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
-        {
-          input: {
-            prompt: `${keyword}, vision board style, inspirational, high quality, aesthetic`,
-            negative_prompt: "text, watermark, low quality, blurry",
-            width: 512,
-            height: 512,
-          },
-        }
-      );
+    console.log("All images generated successfully:", images.length);
 
-      // Replicate returns an array of image URLs
-      return Array.isArray(output) ? output[0] : output;
-    });
-
-    const images = await Promise.all(imagePromises);
-
-    return NextResponse.json({ images, keywords });
-  } catch (error) {
+    return NextResponse.json({ images, keywords: imageKeywords });
+  } catch (error: unknown) {
     console.error("Error generating images:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    console.error("Error details:", errorMessage, errorStack);
+
     return NextResponse.json(
-      { error: "Failed to generate images" },
+      {
+        error: errorMessage,
+        details: errorStack || "No stack trace available",
+      },
       { status: 500 }
     );
   }
