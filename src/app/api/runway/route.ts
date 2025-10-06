@@ -34,47 +34,23 @@ export async function POST(request: NextRequest) {
           );
 
           // Prepare request with reference images if available
-          type RunwayModel =
-            | "gen4_image_turbo"
-            | "gen4_image"
-            | "gemini_2.5_flash";
-
-          interface RunwayRequestData {
-            model: RunwayModel;
-            promptText: string;
-            ratio:
-              | "1920:1080"
-              | "1080:1920"
-              | "1024:1024"
-              | "1360:768"
-              | "1080:1080"
-              | "1168:880"
-              | "1440:1080"
-              | "1080:1440"
-              | "1808:768"
-              | "2112:912"
-              | "1280:720"
-              | "720:1280"
-              | "720:720"
-              | "1536:672";
-            referenceImageUrl?: string;
-            referenceImageStrength?: number;
-          }
-
-          const requestData: RunwayRequestData = {
-            model: "gen4_image_turbo", // Faster and cheaper model
+          const requestData: any = {
+            model: "gen4_turbo", // Faster and cheaper model
             promptText: prompt,
-            ratio: "1024:1024", // Square format for polaroid style
+            ratio: "1:1", // Square format for polaroid style
           };
 
-          // Add reference images if user provided them
-          if (userImages && userImages.length > 0) {
-            // Use user images as reference for some generations
-            const useReference = (i + index) % 3 === 0; // Every 3rd image uses reference
-            if (useReference && userImages.length > 0) {
-              // Use the first image as reference
-              requestData.referenceImageUrl = userImages[0];
-            }
+          // Add reference images if user provided them and prompt mentions "person from reference"
+          const shouldUseReference = prompt.toLowerCase().includes("person from reference") ||
+                                      prompt.toLowerCase().includes("from reference photo");
+
+          if (userImages && userImages.length > 0 && shouldUseReference) {
+            // Use first image (selfie) as reference for images that should include the person
+            requestData.referenceImages = [{
+              url: userImages[0],
+              tag: "@ref0"
+            }];
+            console.log("Using reference image for this generation");
           }
 
           const imageResponse = await runway.textToImage.create(requestData);

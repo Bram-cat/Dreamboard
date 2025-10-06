@@ -121,8 +121,9 @@ export default function Home() {
     setLoading(true);
     setStep("preview");
 
-    // Use AI to analyze goals and generate smart prompts
     try {
+      // Step 1: Use DeepSeek to analyze goals and user images to create prompts
+      console.log("Step 1: Analyzing goals with DeepSeek...");
       const analyzeResponse = await fetch("/api/analyze", {
         method: "POST",
         headers: {
@@ -130,46 +131,50 @@ export default function Home() {
         },
         body: JSON.stringify({
           goals,
-          userImage: userImages[0] || null, // Pass first user image (selfie)
+          userImages, // Pass all user uploaded images
         }),
       });
 
-      if (analyzeResponse.ok) {
-        const analyzeData = await analyzeResponse.json();
-        // Skip if no prompts or images returned
-        if (analyzeData.prompts && Array.isArray(analyzeData.prompts)) {
-          console.log("Received prompts from analyze endpoint:", analyzeData.prompts.length);
-          // Note: These are prompts, not images.
-          // You would pass these to Runway AI to generate images
-          // For now, we skip this step and rely on /api/enhance
-        }
+      if (!analyzeResponse.ok) {
+        throw new Error("Failed to analyze goals");
       }
 
-      // Also generate additional contextual images
-      const enhanceResponse = await fetch("/api/enhance", {
+      const analyzeData = await analyzeResponse.json();
+      const prompts = analyzeData.prompts;
+      console.log(`Received ${prompts.length} prompts from DeepSeek`);
+
+      // Step 2: Use Runway AI to generate images from prompts
+      console.log("Step 2: Generating images with Runway AI...");
+      const runwayResponse = await fetch("/api/runway", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          goals,
-          userImageCount: userImages.length,
+          prompts,
+          userImages, // Pass user images as references for Runway AI
         }),
       });
 
-      if (enhanceResponse.ok) {
-        const enhanceData = await enhanceResponse.json();
-        const enhancedImages = enhanceData.images.map(
-          (url: string, index: number) => ({
-            url,
-            keyword: enhanceData.keywords[index] || "inspiration",
-          })
-        );
-        // Add enhanced images
-        setImages((prev) => [...prev, ...enhancedImages]);
+      if (!runwayResponse.ok) {
+        throw new Error("Failed to generate images with Runway AI");
       }
+
+      const runwayData = await runwayResponse.json();
+      console.log(`Generated ${runwayData.images.length} images with Runway AI`);
+
+      // Add generated images to the board
+      const generatedImages = runwayData.images.map((url: string, index: number) => ({
+        url,
+        keyword: prompts[index]?.split(",")[0] || "inspiration",
+      }));
+
+      setImages((prev) => [...prev, ...generatedImages]);
+
+      console.log("Vision board ready!");
     } catch (err) {
-      console.error("Failed to enhance vision board:", err);
+      console.error("Failed to generate vision board:", err);
+      setError(err instanceof Error ? err.message : "Failed to generate vision board");
     }
 
     setLoading(false);

@@ -18,7 +18,9 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("Analyzing goals with DeepSeek:", goals);
-    console.log("User images count:", userImages?.length || 0);
+    console.log("User images count:", Array.isArray(userImages) ? userImages.length : 0);
+
+    const hasUserImages = Array.isArray(userImages) && userImages.length > 0;
 
     // Create a detailed prompt for DeepSeek to generate image prompts
     const systemPrompt = `You are a vision board creator AI. Your task is to analyze user goals and create detailed, inspiring image generation prompts for Runway AI.
@@ -35,22 +37,28 @@ Guidelines:
 
     const userPrompt = `User's Goals: ${goals}
 
-Has user uploaded images: ${userImages && userImages.length > 0 ? "Yes" : "No"}
+Has user uploaded images: ${hasUserImages ? `Yes (${userImages.length} images)` : "No"}
 
-Generate 10-15 detailed image prompts that will inspire and motivate the user. Each prompt should be:
-1. Specific and detailed
-2. Photorealistic style
-3. Polaroid or sticky note aesthetic
-4. Warm, dreamy atmosphere
-5. Related to their goals
+${hasUserImages ? `The user has uploaded personal photos including:
+- Selfie/personal photo
+- Photos related to their goals (e.g., dream car, destinations)
 
-${
-  userImages && userImages.length > 0
-    ? "IMPORTANT: For 5-7 prompts, incorporate the user's selfie naturally into scenes showing them achieving their dreams (e.g., 'polaroid photo of person in luxury car, sunset, dreamy aesthetic')."
-    : ""
-}
+IMPORTANT: Create prompts that will generate NEW images incorporating these user photos:
+- For 6-8 prompts: Create scenarios showing the person achieving their dreams using their photos as reference
+  Examples: "person from reference photo driving luxury sports car, golden hour, cinematic"
+            "person from reference photo at tropical beach resort, vacation vibes, dreamy"
+- For 4-7 prompts: Create inspirational images related to their goals without the person
+  Examples: "luxury sports car on mountain road, sunset, aspirational aesthetic"
+            "motivational quote about success, modern typography, aesthetic"` : ""}
 
-Return ONLY a JSON array of strings, each string being one image prompt. Example format:
+Generate 10-15 detailed image prompts for Runway AI that will inspire and motivate the user. Each prompt should be:
+1. Specific and detailed (under 200 characters)
+2. Photorealistic, cinematic style
+3. Related to their specific goals
+4. Warm, dreamy, aspirational atmosphere
+5. If user uploaded images, incorporate them as references
+
+Return ONLY a JSON array of strings, each string being one complete image prompt. Example format:
 ["prompt 1 here", "prompt 2 here", ...]`;
 
     let prompts: string[] = [];
@@ -90,10 +98,15 @@ Return ONLY a JSON array of strings, each string being one image prompt. Example
 
       prompts = keywords.flatMap((keyword: string) => {
         const kw = keyword.toLowerCase();
-        const basePrompts = [
-          `${keyword}, vision board aesthetic, polaroid style, warm dreamy atmosphere`,
-          `achieving ${keyword}, motivational poster, professional photography, golden hour`,
-        ];
+        const basePrompts: string[] = [];
+
+        // Add prompts with user photo references if available
+        if (hasUserImages) {
+          basePrompts.push(
+            `person from reference photo achieving ${keyword}, cinematic style, golden hour lighting`,
+            `person from reference photo with ${keyword}, success moment, professional photography`
+          );
+        }
 
         // Add specific scenarios based on keyword
         if (
@@ -102,18 +115,22 @@ Return ONLY a JSON array of strings, each string being one image prompt. Example
           kw.includes("rich")
         ) {
           basePrompts.push(
-            "luxury lifestyle, expensive watch, champagne celebration, success mindset"
+            hasUserImages
+              ? "person from reference photo celebrating financial success, luxury lifestyle, champagne, cinematic"
+              : "luxury lifestyle success, expensive watch, champagne celebration, wealth aesthetic"
           );
           basePrompts.push(
-            "stack of money, financial freedom, abundance, prosperity aesthetic"
+            "stack of money and luxury items, financial freedom, abundance, prosperity aesthetic"
           );
         }
         if (kw.includes("car") || kw.includes("vehicle")) {
           basePrompts.push(
-            "luxury sports car, dream car goals, exotic automobile, high-end vehicle"
+            hasUserImages
+              ? "person from reference photo with luxury sports car, dream car achieved, golden hour"
+              : "luxury sports car on scenic road, dream car goals, exotic automobile"
           );
           basePrompts.push(
-            "person with luxury car, car ownership dream, automotive success"
+            "exotic luxury car interior and exterior, high-end automotive, dream vehicle"
           );
         }
         if (
@@ -122,10 +139,20 @@ Return ONLY a JSON array of strings, each string being one image prompt. Example
           kw.includes("destination")
         ) {
           basePrompts.push(
-            "exotic beach paradise, travel goals, tropical destination, wanderlust"
+            hasUserImages
+              ? "person from reference photo at tropical beach paradise, vacation goals, dreamy"
+              : "exotic beach paradise, turquoise water, travel goals, tropical destination"
           );
           basePrompts.push(
-            "mountain adventure, world traveler, passport stamps, adventure lifestyle"
+            "mountain adventure landscape, world traveler vibes, wanderlust aesthetic"
+          );
+        }
+
+        // Add generic goal-related prompts if not enough yet
+        if (basePrompts.length < 3) {
+          basePrompts.push(
+            `${keyword} achievement visualization, warm tones, professional photography`,
+            `${keyword} success, dreamy aesthetic, aspirational, cinematic lighting`
           );
         }
 
