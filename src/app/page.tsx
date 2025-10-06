@@ -136,14 +136,13 @@ export default function Home() {
 
       if (analyzeResponse.ok) {
         const analyzeData = await analyzeResponse.json();
-        const aiGeneratedImages = analyzeData.images.map(
-          (url: string, index: number) => ({
-            url,
-            keyword: analyzeData.prompts[index]?.split(',')[0] || "inspiration",
-          })
-        );
-        // Add AI-generated images
-        setImages((prev) => [...prev, ...aiGeneratedImages]);
+        // Skip if no prompts or images returned
+        if (analyzeData.prompts && Array.isArray(analyzeData.prompts)) {
+          console.log("Received prompts from analyze endpoint:", analyzeData.prompts.length);
+          // Note: These are prompts, not images.
+          // You would pass these to Runway AI to generate images
+          // For now, we skip this step and rely on /api/enhance
+        }
       }
 
       // Also generate additional contextual images
