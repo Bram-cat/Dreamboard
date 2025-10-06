@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import html2canvas from "html2canvas";
 
 interface GeneratedImage {
   url: string;
@@ -40,7 +39,6 @@ export default function Home() {
   const [step, setStep] = useState<"input" | "upload" | "preview">("input");
   const [uploadCategories, setUploadCategories] = useState<string[]>([]);
   const [collageReady, setCollageReady] = useState(false);
-  const boardRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -179,13 +177,6 @@ export default function Home() {
 
     setLoading(false);
   };
-
-  // Create collage when user proceeds to preview
-  useEffect(() => {
-    if (step === "preview" && !collageReady) {
-      createCollage();
-    }
-  }, [step]);
 
   const createCollage = async () => {
     const canvas = canvasRef.current;
@@ -331,6 +322,13 @@ export default function Home() {
 
     setCollageReady(true);
   };
+
+  // Create collage when user proceeds to preview
+  useEffect(() => {
+    if (step === "preview" && !collageReady && images.length > 0) {
+      createCollage();
+    }
+  }, [step, collageReady, images, userImages]);
 
   const handleDownload = async () => {
     const canvas = canvasRef.current;

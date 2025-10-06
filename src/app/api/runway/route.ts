@@ -34,23 +34,26 @@ export async function POST(request: NextRequest) {
           );
 
           // Prepare request with reference images if available
-          const requestData: any = {
-            model: "gen4_turbo", // Faster and cheaper model
-            promptText: prompt,
-            ratio: "1:1", // Square format for polaroid style
-          };
-
-          // Add reference images if user provided them and prompt mentions "person from reference"
+          // Check if prompt needs user reference image
           const shouldUseReference = prompt.toLowerCase().includes("person from reference") ||
                                       prompt.toLowerCase().includes("from reference photo");
 
-          if (userImages && userImages.length > 0 && shouldUseReference) {
-            // Use first image (selfie) as reference for images that should include the person
-            requestData.referenceImages = [{
-              url: userImages[0],
-              tag: "@ref0"
-            }];
-            console.log("Using reference image for this generation");
+          const hasReferenceImages = userImages && userImages.length > 0 && shouldUseReference;
+
+          const requestData = {
+            model: "gen4_image_turbo" as const,
+            promptText: prompt,
+            ratio: "1024:1024" as const,
+            ...(hasReferenceImages && {
+              referenceImages: [{
+                url: userImages[0],
+                tag: "@ref0"
+              }]
+            })
+          };
+
+          if (hasReferenceImages) {
+            console.log("Using reference image for personalized generation");
           }
 
           const imageResponse = await runway.textToImage.create(requestData);
