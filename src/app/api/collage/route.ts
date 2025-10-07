@@ -5,7 +5,7 @@ import OpenAI from "openai";
 export async function POST(request: NextRequest) {
   // Initialize clients (lazy load to avoid build-time errors)
   const runway = new RunwayML({
-    apiKey: process.env.RUNWAYML_API_KEY || "",
+    apiKey: process.env.RUNWAYML_API_SECRET || "",
   });
 
   const deepseek = new OpenAI({

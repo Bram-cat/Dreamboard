@@ -4,7 +4,7 @@ import RunwayML from "@runwayml/sdk";
 export async function POST(request: NextRequest) {
   // Initialize Runway client (lazy load to avoid build-time errors)
   const runway = new RunwayML({
-    apiKey: process.env.RUNWAYML_API_KEY || "",
+    apiKey: process.env.RUNWAYML_API_SECRET || "",
   });
   try {
     const { prompts, userImages } = await request.json();
@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
             ratio: "1024:1024" as const,
             ...(hasReferenceImages && {
               referenceImages: [{
-                url: userImages[0],
-                tag: "@ref0"
+                uri: userImages[0], // Use 'uri' not 'url'
+                tag: "ref0" // Tag without @ symbol
               }]
             })
           };
