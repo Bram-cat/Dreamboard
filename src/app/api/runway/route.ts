@@ -48,7 +48,16 @@ export async function POST(request: NextRequest) {
         console.log("Using user selfie as reference with tag @userPhoto");
       }
 
+      console.log("Sending request to Runway API...");
+      console.log("Request config:", {
+        model: requestData.model,
+        promptLength: requestData.promptText.length,
+        ratio: requestData.ratio,
+        hasReference: hasReferenceImages
+      });
+
       const imageResponse = await runway.textToImage.create(requestData);
+      console.log("Runway API accepted request, task ID:", imageResponse.id);
 
       // Wait for the task to complete
       const taskId = imageResponse.id;

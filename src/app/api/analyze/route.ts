@@ -46,35 +46,15 @@ YOUR TASK:
 Create ONE comprehensive prompt describing a complete vision board collage that includes all relevant elements based on user's goals.`;
 
     const userPrompt = `User's Goals: ${goals}
-${hasUserImages ? `\nUser uploaded a selfie - include @userPhoto in some scenarios` : ""}
+${hasUserImages ? `\nUser uploaded a selfie - include @userPhoto in 2-3 scenarios` : ""}
 
-Create ONE detailed prompt for generating a COMPLETE vision board collage image. The prompt should describe:
+Create ONE concise prompt (under 400 characters) for Runway AI to generate a complete vision board collage.
 
-COLLAGE LAYOUT:
-- 10-15 small images arranged in a scattered, overlapping Pinterest-style collage
-- Some images in polaroid frames, some with torn edges, varied sizes
-- Beige/cream/warm background color
-- Title text "MY VISION BOARD" or "Make it Happen" or similar
+The prompt must describe: A Pinterest-style collage with 12-15 small polaroid-framed photos scattered on warm beige background, including: modern dream house, Paris/tropical beach travel, woman doing yoga/meditation, healthy food (acai bowl, coffee), nature sunset, minimalist interior, gold coins/money${hasUserImages ? `, @userPhoto doing yoga, @userPhoto at beach, @userPhoto working out` : `, woman achieving goals`}, text labels "Traveling", "Meditation", "I Love What I Do". Additional elements from goals: ${goals.split(',').slice(0, 3).join(', ')}.
 
-INCLUDE THESE ELEMENTS IN THE COLLAGE:
-1. Dream house - modern luxury home exterior with clean architecture
-2. Travel - Paris/Eiffel Tower, tropical beach, or mountains based on goals
-3. Wellness - yoga pose, meditation, spa/self-care scene
-4. Food - healthy acai bowl, coffee latte art, aesthetic breakfast
-5. Nature - garden path, sunset, peaceful landscape
-6. Money/wealth - stack of cash, gold coins (if financial goals mentioned)
-7. Luxury lifestyle - modern minimalist interior design
-${hasUserImages ? `8. Person scenes - @userPhoto doing yoga, @userPhoto at beach celebrating, @userPhoto working out (2-3 images)` : "8. Inspirational woman achieving goals (2-3 images)"}
-9. Motivational text - "Meditation", "Traveling", "I Love What I Do", "Dream big, work hard"
-10. Additional elements based on specific goals: ${goals}
+Style: warm tones, film photography, feminine aesthetic.
 
-STYLE:
-- Warm tones, film photography aesthetic, natural lighting
-- Feminine, aspirational, peaceful vibes
-- Magazine/Pinterest collage aesthetic
-- Mix of close-ups and wide shots
-
-Return ONE detailed prompt (under 500 characters) describing this complete collage as a single image.`;
+Return ONLY the prompt text, nothing else. Keep it under 400 characters.`;
 
     let prompts: string[] = [];
 
@@ -142,19 +122,26 @@ Return ONE detailed prompt (under 500 characters) describing this complete colla
       // Add motivational text
       elements.push("text labels: 'Meditation', 'Traveling', 'I Love What I Do', 'Dream big work hard'");
 
-      const collagePrompt = `Vision board collage with 12-15 small photos in polaroid frames, scattered overlapping layout on beige background. Title "MY VISION BOARD" at top. Contains: ${elements.join(", ")}. Warm tones, film photography aesthetic, feminine Pinterest style, natural lighting.`;
+      // Keep it concise - under 400 characters
+      const elementList = elements.slice(0, 8).join(", ");
+      const collagePrompt = `Vision board collage: 12 polaroid photos scattered on beige background. ${elementList}. Text "MY VISION BOARD". Warm tones, film aesthetic.`;
 
       prompts = [collagePrompt];
     }
 
     // Should only have ONE prompt now (the complete collage)
     if (prompts.length === 0 || !prompts[0] || prompts[0].length < 50) {
-      // Ultimate fallback: generic vision board collage
-      prompts = [`Vision board collage with 12 small photos in polaroid frames on beige background. Title "MY VISION BOARD". Contains: luxury dream house, Paris Eiffel Tower, tropical beach, woman doing yoga, meditation scene, healthy acai bowl, coffee latte, garden path, sunset, gold coins money stack, minimalist interior, motivational text "Traveling", "I Love What I Do", "Dream big work hard". Warm tones, film photography, Pinterest aesthetic.`];
+      // Ultimate fallback: simple generic collage
+      prompts = [`Vision board collage: 12 polaroid photos on beige background. Dream house, Paris, beach, yoga, meditation, acai bowl, coffee, nature, gold coins, interior, text "Traveling", "Meditation". Warm tones, Pinterest style.`];
     }
 
-    // Ensure only ONE prompt
-    prompts = [prompts[0]];
+    // Ensure only ONE prompt and it's not too long
+    let finalPrompt = prompts[0];
+    if (finalPrompt.length > 500) {
+      // Truncate if too long
+      finalPrompt = finalPrompt.substring(0, 497) + "...";
+    }
+    prompts = [finalPrompt];
 
     console.log(`Generated ${prompts.length} prompts for Runway AI`);
 
