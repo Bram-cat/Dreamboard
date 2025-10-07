@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
           }
 
           const requestData = {
-            model: "gen4_image_turbo" as const,
+            model: "gen4_image" as const,
             promptText: finalPrompt,
             ratio: "1024:1024" as const,
             ...(hasReferenceImages && {
@@ -94,14 +94,12 @@ export async function POST(request: NextRequest) {
             throw new Error("Task did not complete in time");
           }
         } catch (error: unknown) {
+          console.error(`Error generating image ${i + index + 1}:`, error);
           const errorMessage =
             error instanceof Error
               ? error.message
-              : "An unknown error occurred";
-          console.error(
-            `Error generating image ${i + index + 1}:`,
-            errorMessage
-          );
+              : JSON.stringify(error);
+          console.error("Full error details:", errorMessage);
           errors.push(`Prompt ${i + index + 1}: ${errorMessage}`);
         }
       });
