@@ -33,22 +33,12 @@ export async function POST(request: NextRequest) {
             }: ${prompt.substring(0, 50)}...`
           );
 
-          // Prepare request with reference images if available
-          // Check if prompt needs user reference image
-          const shouldUseReference = prompt.toLowerCase().includes("person from reference") ||
-                                      prompt.toLowerCase().includes("from reference photo");
-
+          // Check if prompt needs user reference image (uses @userPhoto tag)
+          const shouldUseReference = prompt.includes("@userPhoto");
           const hasReferenceImages = userImages && userImages.length > 0 && shouldUseReference;
 
-          // If using reference images, update the prompt to include the tag
-          let finalPrompt = prompt;
-          if (hasReferenceImages) {
-            // Replace "person from reference photo" with "@userPhoto" tag reference
-            finalPrompt = prompt
-              .replace(/person from reference photo/gi, "@userPhoto")
-              .replace(/person from reference/gi, "@userPhoto")
-              .replace(/from reference photo/gi, "@userPhoto");
-          }
+          // Prompt already has @userPhoto tag from analyze endpoint
+          const finalPrompt = prompt;
 
           const requestData = {
             model: "gen4_image_turbo",

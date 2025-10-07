@@ -24,44 +24,64 @@ export async function POST(request: NextRequest) {
     const hasUserImages = Array.isArray(userImages) && userImages.length > 0;
 
     // Create a detailed prompt for DeepSeek to generate image prompts
-    const systemPrompt = `You are a vision board creator AI. Your task is to analyze user goals and create detailed, inspiring image generation prompts for Runway AI.
+    const systemPrompt = `You are a vision board creator AI. Your task is to analyze user goals and create detailed, inspiring image generation prompts for Runway AI to create a collage-style vision board.
 
-Guidelines:
-- Generate 10-15 unique, specific image prompts
-- Each prompt should be photorealistic, inspirational, and visually appealing
-- Include user's selfie/photo naturally in scenarios where they're living their dream life
-- Create prompts for: lifestyle goals, success moments, dream possessions, motivational scenes
-- Style: polaroid aesthetic, warm tones, professional photography, dreamy atmosphere
-- Make prompts diverse: some with people achieving goals, some with dream items, some with inspirational quotes overlaid
-- If user mentions specific goals (car, travel, fitness), include those prominently
-- Keep each prompt under 200 characters for optimal generation`;
+IMPORTANT STYLE REQUIREMENTS:
+- Generate 5-10 unique, specific image prompts (NOT 15, quality over quantity)
+- Each image should look like a polaroid/photo from a magazine - natural, candid, lifestyle photography
+- Warm tones, natural lighting, soft focus, film photography aesthetic
+- Mix of: person in scenarios (50%), lifestyle objects/places (30%), text overlays (20%)
+
+PROMPT CATEGORIES TO INCLUDE:
+1. Person-focused (use "@userPhoto" tag):
+   - Yoga/meditation poses in beautiful settings
+   - Working out / fitness activities
+   - At dream travel destinations (beach, mountains, hot air balloons)
+   - Celebrating success (arms raised, joyful moments)
+   - Doing activities related to their goals
+
+2. Lifestyle imagery (NO person):
+   - Healthy foods (acai bowls, smoothies, coffee, pastries)
+   - Luxury items (if mentioned: cars, homes, watches)
+   - Nature scenes (mountains, beaches, forests, sunsets)
+   - Wellness items (journals, books, candles, plants)
+
+3. Motivational text overlays:
+   - Affirmations related to their goals
+   - Example: "I am capable", "Money flows to me effortlessly", "Grateful, glowing, & growing"
+
+Keep each prompt under 150 characters for optimal generation.`;
 
     const userPrompt = `User's Goals: ${goals}
 
-Has user uploaded images: ${hasUserImages ? `Yes (${userImages.length} images)` : "No"}
+${hasUserImages && imageContext ? `User uploaded a selfie - Use "@userPhoto" in prompts where you want to show the person achieving their goals.` : ""}
 
-${hasUserImages && imageContext ? `What's in the uploaded images:
-${imageContext}
+Generate 5-10 prompts based on their goals. Mix these types:
 
-IMPORTANT: Create prompts that will generate NEW images incorporating these specific user photos:
-- For prompts featuring the person: Use "person from reference photo" and place them in scenarios matching their goals
-  ${imageContext.toLowerCase().includes("selfie") ? 'Example: "person from reference photo driving luxury sports car, golden hour, cinematic"' : ''}
-- For prompts featuring their belongings: Use the actual items they uploaded
-  ${imageContext.toLowerCase().includes("car") ? 'Example: "upgraded version of user\'s car, luxury modification, professional photography"' : ''}
-  ${imageContext.toLowerCase().includes("destination") ? 'Example: "person at their dream travel destination similar to reference, wanderlust aesthetic"' : ''}
-- For aspirational prompts: Create inspirational images related to their specific goals
-  Examples: "motivational quote about ${goals.split(',')[0]}, modern typography, aesthetic"` : hasUserImages ? `The user has uploaded personal photos.
-Create prompts showing them achieving their dreams using reference photos.` : ""}
+TYPE 1 - Person in lifestyle scenarios (3-5 prompts):
+${hasUserImages ? `- "@userPhoto doing yoga at sunrise, peaceful meditation, warm light, film photography"
+- "@userPhoto celebrating at beach, arms raised in joy, sunset, candid moment"
+- "@userPhoto working out, fitness journey, gym aesthetic, natural lighting"
+- Add more based on their specific goals (travel, wealth, fitness, etc.)` : `- Skip person-focused prompts if no selfie uploaded`}
 
-Generate 10-15 detailed image prompts for Runway AI that will inspire and motivate the user. Each prompt should be:
-1. Specific and detailed (under 200 characters)
-2. Photorealistic, cinematic style
-3. Related to their specific goals
-4. Warm, dreamy, aspirational atmosphere
-5. If user uploaded images, incorporate them as references
+TYPE 2 - Lifestyle objects/scenes (2-3 prompts):
+- "Healthy acai bowl with berries, aesthetic food photography, warm tones"
+- "Luxury modern home exterior, dream house, architectural photography"
+- "Stack of cash and gold coins, wealth abundance, overhead shot"
+- "Tropical beach paradise, turquoise water, travel goals, aerial view"
+- Choose based on their goals
 
-Return ONLY a JSON array of strings, each string being one complete image prompt. Example format:
-["prompt 1 here", "prompt 2 here", ...]`;
+TYPE 3 - Text overlays (1-2 prompts):
+- "Affirmation text overlay: 'I am capable', handwritten font, cream background"
+- "Motivational quote: '${goals.split(',')[0]}', elegant typography, minimalist"
+
+RULES:
+- Keep prompts under 150 characters
+- Use "@userPhoto" ONLY if user uploaded a selfie
+- Make it natural, candid, lifestyle photography style
+- Warm tones, film aesthetic, soft lighting
+
+Return ONLY a JSON array of strings: ["prompt 1", "prompt 2", ...]`;
 
     let prompts: string[] = [];
 
@@ -98,93 +118,92 @@ Return ONLY a JSON array of strings, each string being one complete image prompt
         .map((g: string) => g.trim())
         .filter(Boolean);
 
-      prompts = keywords.flatMap((keyword: string) => {
-        const kw = keyword.toLowerCase();
-        const basePrompts: string[] = [];
+      // Fallback: Create lifestyle prompts matching sample aesthetic
+      const personPrompts: string[] = [];
+      const lifestylePrompts: string[] = [];
+      const textPrompts: string[] = [];
 
-        // Add prompts with user photo references if available
-        if (hasUserImages) {
-          basePrompts.push(
-            `person from reference photo achieving ${keyword}, cinematic style, golden hour lighting`,
-            `person from reference photo with ${keyword}, success moment, professional photography`
+      // Person-focused prompts (if selfie uploaded)
+      if (hasUserImages) {
+        personPrompts.push(
+          "@userPhoto doing yoga at sunrise, peaceful meditation, warm natural light, film photography",
+          "@userPhoto at beach celebrating, arms raised in joy, sunset, candid lifestyle moment",
+          "@userPhoto working out, fitness journey, gym aesthetic, natural lighting, healthy lifestyle"
+        );
+
+        keywords.forEach((keyword: string) => {
+          const kw = keyword.toLowerCase();
+          if (kw.includes("travel") || kw.includes("vacation")) {
+            personPrompts.push("@userPhoto at tropical destination, travel goals, wanderlust, natural candid shot");
+          }
+          if (kw.includes("money") || kw.includes("wealth") || kw.includes("rich")) {
+            personPrompts.push("@userPhoto celebrating success, luxury lifestyle, champagne toast, golden hour");
+          }
+          if (kw.includes("fitness") || kw.includes("health") || kw.includes("yoga")) {
+            personPrompts.push("@userPhoto meditating in nature, wellness journey, peaceful zen moment, soft focus");
+          }
+        });
+      }
+
+      // Lifestyle object/scene prompts (NO person)
+      keywords.forEach((keyword: string) => {
+        const kw = keyword.toLowerCase();
+
+        if (kw.includes("money") || kw.includes("wealth") || kw.includes("rich")) {
+          lifestylePrompts.push(
+            "stack of cash and gold coins, wealth abundance, overhead flat lay, warm tones",
+            "luxury modern home exterior, dream house, architectural photography, natural daylight"
           );
         }
-
-        // Add specific scenarios based on keyword
-        if (
-          kw.includes("money") ||
-          kw.includes("wealth") ||
-          kw.includes("rich")
-        ) {
-          basePrompts.push(
-            hasUserImages
-              ? "person from reference photo celebrating financial success, luxury lifestyle, champagne, cinematic"
-              : "luxury lifestyle success, expensive watch, champagne celebration, wealth aesthetic"
+        if (kw.includes("travel") || kw.includes("vacation")) {
+          lifestylePrompts.push(
+            "tropical beach paradise, turquoise water, aerial view, travel goals aesthetic",
+            "airplane window view, clouds and sky, wanderlust vibes, soft natural light"
           );
-          basePrompts.push(
-            "stack of money and luxury items, financial freedom, abundance, prosperity aesthetic"
+        }
+        if (kw.includes("health") || kw.includes("fitness") || kw.includes("food")) {
+          lifestylePrompts.push(
+            "acai bowl with fresh berries, aesthetic food photography, bright natural light, overhead",
+            "morning coffee latte art, cozy breakfast scene, warm tones, lifestyle flat lay"
           );
         }
         if (kw.includes("car") || kw.includes("vehicle")) {
-          basePrompts.push(
-            hasUserImages
-              ? "person from reference photo with luxury sports car, dream car achieved, golden hour"
-              : "luxury sports car on scenic road, dream car goals, exotic automobile"
-          );
-          basePrompts.push(
-            "exotic luxury car interior and exterior, high-end automotive, dream vehicle"
-          );
+          lifestylePrompts.push("luxury sports car on scenic road, dream car goals, golden hour, cinematic");
         }
-        if (
-          kw.includes("travel") ||
-          kw.includes("vacation") ||
-          kw.includes("destination")
-        ) {
-          basePrompts.push(
-            hasUserImages
-              ? "person from reference photo at tropical beach paradise, vacation goals, dreamy"
-              : "exotic beach paradise, turquoise water, travel goals, tropical destination"
-          );
-          basePrompts.push(
-            "mountain adventure landscape, world traveler vibes, wanderlust aesthetic"
-          );
-        }
-
-        // Add generic goal-related prompts if not enough yet
-        if (basePrompts.length < 3) {
-          basePrompts.push(
-            `${keyword} achievement visualization, warm tones, professional photography`,
-            `${keyword} success, dreamy aesthetic, aspirational, cinematic lighting`
-          );
-        }
-
-        return basePrompts;
       });
 
-      // Add general motivational prompts
-      const generalPrompts = [
-        "success and achievement, winning mindset, inspirational quote overlay",
-        "dream life manifestation, vision board collage, multiple goals aesthetic",
-        "happiness and fulfillment, positive mindset, gratitude practice",
-        "luxury lifestyle montage, abundance, prosperity vision",
-        "fitness and health goals, wellness journey, transformation",
-      ];
+      // Always add some general lifestyle prompts
+      lifestylePrompts.push(
+        "journal and coffee on desk, morning routine, cozy aesthetic, natural window light",
+        "mountain landscape sunset, nature goals, peaceful vibes, warm golden tones"
+      );
 
-      prompts = [...prompts, ...generalPrompts];
+      // Text overlay prompts
+      textPrompts.push(
+        `Affirmation text overlay: 'I am capable', handwritten elegant font, cream background, minimalist`,
+        `Motivational quote: 'Money flows to me effortlessly', modern typography, aesthetic design`
+      );
+
+      // Combine prompts: 50% person, 30% lifestyle, 20% text
+      prompts = [
+        ...personPrompts.slice(0, 4),
+        ...lifestylePrompts.slice(0, 3),
+        ...textPrompts.slice(0, 1)
+      ];
     }
 
-    // Ensure we have 10-15 prompts
-    if (prompts.length < 10) {
+    // Ensure we have 5-10 prompts (matching sample quality)
+    if (prompts.length < 5) {
       const genericPrompts = [
-        "success and achievement, polaroid aesthetic, inspirational",
-        "dream life manifestation, warm tones, professional photography",
-        "luxury lifestyle, dreamy atmosphere, golden hour",
-        "fitness and health goals, motivational aesthetic",
-        "happiness and fulfillment, polaroid style, soft lighting",
+        "healthy acai bowl with berries, aesthetic food photography, warm natural light, overhead",
+        "tropical beach sunset, travel goals, wanderlust aesthetic, warm tones, paradise",
+        "Affirmation text: 'Grateful, glowing, & growing', elegant handwritten font, minimalist",
+        "mountain landscape at golden hour, nature peace, serene vibes, film photography",
+        "cozy coffee and journal, morning routine, lifestyle flat lay, warm aesthetic",
       ];
-      prompts = [...prompts, ...genericPrompts].slice(0, 12);
-    } else if (prompts.length > 15) {
-      prompts = prompts.slice(0, 15);
+      prompts = [...prompts, ...genericPrompts].slice(0, 8);
+    } else if (prompts.length > 10) {
+      prompts = prompts.slice(0, 10);
     }
 
     console.log(`Generated ${prompts.length} prompts for Runway AI`);
