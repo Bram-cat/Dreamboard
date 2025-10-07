@@ -48,45 +48,12 @@ export default function Home() {
       return;
     }
 
-    setLoading(true);
-    setError("");
-    setImages([]);
+    // Generate smart upload categories based on keywords
+    const categories = generateUploadCategories(goals);
+    setUploadCategories(categories);
 
-    try {
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ goals }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to generate images");
-      }
-
-      const data = await response.json();
-      const generatedImages = data.images.map(
-        (url: string, index: number) => ({
-          url,
-          keyword: data.keywords[index],
-        })
-      );
-
-      setImages(generatedImages);
-
-      // Generate smart upload categories based on keywords
-      const categories = generateUploadCategories(goals);
-      setUploadCategories(categories);
-
-      setStep("upload"); // Move to upload step
-      setCollageReady(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    setStep("upload"); // Move to upload step
+    setCollageReady(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,6 +87,34 @@ export default function Home() {
     setStep("preview");
 
     try {
+      // Step 0: Recognize what's in the uploaded images
+      let imageContext = "";
+      if (userImages.length > 0) {
+        console.log("Step 0: Recognizing uploaded images...");
+        try {
+          const recognizeResponse = await fetch("/api/recognize", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ images: userImages }),
+          });
+
+          if (recognizeResponse.ok) {
+            const recognizeData = await recognizeResponse.json();
+            const descriptions = recognizeData.recognitions
+              .map((r: { type: string; description: string }, idx: number) =>
+                `Image ${idx + 1}: ${r.type} - ${r.description}`
+              )
+              .join("; ");
+            imageContext = descriptions;
+            console.log("Image recognition:", descriptions);
+          }
+        } catch (error) {
+          console.error("Image recognition failed, continuing anyway:", error);
+        }
+      }
+
       // Step 1: Use DeepSeek to analyze goals and user images to create prompts
       console.log("Step 1: Analyzing goals with DeepSeek...");
       const analyzeResponse = await fetch("/api/analyze", {
@@ -130,6 +125,7 @@ export default function Home() {
         body: JSON.stringify({
           goals,
           userImages, // Pass all user uploaded images
+          imageContext, // Pass what we learned about the images
         }),
       });
 

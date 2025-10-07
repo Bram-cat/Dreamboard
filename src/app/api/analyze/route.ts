@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     baseURL: "https://api.deepseek.com/v1",
   });
   try {
-    const { goals, userImages } = await request.json();
+    const { goals, userImages, imageContext } = await request.json();
 
     if (!goals || typeof goals !== "string") {
       return NextResponse.json(
@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
 
     console.log("Analyzing goals with DeepSeek:", goals);
     console.log("User images count:", Array.isArray(userImages) ? userImages.length : 0);
+    console.log("Image context:", imageContext || "None");
 
     const hasUserImages = Array.isArray(userImages) && userImages.length > 0;
 
@@ -39,17 +40,18 @@ Guidelines:
 
 Has user uploaded images: ${hasUserImages ? `Yes (${userImages.length} images)` : "No"}
 
-${hasUserImages ? `The user has uploaded personal photos including:
-- Selfie/personal photo
-- Photos related to their goals (e.g., dream car, destinations)
+${hasUserImages && imageContext ? `What's in the uploaded images:
+${imageContext}
 
-IMPORTANT: Create prompts that will generate NEW images incorporating these user photos:
-- For 6-8 prompts: Create scenarios showing the person achieving their dreams using their photos as reference
-  Examples: "person from reference photo driving luxury sports car, golden hour, cinematic"
-            "person from reference photo at tropical beach resort, vacation vibes, dreamy"
-- For 4-7 prompts: Create inspirational images related to their goals without the person
-  Examples: "luxury sports car on mountain road, sunset, aspirational aesthetic"
-            "motivational quote about success, modern typography, aesthetic"` : ""}
+IMPORTANT: Create prompts that will generate NEW images incorporating these specific user photos:
+- For prompts featuring the person: Use "person from reference photo" and place them in scenarios matching their goals
+  ${imageContext.toLowerCase().includes("selfie") ? 'Example: "person from reference photo driving luxury sports car, golden hour, cinematic"' : ''}
+- For prompts featuring their belongings: Use the actual items they uploaded
+  ${imageContext.toLowerCase().includes("car") ? 'Example: "upgraded version of user\'s car, luxury modification, professional photography"' : ''}
+  ${imageContext.toLowerCase().includes("destination") ? 'Example: "person at their dream travel destination similar to reference, wanderlust aesthetic"' : ''}
+- For aspirational prompts: Create inspirational images related to their specific goals
+  Examples: "motivational quote about ${goals.split(',')[0]}, modern typography, aesthetic"` : hasUserImages ? `The user has uploaded personal photos.
+Create prompts showing them achieving their dreams using reference photos.` : ""}
 
 Generate 10-15 detailed image prompts for Runway AI that will inspire and motivate the user. Each prompt should be:
 1. Specific and detailed (under 200 characters)
