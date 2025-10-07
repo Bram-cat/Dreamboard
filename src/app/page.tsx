@@ -335,7 +335,7 @@ export default function Home() {
       link.download = "my-vision-board.png";
       link.href = canvas.toDataURL("image/png");
       link.click();
-    } catch (err) {
+    } catch {
       setError("Failed to download board");
     }
   };

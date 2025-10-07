@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
               .replace(/from reference photo/gi, "@userPhoto");
           }
 
-          const requestData: any = {
+          const requestData = {
             model: "gen4_image_turbo",
             promptText: finalPrompt,
             ratio: "1024:1024",
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
                 tag: "userPhoto" // Tag referenced as @userPhoto in prompt
               }]
             })
-          };
+          } as const;
 
           if (hasReferenceImages) {
             console.log("Using reference image with tag @userPhoto");
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
 
           // Check if it's an API error with response data
           if (error && typeof error === 'object' && 'response' in error) {
-            const apiError = error as any;
+            const apiError = error as { response?: { data?: unknown } };
             console.error("API Response:", JSON.stringify(apiError.response));
             if (apiError.response?.data) {
               errorMessage = JSON.stringify(apiError.response.data);
