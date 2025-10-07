@@ -64,16 +64,9 @@ export async function POST(request: NextRequest) {
 
           if (hasReferenceImages) {
             console.log("Using reference image with tag @userPhoto");
-            console.log("Modified prompt:", finalPrompt.substring(0, 100));
           }
 
-          console.log("Runway API request:", JSON.stringify({
-            ...requestData,
-            ...(hasReferenceImages && { referenceImages: [{ uri: "[DATA_URI]", tag: "userPhoto" }] })
-          }));
-
           const imageResponse = await runway.textToImage.create(requestData);
-          console.log("Runway API response:", JSON.stringify(imageResponse));
 
           // Wait for the task to complete
           const taskId = imageResponse.id;
@@ -102,20 +95,13 @@ export async function POST(request: NextRequest) {
         } catch (error: unknown) {
           console.error(`Error generating image ${i + index + 1}:`, error);
 
-          // Try to extract API error details
           let errorMessage = "Unknown error";
           if (error instanceof Error) {
             errorMessage = error.message;
-            console.error("Error message:", error.message);
-            console.error("Error stack:", error.stack);
-          }
-
-          // Check if it's an API error with response data
-          if (error && typeof error === 'object' && 'response' in error) {
-            const apiError = error as { response?: { data?: unknown } };
-            console.error("API Response:", JSON.stringify(apiError.response));
-            if (apiError.response?.data) {
-              errorMessage = JSON.stringify(apiError.response.data);
+          } else if (error && typeof error === 'object' && 'response' in error) {
+            const apiError = error as { response?: { data?: { error?: string } } };
+            if (apiError.response?.data?.error) {
+              errorMessage = apiError.response.data.error;
             }
           }
 
