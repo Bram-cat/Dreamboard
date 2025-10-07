@@ -40,20 +40,31 @@ export async function POST(request: NextRequest) {
 
           const hasReferenceImages = userImages && userImages.length > 0 && shouldUseReference;
 
+          // If using reference images, update the prompt to include the tag
+          let finalPrompt = prompt;
+          if (hasReferenceImages) {
+            // Replace "person from reference photo" with "@userPhoto" tag reference
+            finalPrompt = prompt
+              .replace(/person from reference photo/gi, "@userPhoto")
+              .replace(/person from reference/gi, "@userPhoto")
+              .replace(/from reference photo/gi, "@userPhoto");
+          }
+
           const requestData = {
             model: "gen4_image_turbo" as const,
-            promptText: prompt,
+            promptText: finalPrompt,
             ratio: "1024:1024" as const,
             ...(hasReferenceImages && {
               referenceImages: [{
-                uri: userImages[0], // Use 'uri' not 'url'
-                tag: "ref0" // Tag without @ symbol
+                uri: userImages[0], // Data URI from user upload
+                tag: "userPhoto" // Tag referenced as @userPhoto in prompt
               }]
             })
           };
 
           if (hasReferenceImages) {
-            console.log("Using reference image for personalized generation");
+            console.log("Using reference image with tag @userPhoto");
+            console.log("Modified prompt:", finalPrompt.substring(0, 100));
           }
 
           const imageResponse = await runway.textToImage.create(requestData);
