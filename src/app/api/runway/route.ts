@@ -50,10 +50,10 @@ export async function POST(request: NextRequest) {
               .replace(/from reference photo/gi, "@userPhoto");
           }
 
-          const requestData = {
-            model: "gen4_image" as const,
+          const requestData: any = {
+            model: "gen4_image_turbo",
             promptText: finalPrompt,
-            ratio: "1024:1024" as const,
+            ratio: "1024:1024",
             ...(hasReferenceImages && {
               referenceImages: [{
                 uri: userImages[0], // Data URI from user upload
@@ -67,7 +67,13 @@ export async function POST(request: NextRequest) {
             console.log("Modified prompt:", finalPrompt.substring(0, 100));
           }
 
+          console.log("Runway API request:", JSON.stringify({
+            ...requestData,
+            ...(hasReferenceImages && { referenceImages: [{ uri: "[DATA_URI]", tag: "userPhoto" }] })
+          }));
+
           const imageResponse = await runway.textToImage.create(requestData);
+          console.log("Runway API response:", JSON.stringify(imageResponse));
 
           // Wait for the task to complete
           const taskId = imageResponse.id;
@@ -95,11 +101,24 @@ export async function POST(request: NextRequest) {
           }
         } catch (error: unknown) {
           console.error(`Error generating image ${i + index + 1}:`, error);
-          const errorMessage =
-            error instanceof Error
-              ? error.message
-              : JSON.stringify(error);
-          console.error("Full error details:", errorMessage);
+
+          // Try to extract API error details
+          let errorMessage = "Unknown error";
+          if (error instanceof Error) {
+            errorMessage = error.message;
+            console.error("Error message:", error.message);
+            console.error("Error stack:", error.stack);
+          }
+
+          // Check if it's an API error with response data
+          if (error && typeof error === 'object' && 'response' in error) {
+            const apiError = error as any;
+            console.error("API Response:", JSON.stringify(apiError.response));
+            if (apiError.response?.data) {
+              errorMessage = JSON.stringify(apiError.response.data);
+            }
+          }
+
           errors.push(`Prompt ${i + index + 1}: ${errorMessage}`);
         }
       });
