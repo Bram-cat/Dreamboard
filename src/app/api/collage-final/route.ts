@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
     // Create a prompt for the final collage composition
     const collagePrompt = `Vision board collage in magazine cutout style: overlapping photos arranged densely on dark background. Include motivational text labels like "VISION BOARD", "2025", "FINANCIAL FREEDOM", "DREAM BIG", scattered throughout. Magazine aesthetic, inspirational, powerful, feminine energy. Goals: ${goals}`;
 
-    // Use the first generated image as main reference, others as additional context
-    const referenceImages = generatedImages.slice(0, 5).map((url: string, idx: number) => ({
+    // Runway API allows max 3 reference images - use best variety
+    const referenceImages = generatedImages.slice(0, 3).map((url: string, idx: number) => ({
       uri: url,
       tag: `img${idx}`
     }));
