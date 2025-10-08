@@ -16,87 +16,72 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`Generating complete vision board collage with Runway AI...`);
-    console.log(`Prompt: ${prompts[0].substring(0, 200)}...`);
+    console.log(`Generating ${prompts.length} individual images for vision board...`);
 
     const generatedImages: string[] = [];
     const errors: string[] = [];
 
-    // Generate ONE complete vision board collage (not multiple individual images)
-    const prompt = prompts[0]; // Should only be one prompt for the full collage
+    // Generate images in batches to avoid rate limits
+    const batchSize = 3;
+    for (let i = 0; i < prompts.length; i += batchSize) {
+      const batch = prompts.slice(i, i + batchSize);
+      const batchPromises = batch.map(async (prompt: string, index: number) => {
+        try {
+          const imageNum = i + index + 1;
+          console.log(`[${imageNum}/${prompts.length}] Generating: ${prompt.substring(0, 60)}...`);
 
-    try {
-      console.log(`Creating vision board collage...`);
+          // Check if prompt needs user reference image (uses @userPhoto tag)
+          const shouldUseReference = prompt.includes("@userPhoto");
+          const hasReferenceImages = userImages && userImages.length > 0 && shouldUseReference;
 
-      // Check if prompt needs user reference image (uses @userPhoto tag)
-      const shouldUseReference = prompt.includes("@userPhoto");
-      const hasReferenceImages = userImages && userImages.length > 0 && shouldUseReference;
+          const requestData = {
+            model: "gen4_image_turbo",
+            promptText: prompt,
+            ratio: "1:1", // Square images for collage
+            ...(hasReferenceImages && {
+              referenceImages: [{
+                uri: userImages[0],
+                tag: "userPhoto"
+              }]
+            })
+          } as const;
 
-      const requestData = {
-        model: "gen4_image_turbo",
-        promptText: prompt,
-        ratio: "16:9", // Wider ratio better for collage layout
-        ...(hasReferenceImages && {
-          referenceImages: [{
-            uri: userImages[0], // Data URI from user upload
-            tag: "userPhoto" // Tag referenced as @userPhoto in prompt
-          }]
-        })
-      } as const;
+          const imageResponse = await runway.textToImage.create(requestData);
 
-      if (hasReferenceImages) {
-        console.log("Using user selfie as reference with tag @userPhoto");
-      }
+          // Poll for completion
+          let taskResult = await runway.tasks.retrieve(imageResponse.id);
+          let attempts = 0;
+          while (taskResult.status !== "SUCCEEDED" && attempts < 30) {
+            if (taskResult.status === "FAILED") {
+              throw new Error(`Task failed: ${taskResult.failure}`);
+            }
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            taskResult = await runway.tasks.retrieve(imageResponse.id);
+            attempts++;
+          }
 
-      console.log("Sending request to Runway API...");
-      console.log("Request config:", {
-        model: requestData.model,
-        promptLength: requestData.promptText.length,
-        ratio: requestData.ratio,
-        hasReference: hasReferenceImages
+          if (taskResult.status === "SUCCEEDED" && taskResult.output) {
+            const imageUrl = Array.isArray(taskResult.output)
+              ? taskResult.output[0]
+              : taskResult.output;
+            generatedImages.push(imageUrl);
+            console.log(`✓ [${imageNum}/${prompts.length}] Generated successfully`);
+          } else {
+            throw new Error("Task timeout");
+          }
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          console.error(`✗ [${i + index + 1}/${prompts.length}] Error:`, errorMessage);
+          errors.push(`Image ${i + index + 1}: ${errorMessage}`);
+        }
       });
 
-      const imageResponse = await runway.textToImage.create(requestData);
-      console.log("Runway API accepted request, task ID:", imageResponse.id);
+      await Promise.all(batchPromises);
 
-      // Wait for the task to complete
-      const taskId = imageResponse.id;
-      let taskResult = await runway.tasks.retrieve(taskId);
-
-      // Poll until complete (max 120 seconds for complex collage generation)
-      let attempts = 0;
-      while (taskResult.status !== "SUCCEEDED" && attempts < 60) {
-        if (taskResult.status === "FAILED") {
-          throw new Error(`Task failed: ${taskResult.failure}`);
-        }
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2 seconds
-        taskResult = await runway.tasks.retrieve(taskId);
-        attempts++;
+      // Delay between batches
+      if (i + batchSize < prompts.length) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-
-      if (taskResult.status === "SUCCEEDED" && taskResult.output) {
-        const imageUrl = Array.isArray(taskResult.output)
-          ? taskResult.output[0]
-          : taskResult.output;
-        generatedImages.push(imageUrl);
-        console.log(`✓ Generated complete vision board collage successfully`);
-      } else {
-        throw new Error("Task did not complete in time");
-      }
-    } catch (error: unknown) {
-      console.error(`Error generating vision board:`, error);
-
-      let errorMessage = "Unknown error";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (error && typeof error === 'object' && 'response' in error) {
-        const apiError = error as { response?: { data?: { error?: string } } };
-        if (apiError.response?.data?.error) {
-          errorMessage = apiError.response.data.error;
-        }
-      }
-
-      errors.push(errorMessage);
     }
 
     console.log(

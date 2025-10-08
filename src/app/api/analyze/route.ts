@@ -46,15 +46,27 @@ YOUR TASK:
 Create ONE comprehensive prompt describing a complete vision board collage that includes all relevant elements based on user's goals.`;
 
     const userPrompt = `User's Goals: ${goals}
-${hasUserImages ? `\nUser uploaded a selfie - include @userPhoto in 2-3 scenarios` : ""}
+${hasUserImages ? `\nUser uploaded a selfie - use @userPhoto tag for person scenarios` : ""}
 
-Create ONE concise prompt (under 400 characters) for Runway AI to generate a complete vision board collage.
+Generate 8-12 individual image prompts for a vision board. Each prompt should be short (under 100 characters) and describe ONE specific scene.
 
-The prompt must describe: A Pinterest-style collage with 12-15 small polaroid-framed photos scattered on warm beige background, including: modern dream house, Paris/tropical beach travel, woman doing yoga/meditation, healthy food (acai bowl, coffee), nature sunset, minimalist interior, gold coins/money${hasUserImages ? `, @userPhoto doing yoga, @userPhoto at beach, @userPhoto working out` : `, woman achieving goals`}, text labels "Traveling", "Meditation", "I Love What I Do". Additional elements from goals: ${goals.split(',').slice(0, 3).join(', ')}.
+REQUIRED IMAGES (select based on goals):
+1. Modern luxury dream house exterior
+2. Travel destination (Paris/Eiffel Tower, tropical beach, or mountain based on: ${goals})
+3. ${hasUserImages ? '@userPhoto' : 'Woman'} doing yoga or meditation
+4. Healthy lifestyle food (acai bowl, smoothie, or coffee)
+5. Nature scene (sunset, garden, or ocean)
+6. ${hasUserImages ? '@userPhoto' : 'Woman'} at beach or celebrating
+7. Minimalist luxury interior
+8-12. Add more based on goals: ${goals}
+   - If "money/wealth/financial": gold coins, luxury car, champagne
+   - If "fitness/health": workout scene, running, gym
+   - If "travel": airplane window, suitcase, wanderlust
+   - If "career/business": office, laptop, success
 
-Style: warm tones, film photography, feminine aesthetic.
+STYLE: All prompts should specify "warm tones, film photography, natural lighting"
 
-Return ONLY the prompt text, nothing else. Keep it under 400 characters.`;
+Return a JSON array of 8-12 short prompts: ["prompt 1", "prompt 2", ...]`;
 
     let prompts: string[] = [];
 
@@ -69,13 +81,16 @@ Return ONLY the prompt text, nothing else. Keep it under 400 characters.`;
         max_tokens: 2000,
       });
 
-      const responseText = completion.choices[0]?.message?.content || "";
+      const responseText = completion.choices[0]?.message?.content || "[]";
       console.log("DeepSeek response:", responseText);
 
-      // DeepSeek should return ONE prompt for the complete collage
-      // Just use the response directly as a single prompt
-      const cleanedPrompt = responseText.trim().replace(/^["']|["']$/g, '');
-      prompts = [cleanedPrompt];
+      // Extract JSON array from the response
+      const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        prompts = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error("No JSON array found in response");
+      }
     } catch (error: unknown) {
       const apiError =
         error instanceof Error ? error : new Error(String(error));
@@ -88,60 +103,48 @@ Return ONLY the prompt text, nothing else. Keep it under 400 characters.`;
         .map((g: string) => g.trim())
         .filter(Boolean);
 
-      // Fallback: Create ONE comprehensive collage prompt
-      const elements: string[] = [];
+      // Fallback: Create 8-10 individual image prompts
+      prompts = [];
 
-      // Core elements for all vision boards (women-focused)
-      elements.push("modern luxury dream house exterior");
-      elements.push("Paris Eiffel Tower or tropical beach travel destination");
-      elements.push("woman doing yoga meditation in peaceful setting");
-      elements.push("healthy acai bowl and coffee latte art");
-      elements.push("beautiful garden path or sunset landscape");
-      elements.push("minimalist luxury interior design");
+      // Core prompts for all vision boards
+      prompts.push("Modern luxury dream house exterior, warm tones, film photography");
+      prompts.push("Paris Eiffel Tower street view, autumn, film aesthetic, warm light");
+      prompts.push(`${hasUserImages ? '@userPhoto' : 'Woman'} doing yoga at sunrise, peaceful, warm natural light`);
+      prompts.push("Healthy acai bowl with berries, overhead shot, aesthetic food photography");
+      prompts.push("Tropical beach sunset, turquoise water, paradise, warm tones");
+      prompts.push(`${hasUserImages ? '@userPhoto' : 'Woman'} at beach celebrating, arms raised, golden hour`);
+      prompts.push("Minimalist luxury interior, modern design, natural daylight");
+      prompts.push("Morning coffee latte art, cozy aesthetic, warm tones");
 
-      // Add goal-specific elements
+      // Add goal-specific prompts
       keywords.forEach((keyword: string) => {
         const kw = keyword.toLowerCase();
         if (kw.includes("money") || kw.includes("wealth") || kw.includes("rich")) {
-          elements.push("stack of cash and gold coins");
+          prompts.push("Stack of gold coins and cash, abundance, overhead flat lay");
         }
         if (kw.includes("car") || kw.includes("vehicle")) {
-          elements.push("luxury sports car");
+          prompts.push("Luxury sports car on scenic road, dream car, golden hour");
         }
         if (kw.includes("fitness") || kw.includes("health")) {
-          elements.push("fitness workout scene");
+          prompts.push(`${hasUserImages ? '@userPhoto' : 'Woman'} working out, fitness journey, gym, natural light`);
+        }
+        if (kw.includes("travel")) {
+          prompts.push("Airplane window view clouds and sky, wanderlust vibes");
         }
       });
-
-      // Add person if selfie uploaded
-      if (hasUserImages) {
-        elements.push("@userPhoto doing yoga");
-        elements.push("@userPhoto celebrating at beach");
-      }
-
-      // Add motivational text
-      elements.push("text labels: 'Meditation', 'Traveling', 'I Love What I Do', 'Dream big work hard'");
-
-      // Keep it concise - under 400 characters
-      const elementList = elements.slice(0, 8).join(", ");
-      const collagePrompt = `Vision board collage: 12 polaroid photos scattered on beige background. ${elementList}. Text "MY VISION BOARD". Warm tones, film aesthetic.`;
-
-      prompts = [collagePrompt];
     }
 
-    // Should only have ONE prompt now (the complete collage)
-    if (prompts.length === 0 || !prompts[0] || prompts[0].length < 50) {
-      // Ultimate fallback: simple generic collage
-      prompts = [`Vision board collage: 12 polaroid photos on beige background. Dream house, Paris, beach, yoga, meditation, acai bowl, coffee, nature, gold coins, interior, text "Traveling", "Meditation". Warm tones, Pinterest style.`];
+    // Ensure we have 8-12 prompts
+    if (prompts.length < 8) {
+      const genericPrompts = [
+        "Mountain landscape sunset, nature peace, warm golden tones",
+        "Journal and coffee on desk, morning routine, cozy aesthetic",
+        "Beautiful garden path with flowers, peaceful, natural daylight",
+      ];
+      prompts = [...prompts, ...genericPrompts].slice(0, 10);
+    } else if (prompts.length > 12) {
+      prompts = prompts.slice(0, 12);
     }
-
-    // Ensure only ONE prompt and it's not too long
-    let finalPrompt = prompts[0];
-    if (finalPrompt.length > 500) {
-      // Truncate if too long
-      finalPrompt = finalPrompt.substring(0, 497) + "...";
-    }
-    prompts = [finalPrompt];
 
     console.log(`Generated ${prompts.length} prompts for Runway AI`);
 
