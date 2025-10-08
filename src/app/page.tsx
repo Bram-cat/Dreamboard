@@ -157,13 +157,33 @@ export default function Home() {
       const runwayData = await runwayResponse.json();
       console.log(`Generated ${runwayData.images.length} images with Runway AI`);
 
-      // Add generated images to the board
-      const generatedImages = runwayData.images.map((url: string, index: number) => ({
-        url,
-        keyword: prompts[index]?.split(",")[0] || "inspiration",
-      }));
+      // Step 3: Create final collage from all generated images
+      console.log("Step 3: Creating final collage from all images...");
+      const collageResponse = await fetch("/api/collage-final", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          generatedImages: runwayData.images,
+          goals: goals,
+        }),
+      });
 
-      setImages((prev) => [...prev, ...generatedImages]);
+      if (!collageResponse.ok) {
+        throw new Error("Failed to create final collage");
+      }
+
+      const collageData = await collageResponse.json();
+      console.log("Final collage created!");
+
+      // Display the final collage
+      const finalCollageImage = {
+        url: collageData.collageUrl,
+        keyword: "Vision Board 2025",
+      };
+
+      setImages([finalCollageImage]);
 
       console.log("Vision board ready!");
     } catch (err) {
