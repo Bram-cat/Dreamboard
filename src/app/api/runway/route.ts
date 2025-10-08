@@ -34,19 +34,37 @@ export async function POST(request: NextRequest) {
           const shouldUseReference = prompt.includes("@userPhoto");
           const hasReferenceImages = userImages && userImages.length > 0 && shouldUseReference;
 
-          const requestData = {
+          // Build request - start simple without reference images for debugging
+          const requestData: {
+            model: string;
+            promptText: string;
+            ratio: string;
+            referenceImages?: Array<{ uri: string; tag: string }>;
+          } = {
             model: "gen4_image_turbo",
             promptText: prompt,
-            ratio: "1:1", // Square images for collage
-            ...(hasReferenceImages && {
-              referenceImages: [{
-                uri: userImages[0],
-                tag: "userPhoto"
-              }]
-            })
-          } as const;
+            ratio: "1024:1024"
+          };
 
-          const imageResponse = await runway.textToImage.create(requestData);
+          // Only add reference images if needed and available
+          if (hasReferenceImages) {
+            requestData.referenceImages = [{
+              uri: userImages[0],
+              tag: "userPhoto"
+            }];
+            console.log(`Using reference image for prompt with @userPhoto tag`);
+          }
+
+          let imageResponse;
+          try {
+            imageResponse = await runway.textToImage.create(requestData);
+          } catch (createError: unknown) {
+            console.error(`Runway API create error for image ${imageNum}:`, createError);
+            if (createError && typeof createError === 'object') {
+              console.error('Error details:', JSON.stringify(createError, null, 2));
+            }
+            throw createError;
+          }
 
           // Poll for completion
           let taskResult = await runway.tasks.retrieve(imageResponse.id);
