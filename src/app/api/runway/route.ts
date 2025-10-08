@@ -34,25 +34,21 @@ export async function POST(request: NextRequest) {
           const shouldUseReference = prompt.includes("@userPhoto");
           const hasReferenceImages = userImages && userImages.length > 0 && shouldUseReference;
 
-          // Build request - start simple without reference images for debugging
-          const requestData: {
-            model: string;
-            promptText: string;
-            ratio: string;
-            referenceImages?: Array<{ uri: string; tag: string }>;
-          } = {
-            model: "gen4_image_turbo",
+          // Build request with proper types
+          const requestData = {
+            model: "gen4_image_turbo" as const,
             promptText: prompt,
-            ratio: "1024:1024"
+            ratio: "1024:1024" as const,
+            ...(hasReferenceImages && {
+              referenceImages: [{
+                uri: userImages[0],
+                tag: "userPhoto"
+              }]
+            })
           };
 
-          // Only add reference images if needed and available
           if (hasReferenceImages) {
-            requestData.referenceImages = [{
-              uri: userImages[0],
-              tag: "userPhoto"
-            }];
-            console.log(`Using reference image for prompt with @userPhoto tag`);
+            console.log(`[${imageNum}] Using @userPhoto reference image`);
           }
 
           let imageResponse;
