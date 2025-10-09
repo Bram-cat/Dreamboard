@@ -30,17 +30,28 @@ const INSPIRATIONAL_QUOTES = [
   "Rise and grind",
 ];
 
+// Categorized user uploads
+interface CategorizedUploads {
+  selfie: string | null;
+  dreamHouse: string | null;
+  dreamCar: string | null;
+  destination: string | null;
+}
+
 export default function Home() {
   const [goals, setGoals] = useState("");
   const [images, setImages] = useState<GeneratedImage[]>([]);
-  const [userImages, setUserImages] = useState<string[]>([]);
+  const [categorizedUploads, setCategorizedUploads] = useState<CategorizedUploads>({
+    selfie: null,
+    dreamHouse: null,
+    dreamCar: null,
+    destination: null
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState<"input" | "upload" | "preview">("input");
-  const [uploadCategories, setUploadCategories] = useState<string[]>([]);
   const [collageReady, setCollageReady] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleGenerate = async () => {
     if (!goals.trim()) {
