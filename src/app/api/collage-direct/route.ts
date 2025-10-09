@@ -55,68 +55,57 @@ export async function POST(request: NextRequest) {
     const hasHouse = uploadContext?.hasDreamHouse || false;
     const hasDestination = uploadContext?.hasDestination || false;
 
-    // Build detailed, descriptive prompt
-    const collagePrompt = `ULTRA HIGH QUALITY vision board collage in magazine cutout aesthetic. 90% surface coverage with overlapping torn-edge polaroid photos on warm beige background.
+    // Build CONCISE but detailed prompt (under 1000 chars for Runway limit)
+    const userRef = hasSelfie ? '@userPhoto' : 'woman';
+    const carRef = hasCar ? '@dreamCar' : 'luxury car';
+    const houseRef = hasHouse ? '@dreamHouse' : 'modern house';
 
-CRITICAL - Use ONLY these reference images consistently throughout:
-${hasSelfie ? '- @userPhoto (the main person) must appear in multiple scenarios' : ''}
-${hasCar ? '- @dreamCar (their actual dream car)' : ''}
-${hasHouse ? '- @dreamHouse (their actual dream house)' : ''}
+    const collagePrompt = `Dense vision board collage, magazine cutout style, 90% coverage, warm beige background. Overlapping torn-edge polaroids at various angles.
 
-REQUIRED ELEMENTS (arrange in scattered, overlapping layout):
+CENTER: ${userRef} celebrating success golden hour. ${userRef} yoga meditation sunrise. ${hasSelfie && hasCar ? `${userRef} driving ${carRef} happy.` : ''} ${hasSelfie && hasHouse ? `${userRef} at ${houseRef} proud.` : ''}
 
-CENTER FOCUS:
-${hasSelfie ? '- Large polaroid: @userPhoto celebrating success, arms raised, confident, golden hour lighting' : ''}
-${hasSelfie ? '- Medium polaroid: @userPhoto doing yoga/meditation at sunrise, peaceful, ocean view' : ''}
-${hasSelfie && hasCar ? '- Medium polaroid: @userPhoto driving @dreamCar, happy, open road' : ''}
-${hasSelfie && hasHouse ? '- Medium polaroid: @userPhoto standing proudly in front of @dreamHouse' : ''}
+AROUND: ${houseRef} exterior warm light. ${carRef} scenic road. Eiffel Tower Paris autumn. Tropical beach turquoise water. ${userRef} beach sunset. Acai bowl berries overhead. Coffee latte art cozy. Luxury interior natural light. Meditation sunset golden.
 
-SURROUNDING ELEMENTS (smaller polaroids scattered around):
-${hasHouse ? '- @dreamHouse exterior in golden hour light' : '- Modern luxury house exterior, warm tones'}
-${hasCar ? '- @dreamCar on scenic mountain road' : '- Luxury sports car on coastal highway'}
-- Eiffel Tower Paris street view, autumn, romantic
-- Tropical beach with turquoise water and palm trees
-${hasSelfie ? '- @userPhoto at beach sunset, peaceful' : '- Person at beach sunset'}
-- Healthy acai bowl with fresh berries, aesthetic overhead shot
-- Morning coffee latte art, cozy cafe vibes
-- Luxury modern interior with natural light
-- Sunset meditation scene, warm golden tones
+TEXT scattered: "I am growing", "Grateful", "2025", "Dreams manifest", "${goals.split(',')[0].trim()}".
 
-HANDWRITTEN TEXT (scattered elegantly):
-- "I am growing" (flowing script)
-- "Grateful" (elegant cursive)
-- "2025" (bold)
-- "Dreams manifest" (soft script)
-- "${goals.split(',')[0]}" (highlight main goal)
+STYLE: Torn white borders, 3 large 5 medium 7 small polaroids, tilted 5-20°, heavy overlap, warm beige/cream/gold palette, film grain, NO empty corners, magazine quality.
 
-STYLE REQUIREMENTS:
-- Torn white borders on all polaroid photos
-- Various sizes: 3 large, 5 medium, 7 small polaroids
-- Tilted at different angles (5-20 degrees)
-- Heavy overlap creating depth
-- Warm color palette: beige, cream, soft gold
-- Film photography aesthetic with slight grain
-- NO empty corners - fill entire space densely
-- Professional magazine editorial quality
-
-Goals theme: ${goals}`;
+Goals: ${goals}`;
 
     console.log(`Prompt length: ${collagePrompt.length} characters`);
 
     // Use the better model with references
     const model = referenceImages.length > 0 ? "gen4_image_turbo" : "gen4_image";
 
+    // Validate aspect ratio (must be between 0.5 and 2.0)
+    // 1080:1920 = 0.5625 ✓
     const requestData = {
       model: model as "gen4_image_turbo" | "gen4_image",
       promptText: collagePrompt,
-      ratio: "1080:1920" as const, // Vertical format for phone wallpaper
+      ratio: "1080:1920" as const, // 9:16 vertical (0.5625 ratio - valid)
       ...(referenceImages.length > 0 && { referenceImages })
     };
 
     console.log(`Using model: ${model}`);
-    console.log("Sending request to Runway AI...");
+    console.log("Request data:", JSON.stringify({
+      model: requestData.model,
+      promptLength: requestData.promptText.length,
+      ratio: requestData.ratio,
+      hasReferences: !!requestData.referenceImages,
+      numReferences: requestData.referenceImages?.length || 0
+    }));
 
-    const imageResponse = await runway.textToImage.create(requestData);
+    let imageResponse;
+    try {
+      imageResponse = await runway.textToImage.create(requestData);
+      console.log("Task created, ID:", imageResponse.id);
+    } catch (createError: unknown) {
+      console.error("Failed to create Runway task:", createError);
+      if (createError && typeof createError === 'object' && 'message' in createError) {
+        throw new Error(`Runway API error: ${(createError as Error).message}`);
+      }
+      throw new Error(`Runway API error: ${String(createError)}`);
+    }
 
     // Poll for completion
     let taskResult = await runway.tasks.retrieve(imageResponse.id);
