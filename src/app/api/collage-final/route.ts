@@ -19,10 +19,38 @@ export async function POST(request: NextRequest) {
     console.log(`Creating final collage from ${generatedImages.length} generated images...`);
     console.log(`User uploaded ${userImages?.length || 0} personal images`);
 
-    // Create a prompt for the final collage composition
-    // Note: The reference images already include user's face (@userPhoto from generated images)
+    // Create diverse collage prompts based on different sample styles
     const hasUserPhotos = userImages && userImages.length > 0;
-    const collagePrompt = `Vision board collage in magazine cutout style: overlapping photos arranged densely on dark background. Include motivational text labels like "VISION BOARD", "2025", "FINANCIAL FREEDOM", "DREAM BIG", scattered throughout. Magazine aesthetic, inspirational, powerful, feminine energy${hasUserPhotos ? ', featuring the person achieving their dreams' : ''}. Goals: ${goals}`;
+
+    // Randomly select a style (or use goals to determine)
+    const styles = [
+      {
+        // Sample 1 style: Beige elegant
+        prompt: `Vision board photo collage using EXACTLY these reference images @img0 @img1 @img2: Arrange 12-15 polaroid photos scattered on warm beige background. Title "Make it Happen Vision Board 2023!". Include: Paris Eiffel Tower, modern luxury house, garden path, woman at sunset beach, meditation pose, gold coins money, minimalist interior, text labels "Traveling", "Meditation", "I Love What I Do". NO new faces - use reference images only. Warm aesthetic, aspirational. Goals: ${goals}`,
+        bg: "beige"
+      },
+      {
+        // Sample 2 style: Dark magazine
+        prompt: `Magazine cutout collage using ONLY reference images @img0 @img1 @img2: Dense overlapping layout on BLACK background. Bold text "VISION BOARD", "2025", "FINANCIAL FREEDOM", "PASSIVE INCOME", "Soul Sisters". Mix of: person celebrating (from references), luxury items, travel scenes, money/coins, motivational quotes. Urban powerful vibe. DO NOT generate new people - use references. Goals: ${goals}`,
+        bg: "black"
+      },
+      {
+        // Sample 3 style: White polaroids scattered
+        prompt: `Scattered polaroid collage with reference photos @img0 @img1 @img2: 15+ white-framed polaroids at diagonal angles on neutral background. Center text "2025 Guided Vision Board affirmations included ♡". Include: cozy lifestyle scenes, travel destinations, pets, healthy food, nature, beach. Use ONLY the reference images provided - no new people. Warm cozy aesthetic. Goals: ${goals}`,
+        bg: "neutral"
+      },
+      {
+        // Sample 4 style: Torn paper affirmations
+        prompt: `Torn paper collage using reference images @img0 @img1 @img2: Overlapping photos with torn edges, handwritten affirmations. Text: "Money flows to me effortlessly", "I nourish my body mind and soul", "2025", "Grateful glowing & growing", "Growth over perfection", "I am capable", "Confidence courage and clarity". Mix travel, food, wellness, nature scenes. Use reference images - do not create new faces. Personal growth aesthetic. Goals: ${goals}`,
+        bg: "warm"
+      }
+    ];
+
+    // Select style based on goals or random
+    const selectedStyle = styles[Math.floor(Math.random() * styles.length)];
+    const collagePrompt = selectedStyle.prompt;
+
+    console.log(`Selected collage style: ${selectedStyle.bg} background`);
 
     // Helper function to validate image aspect ratio (must be 0.5 to 2.0)
     const validateImageAspectRatio = async (imageUri: string): Promise<boolean> => {
