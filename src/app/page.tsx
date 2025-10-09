@@ -97,59 +97,17 @@ export default function Home() {
 
       console.log("User uploads:", uploadContext);
 
-      // Step 1: Use DeepSeek to analyze goals and categorized uploads
-      console.log("Step 1: Analyzing goals with DeepSeek...");
-      const analyzeResponse = await fetch("/api/analyze", {
+      // Generate ONE complete collage directly (no intermediate steps)
+      console.log("Generating your personalized vision board...");
+      const collageResponse = await fetch("/api/collage-direct", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           goals,
-          categorizedUploads, // Pass categorized uploads
-          uploadContext, // Pass context about what was uploaded
-        }),
-      });
-
-      if (!analyzeResponse.ok) {
-        throw new Error("Failed to analyze goals");
-      }
-
-      const analyzeData = await analyzeResponse.json();
-      const prompts = analyzeData.prompts;
-      console.log(`Received ${prompts.length} prompts from DeepSeek`);
-
-      // Step 2: Use Runway AI to generate images from prompts
-      console.log("Step 2: Generating images with Runway AI...");
-      const runwayResponse = await fetch("/api/runway", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompts,
-          categorizedUploads, // Pass categorized uploads for reference
-        }),
-      });
-
-      if (!runwayResponse.ok) {
-        throw new Error("Failed to generate images with Runway AI");
-      }
-
-      const runwayData = await runwayResponse.json();
-      console.log(`Generated ${runwayData.images.length} images with Runway AI`);
-
-      // Step 3: Create final collage from all generated images
-      console.log("Step 3: Creating final personalized collage...");
-      const collageResponse = await fetch("/api/collage-final", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          generatedImages: runwayData.images,
-          categorizedUploads, // Pass categorized uploads
-          goals: goals,
+          categorizedUploads,
+          uploadContext,
         }),
       });
 
