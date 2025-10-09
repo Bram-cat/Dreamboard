@@ -30,33 +30,11 @@ export async function POST(request: NextRequest) {
 
     console.log(`Prompt length: ${collagePrompt.length} characters`);
 
-    // Helper function to validate image aspect ratio (must be 0.5 to 2.0)
-    const validateImageAspectRatio = async (imageUri: string): Promise<boolean> => {
-      try {
-        // For data URIs, we can't easily validate without loading
-        // For now, skip data URIs (user uploads) and only use generated images
-        if (imageUri.startsWith('data:')) {
-          console.log('Skipping data URI (cannot validate aspect ratio easily)');
-          return false;
-        }
-        return true; // Generated images from Runway are always valid
-      } catch {
-        return false;
-      }
-    };
-
-    // Use only generated images for now (they have valid aspect ratios)
-    // User images (data URIs) might have invalid ratios
-    const allReferenceImages = [];
-
-    // Use generated images (always have valid 1:1 ratio)
-    const genRefs = generatedImages.slice(0, 3).map((url: string, idx: number) => ({
+    // Use only generated images (always have valid 1:1 ratio)
+    const referenceImages = generatedImages.slice(0, 3).map((url: string, idx: number) => ({
       uri: url,
       tag: `img${idx}`
     }));
-    allReferenceImages.push(...genRefs);
-
-    const referenceImages = allReferenceImages;
 
     console.log(`Using ${referenceImages.length} reference images for collage`);
 

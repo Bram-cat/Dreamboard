@@ -59,10 +59,6 @@ export default function Home() {
       return;
     }
 
-    // Generate smart upload categories based on keywords
-    const categories = generateUploadCategories(goals);
-    setUploadCategories(categories);
-
     setStep("upload"); // Move to upload step
     setCollageReady(false);
   };
@@ -202,8 +198,8 @@ export default function Home() {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    // Combine AI and user images
-    const allImages = [...images.map((img) => img.url), ...userImages];
+    // Use only AI generated images (final collage from Runway)
+    const allImages = images.map((img) => img.url);
 
     // Polaroid positions (scattered, overlapping layout)
     const polaroidSize = 200; // Smaller size to fit more
@@ -332,7 +328,7 @@ export default function Home() {
     if (step === "preview" && !collageReady && images.length > 0) {
       createCollage();
     }
-  }, [step, collageReady, images, userImages]);
+  }, [step, collageReady, images]);
 
   const handleDownload = async () => {
     if (!collageReady || images.length === 0) return;
@@ -358,42 +354,6 @@ export default function Home() {
     }
   };
 
-  // Generate smart upload categories based on user's goals
-  const generateUploadCategories = (goalsText: string): string[] => {
-    const categories: string[] = [];
-    const lowerGoals = goalsText.toLowerCase();
-
-    // Always ask for a selfie first
-    categories.push("your photo/selfie (we'll add it to your dream scenarios!)");
-
-    if (lowerGoals.includes("car") || lowerGoals.includes("vehicle")) {
-      categories.push("your dream car");
-    }
-    if (lowerGoals.includes("home") || lowerGoals.includes("house") || lowerGoals.includes("property")) {
-      categories.push("your dream home/property");
-    }
-    if (lowerGoals.includes("travel") || lowerGoals.includes("vacation")) {
-      categories.push("your favorite travel destination");
-    }
-    if (lowerGoals.includes("fitness") || lowerGoals.includes("body") || lowerGoals.includes("health")) {
-      categories.push("your fitness/workout inspiration");
-    }
-    if (lowerGoals.includes("fashion") || lowerGoals.includes("style") || lowerGoals.includes("clothes")) {
-      categories.push("your style/fashion inspiration");
-    }
-    if (lowerGoals.includes("food") || lowerGoals.includes("healthy eating")) {
-      categories.push("your healthy food/meal inspiration");
-    }
-
-    // Add general categories for women
-    if (categories.length < 4) {
-      categories.push("favorite healthy meals/food");
-      categories.push("workout/fitness inspiration");
-      categories.push("travel memories or dream destinations");
-    }
-
-    return categories.slice(0, 6);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 py-12 px-4">
@@ -457,7 +417,7 @@ export default function Home() {
                   <div className="text-4xl mb-2">📸</div>
                   <h3 className="font-bold text-gray-800 mb-2">Your Selfie</h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    We'll show YOU achieving your goals
+                    We&apos;ll show YOU achieving your goals
                   </p>
                   {categorizedUploads.selfie ? (
                     <div className="relative">
@@ -608,7 +568,12 @@ export default function Home() {
                   onClick={() => {
                     setStep("input");
                     setImages([]);
-                    setUserImages([]);
+                    setCategorizedUploads({
+                      selfie: null,
+                      dreamHouse: null,
+                      dreamCar: null,
+                      destination: null
+                    });
                     setCollageReady(false);
                     setGoals("");
                   }}

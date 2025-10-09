@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     baseURL: "https://api.deepseek.com/v1",
   });
   try {
-    const { goals, categorizedUploads, uploadContext } = await request.json();
+    const { goals, uploadContext } = await request.json();
 
     if (!goals || typeof goals !== "string") {
       return NextResponse.json(
