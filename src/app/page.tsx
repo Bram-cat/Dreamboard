@@ -63,16 +63,73 @@ export default function Home() {
     setCollageReady(false);
   };
 
-  // Handle categorized file upload
-  const handleCategorizedUpload = (category: keyof CategorizedUploads, file: File) => {
+  // Helper to resize image to valid aspect ratio (0.5 to 2.0 for Runway API)
+  const resizeImageToValidRatio = (file: File, category: keyof CategorizedUploads) => {
     const reader = new FileReader();
     reader.onload = (e) => {
-      setCategorizedUploads(prev => ({
-        ...prev,
-        [category]: e.target?.result as string
-      }));
+      const img = new window.Image();
+      img.onload = () => {
+        const aspectRatio = img.width / img.height;
+
+        // If aspect ratio is valid (0.5 to 2.0), use as-is
+        if (aspectRatio >= 0.5 && aspectRatio <= 2.0) {
+          setCategorizedUploads(prev => ({
+            ...prev,
+            [category]: e.target?.result as string
+          }));
+          return;
+        }
+
+        // Need to crop to valid ratio
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        let sourceX = 0;
+        let sourceY = 0;
+        let sourceWidth = img.width;
+        let sourceHeight = img.height;
+
+        // If too wide (> 2.0), crop to 2:1 ratio
+        if (aspectRatio > 2.0) {
+          sourceWidth = img.height * 2.0;
+          sourceX = (img.width - sourceWidth) / 2;
+          canvas.width = 1024;
+          canvas.height = 512;
+        }
+        // If too tall (< 0.5), crop to 1:2 ratio
+        else {
+          sourceHeight = img.width * 2.0;
+          sourceY = (img.height - sourceHeight) / 2;
+          canvas.width = 512;
+          canvas.height = 1024;
+        }
+
+        // Draw cropped image
+        ctx.drawImage(
+          img,
+          sourceX, sourceY, sourceWidth, sourceHeight,
+          0, 0, canvas.width, canvas.height
+        );
+
+        // Convert to data URI
+        const resizedDataUri = canvas.toDataURL('image/jpeg', 0.92);
+        setCategorizedUploads(prev => ({
+          ...prev,
+          [category]: resizedDataUri
+        }));
+
+        console.log(`Resized ${category} from ${aspectRatio.toFixed(2)} to ${(canvas.width / canvas.height).toFixed(2)} aspect ratio`);
+      };
+
+      img.src = e.target?.result as string;
     };
     reader.readAsDataURL(file);
+  };
+
+  // Handle categorized file upload
+  const handleCategorizedUpload = (category: keyof CategorizedUploads, file: File) => {
+    resizeImageToValidRatio(file, category);
   };
 
   const removeCategorizedImage = (category: keyof CategorizedUploads) => {
