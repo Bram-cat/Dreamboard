@@ -177,13 +177,14 @@ export default function Home() {
       const collageData = await collageResponse.json();
       console.log("Final collage created!");
 
-      // Display the final collage
+      // Display ONLY the final collage (clear previous images)
       const finalCollageImage = {
         url: collageData.collageUrl,
         keyword: "Vision Board 2025",
       };
 
       setImages([finalCollageImage]);
+      setCollageReady(true); // Mark as ready to skip old createCollage function
 
       console.log("Vision board ready!");
     } catch (err) {
@@ -347,14 +348,24 @@ export default function Home() {
   }, [step, collageReady, images, userImages]);
 
   const handleDownload = async () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !collageReady) return;
+    if (!collageReady || images.length === 0) return;
 
     try {
+      // Download the final collage image from Runway AI
+      const imageUrl = images[0].url;
+
+      // Fetch the image and convert to blob
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+
+      // Create download link
       const link = document.createElement("a");
-      link.download = "my-vision-board.png";
-      link.href = canvas.toDataURL("image/png");
+      link.download = "my-vision-board-2025.png";
+      link.href = URL.createObjectURL(blob);
       link.click();
+
+      // Clean up
+      URL.revokeObjectURL(link.href);
     } catch {
       setError("Failed to download board");
     }
@@ -544,52 +555,59 @@ export default function Home() {
           </div>
         )}
 
-        {/* Step 3: Vision Board Collage */}
+        {/* Step 3: Final Vision Board Collage */}
         {step === "preview" && (
           <div className="space-y-6">
-            {/* Hidden Canvas for collage generation */}
-            <canvas ref={canvasRef} style={{ display: "none" }} />
-
-            {/* Display the collage */}
-            {collageReady && (
-              <div className="bg-white rounded-2xl shadow-2xl p-4 md:p-6">
+            {/* Display the final collage fullscreen */}
+            {collageReady && images.length > 0 && (
+              <div className="relative">
+                {/* Fullscreen collage - no frames, no padding */}
                 <img
-                  src={canvasRef.current?.toDataURL()}
-                  alt="Vision Board Collage"
-                  className="w-full h-auto rounded-lg shadow-lg"
+                  src={images[0].url}
+                  alt="Your Vision Board 2025"
+                  className="w-full h-auto rounded-lg shadow-2xl"
                 />
+
+                {/* Download button overlay */}
+                <button
+                  onClick={handleDownload}
+                  className="absolute top-4 right-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
+                >
+                  📥 Download
+                </button>
               </div>
             )}
 
             {/* Loading state */}
             {!collageReady && (
               <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
-                <div className="animate-pulse">
-                  <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg mb-4"></div>
+                <div className="animate-pulse space-y-4">
+                  <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg"></div>
                   <p className="text-purple-600 font-medium text-lg">
-                    ✨ Creating your vision board with Polaroid frames and quotes...
+                    🎨 Step 1: Generating 8-12 personalized images...
                   </p>
+                  <p className="text-purple-500 text-sm">
+                    🖼️ Step 2: Creating your magazine-style collage...
+                  </p>
+                  <p className="text-gray-500 text-xs">This may take 1-2 minutes</p>
                 </div>
               </div>
             )}
 
             {/* Action Buttons */}
             {collageReady && (
-              <div className="flex gap-4 max-w-2xl mx-auto">
+              <div className="flex gap-4 justify-center">
                 <button
                   onClick={() => {
-                    setStep("upload");
+                    setStep("input");
+                    setImages([]);
+                    setUserImages([]);
                     setCollageReady(false);
+                    setGoals("");
                   }}
-                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
                 >
-                  ← Edit Images
-                </button>
-                <button
-                  onClick={handleDownload}
-                  className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
-                >
-                  📥 Download Vision Board
+                  🔄 Create New Board
                 </button>
               </div>
             )}
