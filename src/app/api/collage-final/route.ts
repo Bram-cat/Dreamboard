@@ -22,41 +22,10 @@ export async function POST(request: NextRequest) {
     // Create diverse collage prompts based on different sample styles
     const hasUserPhotos = userImages && userImages.length > 0;
 
-    // Create ONE comprehensive dense collage prompt
-    // CRITICAL: Must be DENSE with NO empty space, like samples
-    const collagePrompt = `DENSE magazine vision board collage - CRITICAL: FILL ENTIRE IMAGE, NO EMPTY SPACE!
+    // Create SHORT prompt (max 1000 chars for Runway API)
+    const collagePrompt = `Dense vision board collage using @img0 @img1 @img2: Magazine cutout style, overlapping torn paper edges, NO empty space. Warm beige background. Center: person doing yoga at sunset with Eiffel Tower and luxury house behind. Densely packed elements: Paris scene, modern house cutout, meditation poses, beach sunset. Handwritten text: "Grateful glowfully growing", "I am growing", "I am gravity", "2025". Use ONLY reference images, no new people. Fill entire space, torn edges, warm tones. Goals: ${goals}`;
 
-Style: Magazine cutout aesthetic exactly like reference samples. Overlapping torn paper edges, scattered photos, text overlays.
-
-Layout: Warm beige/peach gradient background. CENTER: Large scene of person (from @img0 @img1 @img2) doing yoga/meditation at sunset beach with Eiffel Tower and modern luxury house visible in background.
-
-Surrounding DENSELY PACKED elements (MUST overlap, NO gaps):
-- Top left: Eiffel Tower Paris autumn scene
-- Top right: "2025 challe" handwritten text, hot air balloons
-- Left side: "Grateful glowfully growing" handwritten affirmation
-- Right side: "I am growing", "I am gravity" text
-- Bottom: Modern luxury house torn paper cutout
-- Scattered throughout: Small cutouts of meditation pose, yoga, sunset scenes
-
-Text overlays in handwriting style:
-- "Grateful"
-- "glowfully"
-- "growing"
-- "I am growing"
-- "I am gravity"
-- "2025 challe"
-
-CRITICAL REQUIREMENTS:
-- Use ONLY images from @img0 @img1 @img2 references
-- DO NOT generate new random people
-- FILL ENTIRE SPACE - dense overlapping magazine aesthetic
-- Torn paper edges on cutouts
-- Warm peach/beige tones
-- Handwritten text style
-
-Goals: ${goals}`;
-
-    console.log('Creating DENSE collage with torn paper magazine aesthetic');
+    console.log(`Prompt length: ${collagePrompt.length} characters`);
 
     // Helper function to validate image aspect ratio (must be 0.5 to 2.0)
     const validateImageAspectRatio = async (imageUri: string): Promise<boolean> => {
