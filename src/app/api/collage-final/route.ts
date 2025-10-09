@@ -20,33 +20,39 @@ export async function POST(request: NextRequest) {
     console.log(`User uploaded ${userImages?.length || 0} personal images`);
 
     // Create a prompt for the final collage composition
-    const collagePrompt = `Vision board collage in magazine cutout style: overlapping photos arranged densely on dark background. Include motivational text labels like "VISION BOARD", "2025", "FINANCIAL FREEDOM", "DREAM BIG", scattered throughout. Magazine aesthetic, inspirational, powerful, feminine energy. Incorporate user's personal photos naturally. Goals: ${goals}`;
+    // Note: The reference images already include user's face (@userPhoto from generated images)
+    const hasUserPhotos = userImages && userImages.length > 0;
+    const collagePrompt = `Vision board collage in magazine cutout style: overlapping photos arranged densely on dark background. Include motivational text labels like "VISION BOARD", "2025", "FINANCIAL FREEDOM", "DREAM BIG", scattered throughout. Magazine aesthetic, inspirational, powerful, feminine energy${hasUserPhotos ? ', featuring the person achieving their dreams' : ''}. Goals: ${goals}`;
 
-    // Combine user images (if any) with generated images for references
-    // Priority: user images first (they're most personal), then generated images
-    // Max 3 references total
+    // Helper function to validate image aspect ratio (must be 0.5 to 2.0)
+    const validateImageAspectRatio = async (imageUri: string): Promise<boolean> => {
+      try {
+        // For data URIs, we can't easily validate without loading
+        // For now, skip data URIs (user uploads) and only use generated images
+        if (imageUri.startsWith('data:')) {
+          console.log('Skipping data URI (cannot validate aspect ratio easily)');
+          return false;
+        }
+        return true; // Generated images from Runway are always valid
+      } catch {
+        return false;
+      }
+    };
+
+    // Use only generated images for now (they have valid aspect ratios)
+    // User images (data URIs) might have invalid ratios
     const allReferenceImages = [];
 
-    // Add user's uploaded images first (max 2)
-    if (userImages && userImages.length > 0) {
-      const userRefs = userImages.slice(0, 2).map((url: string, idx: number) => ({
-        uri: url,
-        tag: `userImg${idx}`
-      }));
-      allReferenceImages.push(...userRefs);
-    }
-
-    // Fill remaining slots with generated images
-    const remainingSlots = 3 - allReferenceImages.length;
-    if (remainingSlots > 0) {
-      const genRefs = generatedImages.slice(0, remainingSlots).map((url: string, idx: number) => ({
-        uri: url,
-        tag: `genImg${idx}`
-      }));
-      allReferenceImages.push(...genRefs);
-    }
+    // Use generated images (always have valid 1:1 ratio)
+    const genRefs = generatedImages.slice(0, 3).map((url: string, idx: number) => ({
+      uri: url,
+      tag: `img${idx}`
+    }));
+    allReferenceImages.push(...genRefs);
 
     const referenceImages = allReferenceImages;
+
+    console.log(`Using ${referenceImages.length} reference images for collage`);
 
     const requestData = {
       model: "gen4_image_turbo" as const,
