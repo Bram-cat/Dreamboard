@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   });
 
   try {
-    const { generatedImages, goals } = await request.json();
+    const { generatedImages, goals, userImages } = await request.json();
 
     if (!generatedImages || !Array.isArray(generatedImages) || generatedImages.length === 0) {
       return NextResponse.json(
@@ -16,16 +16,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`Creating final collage from ${generatedImages.length} images...`);
+    console.log(`Creating final collage from ${generatedImages.length} generated images...`);
+    console.log(`User uploaded ${userImages?.length || 0} personal images`);
 
     // Create a prompt for the final collage composition
-    const collagePrompt = `Vision board collage in magazine cutout style: overlapping photos arranged densely on dark background. Include motivational text labels like "VISION BOARD", "2025", "FINANCIAL FREEDOM", "DREAM BIG", scattered throughout. Magazine aesthetic, inspirational, powerful, feminine energy. Goals: ${goals}`;
+    const collagePrompt = `Vision board collage in magazine cutout style: overlapping photos arranged densely on dark background. Include motivational text labels like "VISION BOARD", "2025", "FINANCIAL FREEDOM", "DREAM BIG", scattered throughout. Magazine aesthetic, inspirational, powerful, feminine energy. Incorporate user's personal photos naturally. Goals: ${goals}`;
 
-    // Runway API allows max 3 reference images - use best variety
-    const referenceImages = generatedImages.slice(0, 3).map((url: string, idx: number) => ({
-      uri: url,
-      tag: `img${idx}`
-    }));
+    // Combine user images (if any) with generated images for references
+    // Priority: user images first (they're most personal), then generated images
+    // Max 3 references total
+    const allReferenceImages = [];
+
+    // Add user's uploaded images first (max 2)
+    if (userImages && userImages.length > 0) {
+      const userRefs = userImages.slice(0, 2).map((url: string, idx: number) => ({
+        uri: url,
+        tag: `userImg${idx}`
+      }));
+      allReferenceImages.push(...userRefs);
+    }
+
+    // Fill remaining slots with generated images
+    const remainingSlots = 3 - allReferenceImages.length;
+    if (remainingSlots > 0) {
+      const genRefs = generatedImages.slice(0, remainingSlots).map((url: string, idx: number) => ({
+        uri: url,
+        tag: `genImg${idx}`
+      }));
+      allReferenceImages.push(...genRefs);
+    }
+
+    const referenceImages = allReferenceImages;
 
     const requestData = {
       model: "gen4_image_turbo" as const,

@@ -157,8 +157,8 @@ export default function Home() {
       const runwayData = await runwayResponse.json();
       console.log(`Generated ${runwayData.images.length} images with Runway AI`);
 
-      // Step 3: Create final collage from all generated images
-      console.log("Step 3: Creating final collage from all images...");
+      // Step 3: Create final collage from all generated images + user uploads
+      console.log("Step 3: Creating final personalized collage...");
       const collageResponse = await fetch("/api/collage-final", {
         method: "POST",
         headers: {
@@ -166,6 +166,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           generatedImages: runwayData.images,
+          userImages: userImages, // Include user's uploaded images for personalization
           goals: goals,
         }),
       });
