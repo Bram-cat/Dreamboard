@@ -127,23 +127,18 @@ Remember: This is a PERSONAL vision board - every person shown must be the same 
 
     try {
       console.log("Sending request to Gemini API...");
+      console.log("Contents array length:", contents.length);
 
       const response = await genai.models.generateContent({
         model: "gemini-2.5-flash-image",
-        contents: contents,
-        config: {
-          temperature: 0.85, // Good balance for creative but consistent output
-          topK: 40,
-          topP: 0.95,
-          responseMimeType: "image/jpeg",
-          responseModalities: ["IMAGE"],
-          imageConfig: {
-            aspectRatio: "9:16" // Vertical format for phone wallpaper
-          }
-        }
+        contents: contents
       });
 
       console.log("Gemini response received");
+      console.log("Response structure:", JSON.stringify({
+        hasCandidates: !!response.candidates,
+        numCandidates: response.candidates?.length || 0
+      }));
 
       // Extract generated image from response
       if (!response || !response.candidates || response.candidates.length === 0) {
@@ -178,8 +173,16 @@ Remember: This is a PERSONAL vision board - every person shown must be the same 
 
     } catch (apiError: unknown) {
       console.error("Gemini API error:", apiError);
-      if (apiError && typeof apiError === 'object' && 'message' in apiError) {
-        throw new Error(`Gemini API error: ${(apiError as Error).message}`);
+      console.error("Error details:", JSON.stringify(apiError, null, 2));
+
+      if (apiError && typeof apiError === 'object') {
+        if ('message' in apiError) {
+          throw new Error(`Gemini API error: ${(apiError as Error).message}`);
+        }
+        if ('error' in apiError) {
+          const errObj = apiError as { error: { message?: string; details?: unknown } };
+          throw new Error(`Gemini API error: ${errObj.error.message || JSON.stringify(errObj.error)}`);
+        }
       }
       throw new Error(`Gemini API error: ${String(apiError)}`);
     }
