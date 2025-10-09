@@ -45,10 +45,24 @@ COMMON THEMES FOR WOMEN:
 YOUR TASK:
 Create ONE comprehensive prompt describing a complete vision board collage that includes all relevant elements based on user's goals.`;
 
-    const userPrompt = `User's Goals: ${goals}
-${hasUserImages ? `\nUser uploaded a selfie - use @userPhoto tag for person scenarios` : ""}
+    // Analyze user images to understand what they uploaded
+    let userImageAnalysis = "";
+    if (hasUserImages && imageContext) {
+      userImageAnalysis = `\nUser's uploaded images analysis: ${imageContext}`;
+    }
 
-Generate 8-12 individual image prompts for a vision board. Each prompt should be short (under 100 characters) and describe ONE specific scene.
+    const userPrompt = `User's Goals: ${goals}${userImageAnalysis}
+
+IMPORTANT: Generate 10-15 image prompts that will be used to create a DENSE magazine collage (NO empty space).
+
+If user uploaded images:
+- Understand what they uploaded (selfie, house, car, destination, etc.)
+- Create COMPOSITE scenarios showing them WITH/AT their goals
+- Example: If selfie + house uploaded → "person standing in front of luxury modern house"
+- Example: If selfie + car uploaded → "person posing with luxury sports car"
+- Example: If selfie + destination → "person celebrating at Eiffel Tower Paris"
+
+Generate 10-15 SHORT prompts (under 80 characters each) including:
 
 REQUIRED IMAGES (select based on goals):
 1. Modern luxury dream house exterior

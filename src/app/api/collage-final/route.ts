@@ -22,35 +22,41 @@ export async function POST(request: NextRequest) {
     // Create diverse collage prompts based on different sample styles
     const hasUserPhotos = userImages && userImages.length > 0;
 
-    // Randomly select a style (or use goals to determine)
-    const styles = [
-      {
-        // Sample 1 style: Beige elegant
-        prompt: `Vision board photo collage using EXACTLY these reference images @img0 @img1 @img2: Arrange 12-15 polaroid photos scattered on warm beige background. Title "Make it Happen Vision Board 2023!". Include: Paris Eiffel Tower, modern luxury house, garden path, woman at sunset beach, meditation pose, gold coins money, minimalist interior, text labels "Traveling", "Meditation", "I Love What I Do". NO new faces - use reference images only. Warm aesthetic, aspirational. Goals: ${goals}`,
-        bg: "beige"
-      },
-      {
-        // Sample 2 style: Dark magazine
-        prompt: `Magazine cutout collage using ONLY reference images @img0 @img1 @img2: Dense overlapping layout on BLACK background. Bold text "VISION BOARD", "2025", "FINANCIAL FREEDOM", "PASSIVE INCOME", "Soul Sisters". Mix of: person celebrating (from references), luxury items, travel scenes, money/coins, motivational quotes. Urban powerful vibe. DO NOT generate new people - use references. Goals: ${goals}`,
-        bg: "black"
-      },
-      {
-        // Sample 3 style: White polaroids scattered
-        prompt: `Scattered polaroid collage with reference photos @img0 @img1 @img2: 15+ white-framed polaroids at diagonal angles on neutral background. Center text "2025 Guided Vision Board affirmations included ♡". Include: cozy lifestyle scenes, travel destinations, pets, healthy food, nature, beach. Use ONLY the reference images provided - no new people. Warm cozy aesthetic. Goals: ${goals}`,
-        bg: "neutral"
-      },
-      {
-        // Sample 4 style: Torn paper affirmations
-        prompt: `Torn paper collage using reference images @img0 @img1 @img2: Overlapping photos with torn edges, handwritten affirmations. Text: "Money flows to me effortlessly", "I nourish my body mind and soul", "2025", "Grateful glowing & growing", "Growth over perfection", "I am capable", "Confidence courage and clarity". Mix travel, food, wellness, nature scenes. Use reference images - do not create new faces. Personal growth aesthetic. Goals: ${goals}`,
-        bg: "warm"
-      }
-    ];
+    // Create ONE comprehensive dense collage prompt
+    // CRITICAL: Must be DENSE with NO empty space, like samples
+    const collagePrompt = `DENSE magazine vision board collage - CRITICAL: FILL ENTIRE IMAGE, NO EMPTY SPACE!
 
-    // Select style based on goals or random
-    const selectedStyle = styles[Math.floor(Math.random() * styles.length)];
-    const collagePrompt = selectedStyle.prompt;
+Style: Magazine cutout aesthetic exactly like reference samples. Overlapping torn paper edges, scattered photos, text overlays.
 
-    console.log(`Selected collage style: ${selectedStyle.bg} background`);
+Layout: Warm beige/peach gradient background. CENTER: Large scene of person (from @img0 @img1 @img2) doing yoga/meditation at sunset beach with Eiffel Tower and modern luxury house visible in background.
+
+Surrounding DENSELY PACKED elements (MUST overlap, NO gaps):
+- Top left: Eiffel Tower Paris autumn scene
+- Top right: "2025 challe" handwritten text, hot air balloons
+- Left side: "Grateful glowfully growing" handwritten affirmation
+- Right side: "I am growing", "I am gravity" text
+- Bottom: Modern luxury house torn paper cutout
+- Scattered throughout: Small cutouts of meditation pose, yoga, sunset scenes
+
+Text overlays in handwriting style:
+- "Grateful"
+- "glowfully"
+- "growing"
+- "I am growing"
+- "I am gravity"
+- "2025 challe"
+
+CRITICAL REQUIREMENTS:
+- Use ONLY images from @img0 @img1 @img2 references
+- DO NOT generate new random people
+- FILL ENTIRE SPACE - dense overlapping magazine aesthetic
+- Torn paper edges on cutouts
+- Warm peach/beige tones
+- Handwritten text style
+
+Goals: ${goals}`;
+
+    console.log('Creating DENSE collage with torn paper magazine aesthetic');
 
     // Helper function to validate image aspect ratio (must be 0.5 to 2.0)
     const validateImageAspectRatio = async (imageUri: string): Promise<boolean> => {
