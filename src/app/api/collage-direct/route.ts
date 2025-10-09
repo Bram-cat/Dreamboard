@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 
 export async function POST(request: NextRequest) {
-  const genai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY || "",
-  });
-
   try {
     const { goals, categorizedUploads, uploadContext } = await request.json();
 
@@ -16,9 +12,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check API key
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error("GEMINI_API_KEY not found in environment variables");
+      return NextResponse.json(
+        { error: "Gemini API key not configured" },
+        { status: 500 }
+      );
+    }
+
     console.log("Creating vision board with Gemini 2.5 Flash Image...");
     console.log("User goals:", goals);
     console.log("Uploaded:", uploadContext);
+    console.log("API Key present:", !!apiKey);
+
+    // Initialize Gemini client
+    const genai = new GoogleGenAI({ apiKey });
 
     // Prepare reference images for Gemini (convert data URIs to parts)
     const imageParts = [];
