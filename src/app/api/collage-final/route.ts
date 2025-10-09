@@ -26,23 +26,30 @@ export async function POST(request: NextRequest) {
 
     // Create SHORT prompt (max 1000 chars for Runway API)
     // Focus on 90% coverage with dense overlapping elements
-    const collagePrompt = `ULTRA DENSE vision board collage using ALL reference images @img0 @img1 @img2: Magazine cutout aesthetic, heavily overlapping torn paper edges, polaroid frames, 90% surface coverage, minimal background visible. Layer images diagonally: top-left to bottom-right, bottom-left to top-right. Include handwritten affirmations: "I am growing", "Grateful", "2025", "Dreams manifest". Mix orientations: some tilted 15°, some straight. Torn white borders on cutouts. Warm beige/cream background barely visible. NO empty corners. Pack tightly like ${hasUserPhotos ? 'sample vision boards' : 'magazine mood board'}. Goals: ${goals}`;
+    const userRef = hasUserPhotos ? '@userPhoto' : 'woman';
+    const collagePrompt = `ULTRA DENSE vision board collage: Magazine cutout aesthetic with heavily overlapping torn paper edges and polaroid frames. 90% surface coverage, minimal background visible. Center features ${userRef} achieving goals. Layer cutouts diagonally from all corners. Include multiple small polaroids of: luxury house, Paris Eiffel Tower, ${userRef} doing yoga, beach sunset, healthy food, meditation, fitness scenes. Handwritten affirmations scattered: "I am growing", "Grateful", "2025", "Dreams manifest". Mix orientations: some tilted 15°. Torn white borders on all cutouts. Warm beige/cream background barely visible. NO empty corners. Pack tightly like magazine mood board. Goals theme: ${goals}`;
 
     console.log(`Prompt length: ${collagePrompt.length} characters`);
 
-    // Use only generated images (always have valid 1:1 ratio)
-    const referenceImages = generatedImages.slice(0, 3).map((url: string, idx: number) => ({
-      uri: url,
-      tag: `img${idx}`
-    }));
+    // Use user selfie as reference if available (must be data URI, not URL)
+    const referenceImages = [];
+    if (hasUserPhotos && typeof hasUserPhotos === 'string' && hasUserPhotos.startsWith('data:')) {
+      referenceImages.push({
+        uri: hasUserPhotos,
+        tag: 'userPhoto'
+      });
+    }
 
     console.log(`Using ${referenceImages.length} reference images for collage`);
 
+    // Use gen4_image if no references (it doesn't require reference images)
+    const model = referenceImages.length > 0 ? "gen4_image_turbo" : "gen4_image";
+
     const requestData = {
-      model: "gen4_image_turbo" as const,
+      model: model as "gen4_image_turbo" | "gen4_image",
       promptText: collagePrompt,
       ratio: "1080:1920" as const, // Vertical phone wallpaper format
-      referenceImages: referenceImages
+      ...(referenceImages.length > 0 && { referenceImages })
     };
 
     console.log("Creating final collage with reference to generated images...");
