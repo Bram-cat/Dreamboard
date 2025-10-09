@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@runwayml/sdk": "^3.0.0",
+    "@google/genai": "^1.23.0",
     "html2canvas": "^1.4.1",
     "next": "15.5.4",
     "openai": "^6.1.0",
