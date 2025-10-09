@@ -67,30 +67,23 @@ export default function Home() {
     setCollageReady(false);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    const fileReaders: Promise<string>[] = [];
-
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      const promise = new Promise<string>((resolve) => {
-        reader.onload = (e) => {
-          resolve(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
-      });
-      fileReaders.push(promise);
-    });
-
-    Promise.all(fileReaders).then((results) => {
-      setUserImages((prev) => [...prev, ...results]);
-    });
+  // Handle categorized file upload
+  const handleCategorizedUpload = (category: keyof CategorizedUploads, file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setCategorizedUploads(prev => ({
+        ...prev,
+        [category]: e.target?.result as string
+      }));
+    };
+    reader.readAsDataURL(file);
   };
 
-  const removeUserImage = (index: number) => {
-    setUserImages((prev) => prev.filter((_, i) => i !== index));
+  const removeCategorizedImage = (category: keyof CategorizedUploads) => {
+    setCategorizedUploads(prev => ({
+      ...prev,
+      [category]: null
+    }));
   };
 
   const proceedToCollage = async () => {
@@ -98,35 +91,17 @@ export default function Home() {
     setStep("preview");
 
     try {
-      // Step 0: Recognize what's in the uploaded images
-      let imageContext = "";
-      if (userImages.length > 0) {
-        console.log("Step 0: Recognizing uploaded images...");
-        try {
-          const recognizeResponse = await fetch("/api/recognize", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ images: userImages }),
-          });
+      // Build categorized context from uploads
+      const uploadContext = {
+        hasSelfie: !!categorizedUploads.selfie,
+        hasDreamHouse: !!categorizedUploads.dreamHouse,
+        hasDreamCar: !!categorizedUploads.dreamCar,
+        hasDestination: !!categorizedUploads.destination
+      };
 
-          if (recognizeResponse.ok) {
-            const recognizeData = await recognizeResponse.json();
-            const descriptions = recognizeData.recognitions
-              .map((r: { type: string; description: string }, idx: number) =>
-                `Image ${idx + 1}: ${r.type} - ${r.description}`
-              )
-              .join("; ");
-            imageContext = descriptions;
-            console.log("Image recognition:", descriptions);
-          }
-        } catch (error) {
-          console.error("Image recognition failed, continuing anyway:", error);
-        }
-      }
+      console.log("User uploads:", uploadContext);
 
-      // Step 1: Use DeepSeek to analyze goals and user images to create prompts
+      // Step 1: Use DeepSeek to analyze goals and categorized uploads
       console.log("Step 1: Analyzing goals with DeepSeek...");
       const analyzeResponse = await fetch("/api/analyze", {
         method: "POST",
@@ -135,8 +110,8 @@ export default function Home() {
         },
         body: JSON.stringify({
           goals,
-          userImages, // Pass all user uploaded images
-          imageContext, // Pass what we learned about the images
+          categorizedUploads, // Pass categorized uploads
+          uploadContext, // Pass context about what was uploaded
         }),
       });
 
@@ -157,7 +132,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           prompts,
-          userImages, // Pass user images as references for Runway AI
+          categorizedUploads, // Pass categorized uploads for reference
         }),
       });
 
@@ -168,7 +143,7 @@ export default function Home() {
       const runwayData = await runwayResponse.json();
       console.log(`Generated ${runwayData.images.length} images with Runway AI`);
 
-      // Step 3: Create final collage from all generated images + user uploads
+      // Step 3: Create final collage from all generated images
       console.log("Step 3: Creating final personalized collage...");
       const collageResponse = await fetch("/api/collage-final", {
         method: "POST",
@@ -177,7 +152,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           generatedImages: runwayData.images,
-          userImages: userImages, // Include user's uploaded images for personalization
+          categorizedUploads, // Pass categorized uploads
           goals: goals,
         }),
       });
@@ -464,84 +439,105 @@ export default function Home() {
           </div>
         )}
 
-        {/* Step 2: Upload Your Images */}
+        {/* Step 2: Upload Your Images (Categorized) */}
         {step === "upload" && (
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
             <h2 className="text-2xl font-bold text-purple-900 mb-4">
               Add Your Personal Touch
             </h2>
-            <p className="text-gray-600 mb-4">
-              Upload images that represent YOUR vision:
+            <p className="text-gray-600 mb-6">
+              Upload images to personalize your vision board. All uploads are optional!
             </p>
 
-            {/* Smart upload suggestions */}
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 mb-6">
-              <p className="font-semibold text-purple-900 mb-2">📸 Suggested uploads based on your goals:</p>
-              <ul className="space-y-1 text-sm text-gray-700">
-                {uploadCategories.map((category, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span className="capitalize">{category}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* File Upload */}
-            <div className="mb-6">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 shadow-md"
-              >
-                📸 Upload Images
-              </button>
-            </div>
-
-            {/* Preview uploaded images */}
-            {userImages.length > 0 && (
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-700 mb-3">
-                  Your Images ({userImages.length})
-                </h3>
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                  {userImages.map((img, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={img}
-                        alt={`Upload ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg"
-                      />
-                      <button
-                        onClick={() => removeUserImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        ×
-                      </button>
+            {/* Categorized Upload Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Selfie Upload */}
+              <div className="border-2 border-dashed border-purple-300 rounded-lg p-6 hover:border-purple-500 transition-colors">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">📸</div>
+                  <h3 className="font-bold text-gray-800 mb-2">Your Selfie</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    We'll show YOU achieving your goals
+                  </p>
+                  {categorizedUploads.selfie ? (
+                    <div className="relative">
+                      <img src={categorizedUploads.selfie} alt="Selfie" className="w-full h-32 object-cover rounded-lg mb-2" />
+                      <button onClick={() => removeCategorizedImage('selfie')} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6">×</button>
                     </div>
-                  ))}
+                  ) : (
+                    <label className="block">
+                      <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleCategorizedUpload('selfie', e.target.files[0])} className="hidden" />
+                      <span className="block w-full bg-purple-100 hover:bg-purple-200 text-purple-700 font-semibold py-2 px-4 rounded cursor-pointer">Upload Selfie</span>
+                    </label>
+                  )}
                 </div>
               </div>
-            )}
 
-            {/* Info Box */}
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-l-4 border-purple-500 p-4 mb-6">
-              <p className="text-purple-900 text-sm mb-2">
-                🤖 <strong>AI-Powered Enhancement:</strong>
-              </p>
-              <ul className="text-sm text-gray-700 space-y-1 ml-4">
-                <li>✨ <strong>DeepSeek AI</strong> analyzes your goals to create personalized scenarios</li>
-                <li>🎨 Generates images showing YOU living your dream life</li>
-                <li>🚀 Creates 30+ inspiring images: luxury lifestyle, success moments, dream possessions</li>
-                <li>💎 Combines your uploads with AI-generated aspirational content</li>
-              </ul>
+              {/* Dream House Upload */}
+              <div className="border-2 border-dashed border-pink-300 rounded-lg p-6 hover:border-pink-500 transition-colors">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🏠</div>
+                  <h3 className="font-bold text-gray-800 mb-2">Dream House</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Show you AT your dream home
+                  </p>
+                  {categorizedUploads.dreamHouse ? (
+                    <div className="relative">
+                      <img src={categorizedUploads.dreamHouse} alt="Dream House" className="w-full h-32 object-cover rounded-lg mb-2" />
+                      <button onClick={() => removeCategorizedImage('dreamHouse')} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6">×</button>
+                    </div>
+                  ) : (
+                    <label className="block">
+                      <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleCategorizedUpload('dreamHouse', e.target.files[0])} className="hidden" />
+                      <span className="block w-full bg-pink-100 hover:bg-pink-200 text-pink-700 font-semibold py-2 px-4 rounded cursor-pointer">Upload House</span>
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Dream Car Upload */}
+              <div className="border-2 border-dashed border-blue-300 rounded-lg p-6 hover:border-blue-500 transition-colors">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🚗</div>
+                  <h3 className="font-bold text-gray-800 mb-2">Dream Car</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Show you DRIVING your dream car
+                  </p>
+                  {categorizedUploads.dreamCar ? (
+                    <div className="relative">
+                      <img src={categorizedUploads.dreamCar} alt="Dream Car" className="w-full h-32 object-cover rounded-lg mb-2" />
+                      <button onClick={() => removeCategorizedImage('dreamCar')} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6">×</button>
+                    </div>
+                  ) : (
+                    <label className="block">
+                      <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleCategorizedUpload('dreamCar', e.target.files[0])} className="hidden" />
+                      <span className="block w-full bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold py-2 px-4 rounded cursor-pointer">Upload Car</span>
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Dream Destination Upload */}
+              <div className="border-2 border-dashed border-green-300 rounded-lg p-6 hover:border-green-500 transition-colors">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">✈️</div>
+                  <h3 className="font-bold text-gray-800 mb-2">Dream Destination</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Show you AT your dream location
+                  </p>
+                  {categorizedUploads.destination ? (
+                    <div className="relative">
+                      <img src={categorizedUploads.destination} alt="Destination" className="w-full h-32 object-cover rounded-lg mb-2" />
+                      <button onClick={() => removeCategorizedImage('destination')} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6">×</button>
+                    </div>
+                  ) : (
+                    <label className="block">
+                      <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleCategorizedUpload('destination', e.target.files[0])} className="hidden" />
+                      <span className="block w-full bg-green-100 hover:bg-green-200 text-green-700 font-semibold py-2 px-4 rounded cursor-pointer">Upload Destination</span>
+                    </label>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Action Buttons */}
@@ -550,7 +546,6 @@ export default function Home() {
                 onClick={() => {
                   setStep("input");
                   setImages([]);
-                  setUserImages([]);
                 }}
                 className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
               >

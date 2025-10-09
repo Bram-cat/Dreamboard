@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     baseURL: "https://api.deepseek.com/v1",
   });
   try {
-    const { goals, userImages, imageContext } = await request.json();
+    const { goals, categorizedUploads, uploadContext } = await request.json();
 
     if (!goals || typeof goals !== "string") {
       return NextResponse.json(
@@ -18,10 +18,12 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("Analyzing goals with DeepSeek:", goals);
-    console.log("User images count:", Array.isArray(userImages) ? userImages.length : 0);
-    console.log("Image context:", imageContext || "None");
+    console.log("Categorized uploads:", uploadContext);
 
-    const hasUserImages = Array.isArray(userImages) && userImages.length > 0;
+    const hasSelfie = uploadContext?.hasSelfie || false;
+    const hasCar = uploadContext?.hasDreamCar || false;
+    const hasHouse = uploadContext?.hasDreamHouse || false;
+    const hasDestination = uploadContext?.hasDestination || false;
 
     // Create a detailed prompt for DeepSeek to generate ONE COMPLETE vision board collage prompt
     const systemPrompt = `You are a vision board creator AI for women. Your task is to create ONE detailed prompt that Runway AI will use to generate a COMPLETE vision board collage in one image.
@@ -45,32 +47,28 @@ COMMON THEMES FOR WOMEN:
 YOUR TASK:
 Create ONE comprehensive prompt describing a complete vision board collage that includes all relevant elements based on user's goals.`;
 
-    // Analyze user images to understand what they uploaded
-    let userImageAnalysis = "";
-    if (hasUserImages && imageContext) {
-      userImageAnalysis = `\nUser's uploaded images analysis: ${imageContext}`;
-    }
+    const userPrompt = `User's Goals: ${goals}
 
-    const userPrompt = `User's Goals: ${goals}${userImageAnalysis}
+User uploaded: ${hasSelfie ? 'Selfie ✓' : ''} ${hasHouse ? 'Dream House ✓' : ''} ${hasCar ? 'Dream Car ✓' : ''} ${hasDestination ? 'Destination ✓' : ''}
 
-IMPORTANT: Generate 10-15 image prompts that will be used to create a DENSE magazine collage (NO empty space).
+Generate 10-15 SHORT prompts (under 80 chars) for CONTEXTUAL COMPOSITE scenes:
 
-If user uploaded images:
-- Understand what they uploaded (selfie, house, car, destination, etc.)
-- Create COMPOSITE scenarios showing them WITH/AT their goals
-- Example: If selfie + house uploaded → "person standing in front of luxury modern house"
-- Example: If selfie + car uploaded → "person posing with luxury sports car"
-- Example: If selfie + destination → "person celebrating at Eiffel Tower Paris"
+CRITICAL - Create composite scenarios based on uploads:
+${hasSelfie && hasCar ? '- "@userPhoto driving luxury sports car, happy, cinematic"' : ''}
+${hasSelfie && hasHouse ? '- "@userPhoto standing in front of modern dream house, proud"' : ''}
+${hasSelfie && hasDestination ? '- "@userPhoto celebrating at travel destination, arms raised"' : ''}
+${hasSelfie ? '- "@userPhoto doing yoga at sunset, peaceful, warm light"' : ''}
+${hasSelfie ? '- "@userPhoto at beach celebrating success, golden hour"' : ''}
 
-Generate 10-15 SHORT prompts (under 80 characters each) including:
+Additional prompts (under 80 chars each):
 
 REQUIRED IMAGES (select based on goals):
 1. Modern luxury dream house exterior
 2. Travel destination (Paris/Eiffel Tower, tropical beach, or mountain based on: ${goals})
-3. ${hasUserImages ? '@userPhoto' : 'Woman'} doing yoga or meditation
+3. ${hasSelfie ? '@userPhoto' : 'Woman'} doing yoga or meditation
 4. Healthy lifestyle food (acai bowl, smoothie, or coffee)
 5. Nature scene (sunset, garden, or ocean)
-6. ${hasUserImages ? '@userPhoto' : 'Woman'} at beach or celebrating
+6. ${hasSelfie ? '@userPhoto' : 'Woman'} at beach or celebrating
 7. Minimalist luxury interior
 8-12. Add more based on goals: ${goals}
    - If "money/wealth/financial": gold coins, luxury car, champagne
@@ -123,10 +121,10 @@ Return a JSON array of 8-12 short prompts: ["prompt 1", "prompt 2", ...]`;
       // Core prompts for all vision boards
       prompts.push("Modern luxury dream house exterior, warm tones, film photography");
       prompts.push("Paris Eiffel Tower street view, autumn, film aesthetic, warm light");
-      prompts.push(`${hasUserImages ? '@userPhoto' : 'Woman'} doing yoga at sunrise, peaceful, warm natural light`);
+      prompts.push(`${hasSelfie ? '@userPhoto' : 'Woman'} doing yoga at sunrise, peaceful, warm natural light`);
       prompts.push("Healthy acai bowl with berries, overhead shot, aesthetic food photography");
       prompts.push("Tropical beach sunset, turquoise water, paradise, warm tones");
-      prompts.push(`${hasUserImages ? '@userPhoto' : 'Woman'} at beach celebrating, arms raised, golden hour`);
+      prompts.push(`${hasSelfie ? '@userPhoto' : 'Woman'} at beach celebrating, arms raised, golden hour`);
       prompts.push("Minimalist luxury interior, modern design, natural daylight");
       prompts.push("Morning coffee latte art, cozy aesthetic, warm tones");
 
@@ -140,7 +138,7 @@ Return a JSON array of 8-12 short prompts: ["prompt 1", "prompt 2", ...]`;
           prompts.push("Luxury sports car on scenic road, dream car, golden hour");
         }
         if (kw.includes("fitness") || kw.includes("health")) {
-          prompts.push(`${hasUserImages ? '@userPhoto' : 'Woman'} working out, fitness journey, gym, natural light`);
+          prompts.push(`${hasSelfie ? '@userPhoto' : 'Woman'} working out, fitness journey, gym, natural light`);
         }
         if (kw.includes("travel")) {
           prompts.push("Airplane window view clouds and sky, wanderlust vibes");

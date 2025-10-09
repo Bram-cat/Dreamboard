@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     apiKey: process.env.RUNWAYML_API_SECRET || "",
   });
   try {
-    const { prompts, userImages } = await request.json();
+    const { prompts, categorizedUploads } = await request.json();
 
     if (!prompts || !Array.isArray(prompts) || prompts.length === 0) {
       return NextResponse.json(
@@ -17,6 +17,9 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`Generating ${prompts.length} individual images for vision board...`);
+
+    // Get selfie for reference (if uploaded)
+    const userSelfie = categorizedUploads?.selfie || null;
 
     const generatedImages: string[] = [];
     const errors: string[] = [];
@@ -32,7 +35,7 @@ export async function POST(request: NextRequest) {
 
           // Check if prompt needs user reference image (uses @userPhoto tag)
           const shouldUseReference = prompt.includes("@userPhoto");
-          const hasReferenceImages = userImages && userImages.length > 0 && shouldUseReference;
+          const hasReferenceImages = userSelfie && shouldUseReference;
 
           // IMPORTANT: gen4_image_turbo REQUIRES reference images
           // Use gen4_image for prompts without @userPhoto tag
@@ -45,7 +48,7 @@ export async function POST(request: NextRequest) {
             ratio: "1024:1024" as const,
             ...(hasReferenceImages && {
               referenceImages: [{
-                uri: userImages[0],
+                uri: userSelfie,
                 tag: "userPhoto"
               }]
             })

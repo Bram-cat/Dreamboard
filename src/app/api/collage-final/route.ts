@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   });
 
   try {
-    const { generatedImages, goals, userImages } = await request.json();
+    const { generatedImages, goals, categorizedUploads } = await request.json();
 
     if (!generatedImages || !Array.isArray(generatedImages) || generatedImages.length === 0) {
       return NextResponse.json(
@@ -17,13 +17,16 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`Creating final collage from ${generatedImages.length} generated images...`);
-    console.log(`User uploaded ${userImages?.length || 0} personal images`);
+
+    const uploadCount = Object.values(categorizedUploads || {}).filter(Boolean).length;
+    console.log(`User uploaded ${uploadCount} categorized images`);
 
     // Create diverse collage prompts based on different sample styles
-    const hasUserPhotos = userImages && userImages.length > 0;
+    const hasUserPhotos = categorizedUploads?.selfie || false;
 
     // Create SHORT prompt (max 1000 chars for Runway API)
-    const collagePrompt = `Dense vision board collage using @img0 @img1 @img2: Magazine cutout style, overlapping torn paper edges, NO empty space. Warm beige background. Center: person doing yoga at sunset with Eiffel Tower and luxury house behind. Densely packed elements: Paris scene, modern house cutout, meditation poses, beach sunset. Handwritten text: "Grateful glowfully growing", "I am growing", "I am gravity", "2025". Use ONLY reference images, no new people. Fill entire space, torn edges, warm tones. Goals: ${goals}`;
+    // Focus on 90% coverage with dense overlapping elements
+    const collagePrompt = `ULTRA DENSE vision board collage using ALL reference images @img0 @img1 @img2: Magazine cutout aesthetic, heavily overlapping torn paper edges, polaroid frames, 90% surface coverage, minimal background visible. Layer images diagonally: top-left to bottom-right, bottom-left to top-right. Include handwritten affirmations: "I am growing", "Grateful", "2025", "Dreams manifest". Mix orientations: some tilted 15°, some straight. Torn white borders on cutouts. Warm beige/cream background barely visible. NO empty corners. Pack tightly like ${hasUserPhotos ? 'sample vision boards' : 'magazine mood board'}. Goals: ${goals}`;
 
     console.log(`Prompt length: ${collagePrompt.length} characters`);
 
