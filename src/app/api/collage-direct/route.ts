@@ -100,23 +100,42 @@ ${hasSelfie ? `- Main subject celebrating success with arms raised, golden hour 
 ${hasCar ? '- Main subject driving their dream car, happy expression, scenic open road' : ''}
 ${hasHouse ? '- Main subject standing proudly in front of their dream house, accomplished mood' : ''}` : '- Aspirational lifestyle scenes showing achievement and wellness'}
 
-SURROUNDING ELEMENTS (smaller polaroids scattered around):
+SURROUNDING ELEMENTS (15+ smaller polaroids scattered throughout):
 ${hasHouse ? '- The dream house exterior in warm golden hour light' : '- Modern luxury house with clean architecture'}
 ${hasCar ? '- The dream car on a scenic mountain road or coastal highway' : '- Luxury sports car in aspirational setting'}
 - Eiffel Tower Paris street view, autumn colors, romantic atmosphere
 - Tropical beach with turquoise water, palm trees, paradise vibes
 ${hasSelfie ? '- Main subject at beach during sunset, peaceful moment' : '- Beach sunset silhouette'}
-- Healthy acai bowl with fresh berries, aesthetic overhead flat lay
-- Morning coffee with beautiful latte art, cozy cafe atmosphere
-- Minimalist luxury interior with natural daylight streaming in
-- Meditation or yoga scene at sunset with golden warm tones
+- Healthy acai bowl with fresh berries and granola, aesthetic overhead shot
+- Green smoothie bowl with chia seeds and fruit toppings
+- Fresh salad with avocado and colorful vegetables
+- Morning coffee with beautiful latte art, cozy cafe setting
+- Yoga mat with water bottle and towel, fitness motivation
+- Running shoes on a trail, active lifestyle
+- Meditation cushion in peaceful zen garden
+- Journal and pen on wooden table, self-care routine
+- Face mask and spa items, wellness self-care
+- Minimalist luxury bedroom with white linens
+- Modern walk-in closet with organized clothing
+- Sunset view from airplane window, wanderlust
+- Stacked books on personal development
+- Candles and essential oils, peaceful ambiance
 
-HANDWRITTEN TEXT (scattered elegantly throughout):
-- "I am growing" in flowing cursive script
-- "Grateful" in elegant handwriting
-- "2025" in bold but natural handwriting
-- "Dreams manifest" in soft feminine script
-- "${goals.split(',')[0].trim()}" prominently featured
+INSPIRATIONAL QUOTES & TEXT (scattered elegantly, handwritten style):
+- "I am growing" in flowing cursive
+- "Grateful" in elegant script
+- "2025" in bold handwriting
+- "Dreams manifest" in soft feminine font
+- "She believed she could, so she did"
+- "Choose happiness"
+- "Good vibes only"
+- "Self-love is the best love"
+- "Bloom where you are planted"
+- "Live, laugh, love"
+- "Be your own kind of beautiful"
+- "Inhale confidence, exhale doubt"
+- "Create your own sunshine"
+- "${goals.split(',')[0].trim()}" featured prominently
 
 QUALITY REQUIREMENTS:
 - Professional magazine editorial quality
