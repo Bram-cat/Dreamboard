@@ -154,9 +154,9 @@ export default function Home() {
 
       console.log("User uploads:", uploadContext);
 
-      // Generate ONE complete collage directly (no intermediate steps)
-      console.log("Generating your personalized vision board...");
-      const collageResponse = await fetch("/api/collage-direct", {
+      // STEP 1: Use DeepSeek to generate specific scenarios
+      console.log("Step 1: Analyzing goals and generating scenarios...");
+      const analyzeResponse = await fetch("/api/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -168,21 +168,62 @@ export default function Home() {
         }),
       });
 
-      if (!collageResponse.ok) {
-        throw new Error("Failed to create final collage");
+      if (!analyzeResponse.ok) {
+        throw new Error("Failed to analyze goals");
       }
 
-      const collageData = await collageResponse.json();
-      console.log("Final collage created!");
+      const analyzeData = await analyzeResponse.json();
+      const prompts = analyzeData.prompts;
+      console.log(`Generated ${prompts.length} scenarios`);
 
-      // Display ONLY the final collage (clear previous images)
+      // STEP 2: Generate individual images with Gemini (using selfie reference for consistency)
+      console.log("Step 2: Generating individual images...");
+      const generateResponse = await fetch("/api/generate-images", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompts,
+          categorizedUploads,
+        }),
+      });
+
+      if (!generateResponse.ok) {
+        throw new Error("Failed to generate images");
+      }
+
+      const generateData = await generateResponse.json();
+      console.log(`Generated ${generateData.images.length} individual images`);
+
+      // STEP 3: Stitch all images into final collage
+      console.log("Step 3: Stitching collage...");
+      const stitchResponse = await fetch("/api/stitch-collage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          images: generateData.images,
+          goals,
+        }),
+      });
+
+      if (!stitchResponse.ok) {
+        throw new Error("Failed to stitch collage");
+      }
+
+      const stitchData = await stitchResponse.json();
+      console.log("Collage stitched successfully!");
+
+      // Display ONLY the final collage
       const finalCollageImage = {
-        url: collageData.collageUrl,
+        url: stitchData.collageUrl,
         keyword: "Vision Board 2025",
       };
 
       setImages([finalCollageImage]);
-      setCollageReady(true); // Mark as ready to skip old createCollage function
+      setCollageReady(true);
 
       console.log("Vision board ready!");
     } catch (err) {
