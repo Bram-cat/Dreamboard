@@ -150,14 +150,15 @@ ${hasHouse ? `- The dream house from reference image must appear exactly as show
 
 CONTENT ELEMENTS - CREATE 18-24 DISTINCT PHOTO ELEMENTS:
 
-PRIMARY SCENES WITH MAIN SUBJECT (5-7 larger photos):
-${hasSelfie ? `1. Main subject in business attire looking confident, city skyline background, success pose
-2. Main subject practicing yoga on beach at sunrise, serene expression, waves in background
-3. Main subject laughing with arms raised in celebration, golden hour lighting
-4. Main subject reading in a cozy corner with coffee, peaceful contemplative mood
-${hasCar ? '5. Main subject with their dream car, hand on hood, proud smile, scenic location' : '5. Main subject at outdoor cafe, stylish outfit, enjoying the moment'}
-${hasHouse ? '6. Main subject in front of their dream house, key in hand, achievement moment' : '6. Main subject hiking on mountain trail, backpack, adventurous spirit'}
-7. Main subject meditating in nature, eyes closed, peaceful zen moment` : 'Aspirational lifestyle and wellness scenes'}
+PRIMARY SCENES WITH MAIN SUBJECT (6-8 larger photos showing diverse activities):
+${hasSelfie ? `1. Main subject in sharp business attire, confident power pose, modern office or city skyline background
+2. Main subject at outdoor cafe or restaurant, stylish casual outfit, enjoying coffee/meal, social setting
+3. Main subject celebrating success with arms raised, big smile, golden hour lighting, achievement moment
+4. Main subject in gym workout clothes, active pose (lifting weights or running), fitness motivation
+${hasCar ? '5. Main subject with their dream car, proud expression, hand on hood, scenic mountain or coastal road' : '5. Main subject traveling - airport, beach, or mountain view, adventure mode, backpack or suitcase'}
+${hasHouse ? '6. Main subject in front of their dream house, holding keys, accomplished smile, beautiful exterior' : '6. Main subject in luxurious interior, reading or relaxing, cozy sophisticated space'}
+7. Main subject in ONE wellness scene ONLY: either gentle yoga pose OR peaceful meditation in nature (choose ONE, not both)
+8. Main subject at social gathering or event, dressed up, happy interaction, celebrating life` : 'Aspirational lifestyle and achievement scenes'}
 
 LIFESTYLE & WELLNESS ELEMENTS (10-12 medium/small photos):
 ${hasHouse ? '- The dream house: modern exterior, landscaped yard, warm inviting lighting' : '- Luxury modern home: glass walls, pool, contemporary architecture'}
@@ -218,7 +219,12 @@ REMEMBER: This is a PERSONAL vision board for ONE specific person. Every human f
 
       const response = await genai.models.generateContent({
         model: "gemini-2.5-flash-image",
-        contents: contents
+        contents: contents,
+        config: {
+          imageConfig: {
+            aspectRatio: '16:9'  // 1344x768 - highest quality landscape format
+          }
+        }
       });
 
       console.log("Gemini response received");
