@@ -17,8 +17,8 @@ export async function POST(request: NextRequest) {
     const hasCar = uploadContext?.hasDreamCar || false;
     const hasHouse = uploadContext?.hasDreamHouse || false;
 
-    // Generate 5 diverse, specific scenarios for the vision board
-    // This ensures variety and reduces repetition
+    // Generate 4 diverse, specific scenarios for the vision board
+    // Reduced to 4 to keep payload under 4.5MB limit
     const scenarios = [];
 
     if (hasSelfie) {
@@ -38,15 +38,7 @@ export async function POST(request: NextRequest) {
         needsHouse: false
       });
 
-      // Scenario 3: Fitness/Active (gym or running)
-      scenarios.push({
-        description: "Person in athletic wear at modern gym lifting dumbbells or doing workout, fit and determined expression, or running outdoors on scenic trail, active healthy lifestyle",
-        needsSelfie: true,
-        needsCar: false,
-        needsHouse: false
-      });
-
-      // Scenario 4: Dream Car (if provided) OR Travel/Adventure
+      // Scenario 3: Fitness/Active OR Dream Car
       if (hasCar) {
         scenarios.push({
           description: "Person standing proudly next to their dream car, hand resting on hood, big accomplished smile, scenic mountain road or coastal highway background, achievement moment",
@@ -56,14 +48,14 @@ export async function POST(request: NextRequest) {
         });
       } else {
         scenarios.push({
-          description: "Person at airport terminal with luggage or backpack, excited travel mood, or standing at scenic overlook (beach sunset, mountain vista), wanderlust adventure vibe",
+          description: "Person in athletic wear at modern gym lifting dumbbells or doing workout, fit and determined expression, active healthy lifestyle",
           needsSelfie: true,
           needsCar: false,
           needsHouse: false
         });
       }
 
-      // Scenario 5: Dream House (if provided) OR ONE Wellness scene OR Luxury Interior
+      // Scenario 4: Dream House OR Luxury Interior (NO wellness to avoid repetition)
       if (hasHouse) {
         scenarios.push({
           description: "Person standing in front of their dream house exterior, holding house keys, proud accomplished expression, beautiful landscaped property, homeowner achievement",
@@ -72,26 +64,15 @@ export async function POST(request: NextRequest) {
           needsHouse: true
         });
       } else {
-        // Randomly choose between wellness or luxury interior (prefer luxury to avoid repetition)
-        const useWellness = Math.random() < 0.3; // 30% chance of wellness scene
-        if (useWellness) {
-          scenarios.push({
-            description: "Person in peaceful yoga pose on beach at sunrise OR meditating in serene garden, calm zen expression, natural peaceful setting (ONLY ONE wellness scene)",
-            needsSelfie: true,
-            needsCar: false,
-            needsHouse: false
-          });
-        } else {
-          scenarios.push({
-            description: "Person relaxing in luxurious modern interior, reading book in elegant armchair, or enjoying view from penthouse window, sophisticated wealthy lifestyle",
-            needsSelfie: true,
-            needsCar: false,
-            needsHouse: false
-          });
-        }
+        scenarios.push({
+          description: "Person relaxing in luxurious modern interior, reading book in elegant armchair with city view, or enjoying coffee by floor-to-ceiling windows, sophisticated wealthy lifestyle",
+          needsSelfie: true,
+          needsCar: false,
+          needsHouse: false
+        });
       }
     } else {
-      // If no selfie, generate aspirational scenes without people
+      // If no selfie, generate 4 aspirational scenes without people
       scenarios.push(
         {
           description: "Modern luxury house with clean architecture, floor-to-ceiling windows, beautiful landscaping, golden hour lighting",
@@ -112,13 +93,7 @@ export async function POST(request: NextRequest) {
           needsHouse: false
         },
         {
-          description: "Minimalist luxury bedroom with white linens, modern design, peaceful serene space",
-          needsSelfie: false,
-          needsCar: false,
-          needsHouse: false
-        },
-        {
-          description: "Aesthetic healthy breakfast spread, acai bowl, fresh smoothies, wellness lifestyle",
+          description: "Minimalist luxury interior with modern furniture, city view through windows, sophisticated aesthetic",
           needsSelfie: false,
           needsCar: false,
           needsHouse: false

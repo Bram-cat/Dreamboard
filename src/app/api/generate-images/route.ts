@@ -116,13 +116,14 @@ Style: Professional photography, natural lighting, warm tones, high quality 1344
 
         contents.push({ text: enhancedPrompt });
 
-        // Generate the image with higher resolution
+        // Generate the image - use 1:1 aspect ratio for smaller payload size
+        // Individual images will be 1024x1024, which is smaller than 16:9 (1344x768)
         const response = await genai.models.generateContent({
           model: "gemini-2.5-flash-image",
           contents: contents,
           config: {
             imageConfig: {
-              aspectRatio: '16:9'  // 1344x768 for better quality
+              aspectRatio: '1:1'  // 1024x1024 - smaller payload for stitching
             }
           }
         });
