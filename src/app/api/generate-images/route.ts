@@ -3,11 +3,11 @@ import { GoogleGenAI } from "@google/genai";
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompts, categorizedUploads } = await request.json();
+    const { scenarios, categorizedUploads } = await request.json();
 
-    if (!prompts || !Array.isArray(prompts) || prompts.length === 0) {
+    if (!scenarios || !Array.isArray(scenarios) || scenarios.length === 0) {
       return NextResponse.json(
-        { error: "Prompts array is required" },
+        { error: "Scenarios array is required" },
         { status: 400 }
       );
     }
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`Generating ${prompts.length} individual images with Gemini...`);
+    console.log(`Generating ${scenarios.length} individual images with Gemini for better facial consistency...`);
 
     // Initialize Gemini client
     const genai = new GoogleGenAI({ apiKey });
@@ -70,48 +70,61 @@ export async function POST(request: NextRequest) {
     const generatedImages: string[] = [];
     const errors: string[] = [];
 
-    // Generate each image individually for better consistency
-    for (let i = 0; i < prompts.length; i++) {
-      const prompt = prompts[i];
-      console.log(`[${i + 1}/${prompts.length}] Generating: ${prompt.substring(0, 60)}...`);
+    // Generate each image individually for better facial consistency
+    for (let i = 0; i < scenarios.length; i++) {
+      const scenario = scenarios[i];
+      console.log(`[${i + 1}/${scenarios.length}] Generating: ${scenario.description.substring(0, 60)}...`);
 
       try {
         // Build contents array based on what references are needed
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const contents: any[] = [];
 
-        // Add selfie if the prompt mentions the user
-        const needsSelfie = prompt.includes('@userPhoto') ||
-                          prompt.toLowerCase().includes('main subject') ||
-                          prompt.toLowerCase().includes('you');
-
-        if (needsSelfie && selfiePart) {
+        // Add references based on scenario needs
+        if (scenario.needsSelfie && selfiePart) {
           contents.push(selfiePart);
         }
 
-        // Add car if prompt mentions it
-        if (prompt.includes('@dreamCar') && carPart) {
+        if (scenario.needsCar && carPart) {
           contents.push(carPart);
         }
 
-        // Add house if prompt mentions it
-        if (prompt.includes('@dreamHouse') && housePart) {
+        if (scenario.needsHouse && housePart) {
           contents.push(housePart);
         }
 
-        // Enhanced prompt for better quality and consistency
-        const enhancedPrompt = needsSelfie && selfiePart
-          ? `Using the person from the reference image, create: ${prompt}.
-             CRITICAL: Use the EXACT same person from the reference photo. Match their facial features, skin tone, and appearance precisely.
-             Style: Professional photography, natural lighting, warm tones, high quality, realistic.`
-          : `Create: ${prompt}. Style: Professional photography, natural lighting, warm tones, high quality, aesthetic.`;
+        // Enhanced prompt for better quality and facial consistency
+        const enhancedPrompt = scenario.needsSelfie && selfiePart
+          ? `CRITICAL FACIAL CONSISTENCY REQUIREMENT: You MUST use the EXACT person from the reference image provided.
+
+Reference person's features to maintain:
+- Exact facial structure and bone structure
+- Same skin tone and complexion
+- Same eye shape, color, and expression style
+- Same hair color, texture, and style
+- Same nose, mouth, and facial proportions
+
+Create this specific scene: ${scenario.description}
+
+The person in the scene MUST be the same individual from the reference photo. Match their appearance precisely.
+If you cannot maintain perfect facial consistency, DO NOT create the image.
+
+Style: Professional photography, natural lighting, warm tones, high quality 1344x768 output, photorealistic.`
+          : `Create this specific scene: ${scenario.description}
+
+Style: Professional photography, natural lighting, warm tones, high quality 1344x768 output, photorealistic, aesthetic.`;
 
         contents.push({ text: enhancedPrompt });
 
-        // Generate the image
+        // Generate the image with higher resolution
         const response = await genai.models.generateContent({
           model: "gemini-2.5-flash-image",
-          contents: contents
+          contents: contents,
+          config: {
+            imageConfig: {
+              aspectRatio: '16:9'  // 1344x768 for better quality
+            }
+          }
         });
 
         // Extract image from response
@@ -126,7 +139,8 @@ export async function POST(request: NextRequest) {
             if (imagePart && imagePart.inlineData) {
               const imageDataUri = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
               generatedImages.push(imageDataUri);
-              console.log(`✓ [${i + 1}/${prompts.length}] Generated successfully`);
+
+              console.log(`✓ [${i + 1}/${scenarios.length}] Generated successfully`);
             } else {
               throw new Error("No image data in response");
             }
@@ -138,13 +152,13 @@ export async function POST(request: NextRequest) {
         }
 
         // Small delay to avoid rate limiting
-        if (i < prompts.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+        if (i < scenarios.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay between images
         }
 
       } catch (error: unknown) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        console.error(`✗ [${i + 1}/${prompts.length}] Error:`, errorMsg);
+        console.error(`✗ [${i + 1}/${scenarios.length}] Error:`, errorMsg);
         errors.push(`Image ${i + 1}: ${errorMsg}`);
 
         // Continue with next image even if one fails
@@ -152,7 +166,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log(`Generated ${generatedImages.length}/${prompts.length} images successfully`);
+    console.log(`Generated ${generatedImages.length}/${scenarios.length} images successfully`);
 
     if (generatedImages.length === 0) {
       return NextResponse.json(
@@ -168,7 +182,7 @@ export async function POST(request: NextRequest) {
       images: generatedImages,
       success: true,
       totalGenerated: generatedImages.length,
-      totalRequested: prompts.length,
+      totalRequested: scenarios.length,
       errors: errors.length > 0 ? errors : undefined
     });
 

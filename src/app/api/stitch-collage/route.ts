@@ -12,6 +12,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log(`Stitching ${images.length} individual images into final collage...`);
+
     // Check API key
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -21,8 +23,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    console.log(`Stitching ${images.length} images into final collage...`);
 
     // Initialize Gemini client
     const genai = new GoogleGenAI({ apiKey });
@@ -83,7 +83,12 @@ IMPORTANT: This is a collage assembly task - take the ${images.length} images an
 
       const response = await genai.models.generateContent({
         model: "gemini-2.5-flash-image",
-        contents: contents
+        contents: contents,
+        config: {
+          imageConfig: {
+            aspectRatio: '16:9'  // 1344x768 for final collage
+          }
+        }
       });
 
       // Extract the collage image from response
