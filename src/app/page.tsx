@@ -155,50 +155,31 @@ export default function Home() {
 
       console.log("User uploads:", uploadContext);
 
-      // STEP 1: Analyze goals with DeepSeek to generate specific scenarios
-      console.log("Step 1/3: Analyzing your goals to create specific scenarios...");
-      const analyzeResponse = await fetch("/api/analyze-goals", {
+      // Generate complete dense collage with Gemini (like your sample images!)
+      console.log("Generating dense magazine-style collage with 10-15+ elements...");
+      const collageResponse = await fetch("/api/collage-direct", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           goals,
-          uploadContext,
-        }),
-      });
-
-      if (!analyzeResponse.ok) {
-        throw new Error("Failed to analyze goals");
-      }
-
-      const analyzeData = await analyzeResponse.json();
-      console.log(`✓ Generated ${analyzeData.scenarios.length} specific scenarios`);
-
-      // STEP 2 & 3: Generate images AND stitch on server (no client round-trip!)
-      console.log(`Step 2/3: Generating ${analyzeData.scenarios.length} images and stitching on server...`);
-      const generateResponse = await fetch("/api/generate-images", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          scenarios: analyzeData.scenarios,
           categorizedUploads,
-          goals,
+          uploadContext,
+          style: selectedStyle === "random" ? undefined : selectedStyle,
         }),
       });
 
-      if (!generateResponse.ok) {
-        throw new Error("Failed to generate vision board");
+      if (!collageResponse.ok) {
+        throw new Error("Failed to create vision board");
       }
 
-      const generateData = await generateResponse.json();
+      const collageData = await collageResponse.json();
       console.log("✓ Vision board created successfully!");
 
       // Display the final collage
       const finalCollageImage = {
-        url: generateData.collageUrl,
+        url: collageData.collageUrl,
         keyword: "Vision Board 2025",
       };
 
@@ -645,18 +626,18 @@ export default function Home() {
                 <div className="animate-pulse space-y-4">
                   <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg"></div>
                   <p className="text-purple-600 font-medium text-lg">
-                    🎨 Creating your personalized vision board...
+                    🎨 Creating your dense magazine-style vision board...
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Step 1: Creating 3 high-impact scenarios for you
+                    Generating 10-15+ elements with YOUR face across multiple scenes
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Step 2: Generating 3 photos individually with YOUR exact face
+                    Including: travel, food, fitness, success, wealth & more
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Step 3: Stitching into beautiful high-res collage (1344x768)
+                    Creating dense collage with overlapping polaroids & quotes
                   </p>
-                  <p className="text-gray-500 text-xs">Takes 30-45 seconds for perfect facial consistency</p>
+                  <p className="text-gray-500 text-xs">Takes 30-60 seconds for magazine-quality output (1344x768)</p>
                 </div>
               </div>
             )}
