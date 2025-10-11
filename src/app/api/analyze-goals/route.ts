@@ -11,91 +11,119 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check DeepSeek API key
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-    if (!apiKey) {
-      console.error("DEEPSEEK_API_KEY not found in environment variables");
-      return NextResponse.json(
-        { error: "DeepSeek API key not configured" },
-        { status: 500 }
-      );
-    }
-
-    console.log("Analyzing goals with DeepSeek to generate specific scenarios...");
+    console.log("Generating specific scenarios for vision board...");
 
     const hasSelfie = uploadContext?.hasSelfie || false;
     const hasCar = uploadContext?.hasDreamCar || false;
     const hasHouse = uploadContext?.hasDreamHouse || false;
 
-    // Create prompt for DeepSeek to generate specific, diverse scenarios
-    const analysisPrompt = `You are helping create a vision board. Based on these goals: "${goals}", generate exactly 5 specific, diverse photo scenarios for a vision board.
+    // Generate 5 diverse, specific scenarios for the vision board
+    // This ensures variety and reduces repetition
+    const scenarios = [];
 
-REQUIREMENTS:
-- Create EXACTLY 5 distinct scenarios
-- ${hasSelfie ? 'The user uploaded a selfie, so 4 scenarios should feature them in different activities' : 'No user photo provided, so focus on aspirational scenes'}
-- Make scenarios diverse: business, social, wellness, achievement, lifestyle
-- Each scenario should be specific and actionable for image generation
-- ${hasCar ? 'One scenario MUST include the user with their dream car' : ''}
-- ${hasHouse ? 'One scenario MUST include the user in front of their dream house' : ''}
-- MAXIMUM 1 yoga/meditation scene (preferably 0)
-- Include varied settings: office, cafe, gym, outdoors, luxury interior
+    if (hasSelfie) {
+      // Scenario 1: Business/Professional
+      scenarios.push({
+        description: "Person in sharp business suit standing confidently in modern office or in front of city skyline at golden hour, power pose with arms crossed or hand in pocket, successful entrepreneur vibe",
+        needsSelfie: true,
+        needsCar: false,
+        needsHouse: false
+      });
 
-Return ONLY a JSON array of 5 scenario objects, each with:
-{
-  "description": "specific scene description",
-  "needsSelfie": boolean,
-  "needsCar": boolean,
-  "needsHouse": boolean
-}
+      // Scenario 2: Social/Lifestyle (cafe or restaurant)
+      scenarios.push({
+        description: "Person at trendy outdoor cafe or upscale restaurant, stylish casual outfit, enjoying artisan coffee or brunch, working on laptop or reading, sophisticated lifestyle",
+        needsSelfie: true,
+        needsCar: false,
+        needsHouse: false
+      });
 
-Example format:
-[
-  {"description": "Person in sharp business suit standing confidently in front of city skyline at sunset, power pose", "needsSelfie": true, "needsCar": false, "needsHouse": false},
-  {"description": "Person at trendy outdoor cafe, casual stylish outfit, enjoying coffee and working on laptop", "needsSelfie": true, "needsCar": false, "needsHouse": false},
-  ...
-]
+      // Scenario 3: Fitness/Active (gym or running)
+      scenarios.push({
+        description: "Person in athletic wear at modern gym lifting dumbbells or doing workout, fit and determined expression, or running outdoors on scenic trail, active healthy lifestyle",
+        needsSelfie: true,
+        needsCar: false,
+        needsHouse: false
+      });
 
-Generate 5 diverse scenarios now:`;
+      // Scenario 4: Dream Car (if provided) OR Travel/Adventure
+      if (hasCar) {
+        scenarios.push({
+          description: "Person standing proudly next to their dream car, hand resting on hood, big accomplished smile, scenic mountain road or coastal highway background, achievement moment",
+          needsSelfie: true,
+          needsCar: true,
+          needsHouse: false
+        });
+      } else {
+        scenarios.push({
+          description: "Person at airport terminal with luggage or backpack, excited travel mood, or standing at scenic overlook (beach sunset, mountain vista), wanderlust adventure vibe",
+          needsSelfie: true,
+          needsCar: false,
+          needsHouse: false
+        });
+      }
 
-    // Call DeepSeek API
-    const deepseekResponse = await fetch("https://api.deepseek.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          {
-            role: "user",
-            content: analysisPrompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 1000
-      })
-    });
-
-    if (!deepseekResponse.ok) {
-      throw new Error(`DeepSeek API error: ${deepseekResponse.statusText}`);
-    }
-
-    const deepseekData = await deepseekResponse.json();
-    const responseText = deepseekData.choices[0].message.content;
-
-    console.log("DeepSeek response:", responseText);
-
-    // Parse JSON from response
-    const jsonMatch = responseText.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) {
-      throw new Error("Failed to parse scenarios from DeepSeek response");
-    }
-
-    const scenarios = JSON.parse(jsonMatch[0]);
-
-    if (!Array.isArray(scenarios) || scenarios.length === 0) {
-      throw new Error("Invalid scenarios format from DeepSeek");
+      // Scenario 5: Dream House (if provided) OR ONE Wellness scene OR Luxury Interior
+      if (hasHouse) {
+        scenarios.push({
+          description: "Person standing in front of their dream house exterior, holding house keys, proud accomplished expression, beautiful landscaped property, homeowner achievement",
+          needsSelfie: true,
+          needsCar: false,
+          needsHouse: true
+        });
+      } else {
+        // Randomly choose between wellness or luxury interior (prefer luxury to avoid repetition)
+        const useWellness = Math.random() < 0.3; // 30% chance of wellness scene
+        if (useWellness) {
+          scenarios.push({
+            description: "Person in peaceful yoga pose on beach at sunrise OR meditating in serene garden, calm zen expression, natural peaceful setting (ONLY ONE wellness scene)",
+            needsSelfie: true,
+            needsCar: false,
+            needsHouse: false
+          });
+        } else {
+          scenarios.push({
+            description: "Person relaxing in luxurious modern interior, reading book in elegant armchair, or enjoying view from penthouse window, sophisticated wealthy lifestyle",
+            needsSelfie: true,
+            needsCar: false,
+            needsHouse: false
+          });
+        }
+      }
+    } else {
+      // If no selfie, generate aspirational scenes without people
+      scenarios.push(
+        {
+          description: "Modern luxury house with clean architecture, floor-to-ceiling windows, beautiful landscaping, golden hour lighting",
+          needsSelfie: false,
+          needsCar: hasCar,
+          needsHouse: hasHouse
+        },
+        {
+          description: "High-end sports car on scenic coastal highway, ocean view, sunset lighting, aspirational lifestyle",
+          needsSelfie: false,
+          needsCar: hasCar,
+          needsHouse: false
+        },
+        {
+          description: "Tropical beach paradise with turquoise water, white sand, palm trees, travel destination",
+          needsSelfie: false,
+          needsCar: false,
+          needsHouse: false
+        },
+        {
+          description: "Minimalist luxury bedroom with white linens, modern design, peaceful serene space",
+          needsSelfie: false,
+          needsCar: false,
+          needsHouse: false
+        },
+        {
+          description: "Aesthetic healthy breakfast spread, acai bowl, fresh smoothies, wellness lifestyle",
+          needsSelfie: false,
+          needsCar: false,
+          needsHouse: false
+        }
+      );
     }
 
     console.log(`Generated ${scenarios.length} scenarios successfully`);
@@ -107,10 +135,10 @@ Generate 5 diverse scenarios now:`;
     });
 
   } catch (error: unknown) {
-    console.error("Error analyzing goals:", error);
+    console.error("Error generating scenarios:", error);
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Failed to analyze goals",
+        error: error instanceof Error ? error.message : "Failed to generate scenarios",
         details: error instanceof Error ? error.stack : String(error),
       },
       { status: 500 }
