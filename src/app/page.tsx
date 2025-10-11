@@ -154,9 +154,9 @@ export default function Home() {
 
       console.log("User uploads:", uploadContext);
 
-      // STEP 1: Use DeepSeek to generate specific scenarios
-      console.log("Step 1: Analyzing goals and generating scenarios...");
-      const analyzeResponse = await fetch("/api/analyze", {
+      // Generate vision board directly with Gemini (enhanced for consistency)
+      console.log("Generating your personalized vision board...");
+      const collageResponse = await fetch("/api/collage-direct", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -168,57 +168,16 @@ export default function Home() {
         }),
       });
 
-      if (!analyzeResponse.ok) {
-        throw new Error("Failed to analyze goals");
+      if (!collageResponse.ok) {
+        throw new Error("Failed to create vision board");
       }
 
-      const analyzeData = await analyzeResponse.json();
-      const prompts = analyzeData.prompts;
-      console.log(`Generated ${prompts.length} scenarios`);
+      const collageData = await collageResponse.json();
+      console.log("Vision board created successfully!");
 
-      // STEP 2: Generate individual images with Gemini (using selfie reference for consistency)
-      console.log("Step 2: Generating individual images...");
-      const generateResponse = await fetch("/api/generate-images", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompts,
-          categorizedUploads,
-        }),
-      });
-
-      if (!generateResponse.ok) {
-        throw new Error("Failed to generate images");
-      }
-
-      const generateData = await generateResponse.json();
-      console.log(`Generated ${generateData.images.length} individual images`);
-
-      // STEP 3: Stitch all images into final collage
-      console.log("Step 3: Stitching collage...");
-      const stitchResponse = await fetch("/api/stitch-collage", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          images: generateData.images,
-          goals,
-        }),
-      });
-
-      if (!stitchResponse.ok) {
-        throw new Error("Failed to stitch collage");
-      }
-
-      const stitchData = await stitchResponse.json();
-      console.log("Collage stitched successfully!");
-
-      // Display ONLY the final collage
+      // Display the final collage
       const finalCollageImage = {
-        url: stitchData.collageUrl,
+        url: collageData.collageUrl,
         keyword: "Vision Board 2025",
       };
 
@@ -607,12 +566,12 @@ export default function Home() {
                 <div className="animate-pulse space-y-4">
                   <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg"></div>
                   <p className="text-purple-600 font-medium text-lg">
-                    🎨 Step 1: Generating 8-12 personalized images...
+                    🎨 Creating your personalized vision board...
                   </p>
                   <p className="text-purple-500 text-sm">
-                    🖼️ Step 2: Creating your magazine-style collage...
+                    Using your photos to generate a magazine-style collage
                   </p>
-                  <p className="text-gray-500 text-xs">This may take 1-2 minutes</p>
+                  <p className="text-gray-500 text-xs">This may take 30-60 seconds</p>
                 </div>
               </div>
             )}
