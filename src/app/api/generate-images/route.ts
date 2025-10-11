@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 
 export async function POST(request: NextRequest) {
   try {
-    const { scenarios, categorizedUploads } = await request.json();
+    const { scenarios, categorizedUploads, goals } = await request.json();
 
     if (!scenarios || !Array.isArray(scenarios) || scenarios.length === 0) {
       return NextResponse.json(
@@ -179,8 +179,91 @@ Style: Professional photography, natural lighting, warm tones, high quality 1344
       );
     }
 
+    // NOW STITCH THE IMAGES INTO FINAL COLLAGE (no client round-trip = no 413 error!)
+    console.log("Stitching images into final collage on server...");
+
+    // Prepare all generated images as input parts for stitching
+    const imageParts = generatedImages.map((imageDataUri: string) => {
+      const base64Data = imageDataUri.split(',')[1];
+      const mimeType = imageDataUri.split(';')[0].split(':')[1];
+      return {
+        inlineData: {
+          data: base64Data,
+          mimeType: mimeType
+        }
+      };
+    });
+
+    // Create stitching prompt
+    const stitchPrompt = `Create a DENSE vision board collage by arranging ALL ${generatedImages.length} provided images into a magazine-style layout.
+
+CRITICAL LAYOUT REQUIREMENTS:
+- Use EVERY single image provided (all ${generatedImages.length} images)
+- Arrange them as overlapping polaroid-style photos with torn white borders
+- Cover 90% of the surface - minimal background visible
+- Tilt photos at various angles (5-25 degrees)
+- Layer them with depth - some in front, some behind
+- NO empty corners or large gaps
+
+ARRANGEMENT STYLE:
+- ${generatedImages.length === 3 ? '1 large center image, 2 medium flanking images' : 'Arrange dynamically'}
+- Heavy overlap creating visual interest
+- Diagonal layering from all directions
+- Magazine mood board aesthetic
+
+TEXT ELEMENTS (add as handwritten style):
+- "2025" prominently
+- "Grateful" / "I am growing"
+- "Dreams manifest" / "Choose happiness"
+- "${goals?.split(',')[0]?.trim() || 'Goals'}"
+
+BACKGROUND & STYLE:
+- Warm beige/cream background (barely visible)
+- Torn paper edges on all photos
+- Film photography aesthetic
+- Natural warm tones throughout
+- Professional magazine quality
+
+IMPORTANT: This is a collage assembly task - arrange the ${generatedImages.length} images into a beautiful, dense vision board. DO NOT generate new content.`;
+
+    const stitchContents = [...imageParts, { text: stitchPrompt }];
+
+    const stitchResponse = await genai.models.generateContent({
+      model: "gemini-2.5-flash-image",
+      contents: stitchContents,
+      config: {
+        imageConfig: {
+          aspectRatio: '16:9'  // 1344x768 for final collage
+        }
+      }
+    });
+
+    // Extract the final collage
+    if (!stitchResponse || !stitchResponse.candidates || stitchResponse.candidates.length === 0) {
+      throw new Error("No collage generated");
+    }
+
+    const stitchCandidate = stitchResponse.candidates[0];
+    if (!stitchCandidate.content || !stitchCandidate.content.parts) {
+      throw new Error("No content in stitch response");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stitchImagePart = stitchCandidate.content.parts.find((part: any) =>
+      part.inlineData && part.inlineData.mimeType && part.inlineData.mimeType.startsWith('image/')
+    );
+
+    if (!stitchImagePart || !stitchImagePart.inlineData) {
+      throw new Error("No image data in stitch response");
+    }
+
+    const collageDataUri = `data:${stitchImagePart.inlineData.mimeType};base64,${stitchImagePart.inlineData.data}`;
+
+    console.log("✓ Collage stitched successfully!");
+
+    // Return ONLY the final collage (not individual images)
     return NextResponse.json({
-      images: generatedImages,
+      collageUrl: collageDataUri,
       success: true,
       totalGenerated: generatedImages.length,
       totalRequested: scenarios.length,

@@ -175,8 +175,8 @@ export default function Home() {
       const analyzeData = await analyzeResponse.json();
       console.log(`✓ Generated ${analyzeData.scenarios.length} specific scenarios`);
 
-      // STEP 2: Generate individual images with Gemini for better facial consistency
-      console.log(`Step 2/3: Generating ${analyzeData.scenarios.length} individual images with facial consistency...`);
+      // STEP 2 & 3: Generate images AND stitch on server (no client round-trip!)
+      console.log(`Step 2/3: Generating ${analyzeData.scenarios.length} images and stitching on server...`);
       const generateResponse = await fetch("/api/generate-images", {
         method: "POST",
         headers: {
@@ -185,39 +185,20 @@ export default function Home() {
         body: JSON.stringify({
           scenarios: analyzeData.scenarios,
           categorizedUploads,
-        }),
-      });
-
-      if (!generateResponse.ok) {
-        throw new Error("Failed to generate individual images");
-      }
-
-      const generateData = await generateResponse.json();
-      console.log(`✓ Generated ${generateData.images.length} images successfully`);
-
-      // STEP 3: Stitch images into final collage
-      console.log("Step 3/3: Stitching images into final collage...");
-      const stitchResponse = await fetch("/api/stitch-collage", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          images: generateData.images,
           goals,
         }),
       });
 
-      if (!stitchResponse.ok) {
-        throw new Error("Failed to stitch collage");
+      if (!generateResponse.ok) {
+        throw new Error("Failed to generate vision board");
       }
 
-      const stitchData = await stitchResponse.json();
+      const generateData = await generateResponse.json();
       console.log("✓ Vision board created successfully!");
 
       // Display the final collage
       const finalCollageImage = {
-        url: stitchData.collageUrl,
+        url: generateData.collageUrl,
         keyword: "Vision Board 2025",
       };
 
