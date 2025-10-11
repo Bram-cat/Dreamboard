@@ -667,15 +667,15 @@ export default function Home() {
                     🎨 Creating your personalized vision board...
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Step 1: Creating 4 diverse scenarios for you
+                    Step 1: Creating 3 high-impact scenarios for you
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Step 2: Generating 4 photos individually with YOUR exact face
+                    Step 2: Generating 3 photos individually with YOUR exact face
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Step 3: Stitching into beautiful high-quality collage
+                    Step 3: Stitching into beautiful high-res collage (1344x768)
                   </p>
-                  <p className="text-gray-500 text-xs">Takes 45-60 seconds for perfect facial consistency</p>
+                  <p className="text-gray-500 text-xs">Takes 30-45 seconds for perfect facial consistency</p>
                 </div>
               </div>
             )}
