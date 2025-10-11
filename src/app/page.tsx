@@ -47,6 +47,7 @@ export default function Home() {
     dreamCar: null,
     destination: null
   });
+  const [selectedStyle, setSelectedStyle] = useState<"bold" | "polaroid" | "torn" | "random">("random");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState<"input" | "upload" | "preview">("input");
@@ -156,6 +157,7 @@ export default function Home() {
 
       // Generate vision board directly with Gemini (enhanced for consistency)
       console.log("Generating your personalized vision board...");
+      const styleToUse = selectedStyle === "random" ? undefined : selectedStyle;
       const collageResponse = await fetch("/api/collage-direct", {
         method: "POST",
         headers: {
@@ -165,6 +167,7 @@ export default function Home() {
           goals,
           categorizedUploads,
           uploadContext,
+          style: styleToUse,
         }),
       });
 
@@ -512,6 +515,64 @@ export default function Home() {
                     </label>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Style Selection */}
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 mb-6">
+              <h3 className="font-bold text-gray-800 mb-3 text-center">Choose Your Vision Board Style</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button
+                  onClick={() => setSelectedStyle("bold")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedStyle === "bold"
+                      ? "border-purple-600 bg-purple-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-purple-400"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">💪</div>
+                  <div className="font-bold text-sm">Bold</div>
+                  <div className="text-xs text-gray-600">Graphic & modern</div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedStyle("polaroid")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedStyle === "polaroid"
+                      ? "border-pink-600 bg-pink-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-pink-400"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">📸</div>
+                  <div className="font-bold text-sm">Polaroid</div>
+                  <div className="text-xs text-gray-600">Scattered photos</div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedStyle("torn")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedStyle === "torn"
+                      ? "border-purple-600 bg-purple-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-purple-400"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">✨</div>
+                  <div className="font-bold text-sm">Torn Paper</div>
+                  <div className="text-xs text-gray-600">Soft & dreamy</div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedStyle("random")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedStyle === "random"
+                      ? "border-gradient-to-r from-purple-600 to-pink-600 bg-gradient-to-r from-purple-100 to-pink-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-purple-400"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">🎲</div>
+                  <div className="font-bold text-sm">Surprise Me</div>
+                  <div className="text-xs text-gray-600">Random style</div>
+                </button>
               </div>
             </div>
 

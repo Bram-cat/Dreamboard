@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 
 export async function POST(request: NextRequest) {
   try {
-    const { goals, categorizedUploads, uploadContext } = await request.json();
+    const { goals, categorizedUploads, uploadContext, style } = await request.json();
 
     if (!goals || typeof goals !== "string") {
       return NextResponse.json(
@@ -77,77 +77,135 @@ export async function POST(request: NextRequest) {
     const hasCar = uploadContext?.hasDreamCar || false;
     const hasHouse = uploadContext?.hasDreamHouse || false;
 
+    // Style variations based on sample images
+    const selectedStyle = style || ['bold', 'polaroid', 'torn'][Math.floor(Math.random() * 3)];
+    console.log("Selected style:", selectedStyle);
+
+    // Define style-specific prompts
+    const stylePrompts = {
+      bold: `Create a BOLD, GRAPHIC vision board collage with high contrast and impactful typography.
+
+STYLE INSPIRATION: Magazine editorial with bold text overlays, high contrast, modern aesthetic
+- Large bold typography as key design elements
+- Strong geometric shapes and clean lines
+- High contrast color palette with pops of vibrant colors
+- Mix of photos and graphic text elements
+- Bold sans-serif fonts for main statements
+- Clean white and black text overlays
+- Professional magazine cover aesthetic
+- Text elements like "FINANCIAL FREEDOM", "2025", "VISION BOARD" in bold blocks
+- 80% coverage with strategic white space for text`,
+
+      polaroid: `Create an ORGANIC, OVERLAPPING vision board collage with polaroid-style photos at varied angles.
+
+STYLE INSPIRATION: Scattered polaroid photos with natural overlap, dynamic angles
+- Multiple polaroid frames with white borders
+- Photos tilted at various angles (15-45 degrees)
+- Heavy overlapping creating depth
+- Mix of square and rectangular frames
+- Handwritten-style captions and labels
+- Casual, authentic feel like a real cork board
+- 90% coverage with photos layered on top of each other
+- Organic placement, not grid-based
+- Some photos partially covering others`,
+
+      torn: `Create a SOFT, LAYERED vision board collage with torn paper edges and handwritten elements.
+
+STYLE INSPIRATION: Torn magazine pages with soft aesthetic, handwritten quotes
+- Torn paper edges on all photo elements (irregular, organic edges)
+- Soft, warm color palette (beige, cream, pastels)
+- Handwritten-style script fonts for quotes
+- Delicate aesthetic with feminine touches
+- Scattered confetti or small decorative elements
+- Washi tape effect on some edges
+- Watercolor or soft textures in background
+- 85% coverage with gentle overlaps
+- Dreamy, aspirational mood`
+    };
+
+    // Get the base prompt for selected style
+    const styleBasePrompt = stylePrompts[selectedStyle as keyof typeof stylePrompts] || stylePrompts.torn;
+
     // Create detailed prompt for vision board collage
-    const collagePrompt = `Create a DENSE vision board collage in magazine cutout aesthetic with 90% surface coverage.
+    const collagePrompt = `${styleBasePrompt}
 
-CRITICAL REQUIREMENTS:
-${imageParts.length > 0 ? `- Use the ${imageParts.length} reference image(s) provided. The person/car/house in these photos MUST appear throughout the collage.` : ''}
-${hasSelfie ? '- The person in the first image is the main subject - show them in MULTIPLE scenarios' : ''}
-${hasCar ? `- Include the car from the reference image in multiple scenes` : ''}
-${hasHouse ? `- Include the house from the reference image prominently` : ''}
+CRITICAL FACIAL CONSISTENCY REQUIREMENTS:
+${hasSelfie ? `- The FIRST reference image shows the person who this vision board belongs to
+- This person's face MUST appear in EVERY photo that shows a person
+- CRITICAL: Maintain EXACT facial features across all representations:
+  * Same skin tone and complexion
+  * Same facial structure and bone structure
+  * Same eye shape, color, and expression style
+  * Same hair color, texture, and style
+  * Same nose shape and size
+  * Same mouth and smile
+  * Same overall facial proportions
+- Generate this SAME PERSON in different scenarios, outfits, and settings
+- NO random people, NO stock photos of other people
+- If you cannot maintain facial consistency, show the scene without a person
+- Every human figure must be recognizably the same individual from the reference photo` : ''}
+${imageParts.length > 0 ? `- Use the ${imageParts.length} reference image(s) provided` : ''}
+${hasCar ? `- The dream car from reference image must appear exactly as shown` : ''}
+${hasHouse ? `- The dream house from reference image must appear exactly as shown` : ''}
 
-LAYOUT & STYLE:
-- Magazine cutout style with torn white borders on all photo elements
-- Overlapping polaroid-style photos at various angles (tilted 5-20 degrees)
-- Mix of sizes: 3 large focal polaroids, 5 medium photos, 7 small accent photos
-- Warm beige/cream background (barely visible due to density)
-- Film photography aesthetic with subtle grain
-- NO empty corners - pack tightly like a real vision board
+CONTENT ELEMENTS - CREATE 18-24 DISTINCT PHOTO ELEMENTS:
 
-CENTER FOCUS SCENES:
-${hasSelfie ? `- Main subject celebrating success with arms raised, golden hour lighting, confident pose
-- Main subject doing yoga or meditation at sunrise, peaceful expression, ocean or mountain view
-${hasCar ? '- Main subject driving their dream car, happy expression, scenic open road' : ''}
-${hasHouse ? '- Main subject standing proudly in front of their dream house, accomplished mood' : ''}` : '- Aspirational lifestyle scenes showing achievement and wellness'}
+PRIMARY SCENES WITH MAIN SUBJECT (5-7 larger photos):
+${hasSelfie ? `1. Main subject in business attire looking confident, city skyline background, success pose
+2. Main subject practicing yoga on beach at sunrise, serene expression, waves in background
+3. Main subject laughing with arms raised in celebration, golden hour lighting
+4. Main subject reading in a cozy corner with coffee, peaceful contemplative mood
+${hasCar ? '5. Main subject with their dream car, hand on hood, proud smile, scenic location' : '5. Main subject at outdoor cafe, stylish outfit, enjoying the moment'}
+${hasHouse ? '6. Main subject in front of their dream house, key in hand, achievement moment' : '6. Main subject hiking on mountain trail, backpack, adventurous spirit'}
+7. Main subject meditating in nature, eyes closed, peaceful zen moment` : 'Aspirational lifestyle and wellness scenes'}
 
-SURROUNDING ELEMENTS (15+ smaller polaroids scattered throughout):
-${hasHouse ? '- The dream house exterior in warm golden hour light' : '- Modern luxury house with clean architecture'}
-${hasCar ? '- The dream car on a scenic mountain road or coastal highway' : '- Luxury sports car in aspirational setting'}
-- Eiffel Tower Paris street view, autumn colors, romantic atmosphere
-- Tropical beach with turquoise water, palm trees, paradise vibes
-${hasSelfie ? '- Main subject at beach during sunset, peaceful moment' : '- Beach sunset silhouette'}
-- Healthy acai bowl with fresh berries and granola, aesthetic overhead shot
-- Green smoothie bowl with chia seeds and fruit toppings
-- Fresh salad with avocado and colorful vegetables
-- Morning coffee with beautiful latte art, cozy cafe setting
-- Yoga mat with water bottle and towel, fitness motivation
-- Running shoes on a trail, active lifestyle
-- Meditation cushion in peaceful zen garden
-- Journal and pen on wooden table, self-care routine
-- Face mask and spa items, wellness self-care
-- Minimalist luxury bedroom with white linens
-- Modern walk-in closet with organized clothing
-- Sunset view from airplane window, wanderlust
-- Stacked books on personal development
-- Candles and essential oils, peaceful ambiance
+LIFESTYLE & WELLNESS ELEMENTS (10-12 medium/small photos):
+${hasHouse ? '- The dream house: modern exterior, landscaped yard, warm inviting lighting' : '- Luxury modern home: glass walls, pool, contemporary architecture'}
+${hasCar ? '- The dream car: on coastal highway, mountains in background, adventure mood' : '- High-end sports car: sleek design, urban setting or nature backdrop'}
+- Travel destinations: Eiffel Tower with autumn leaves, Parisian cafe scene
+- Tropical paradise: turquoise waters, white sand beach, palm trees swaying
+- Mountain landscape: snow-capped peaks, hiking trail, adventure awaits
+- Wellness food: acai bowl with berries, granola, coconut, beautiful presentation
+- Green smoothie: chia seeds, fresh fruits, mint, aesthetic overhead shot
+- Healthy meal prep: colorful salads, grilled salmon, quinoa, balanced nutrition
+- Morning ritual: latte art coffee, croissant, sunlight streaming through window
+- Fitness motivation: yoga mat rolled up, dumbbells, water bottle, active lifestyle
+- Spa self-care: face masks, candles, essential oils, bath salts, relaxation
+- Cozy reading nook: stack of self-help books, warm blanket, peaceful corner
+- Luxury bedroom: white linens, plants, minimalist design, serene space
+- Walk-in closet: organized clothes, shoes displayed, fashionable wardrobe
+- Workspace: laptop, journal, pen, coffee, productive creative space
+- Sunset/sunrise: golden hour sky, silhouette moment, new beginnings
 
-INSPIRATIONAL QUOTES & TEXT (scattered elegantly, handwritten style):
-- "I am growing" in flowing cursive
-- "Grateful" in elegant script
-- "2025" in bold handwriting
-- "Dreams manifest" in soft feminine font
+INSPIRATIONAL QUOTES & TEXT (integrate naturally based on ${selectedStyle} style):
+${selectedStyle === 'bold' ? '- Large bold text: "2025", "VISION BOARD", "MANIFEST"' : '- "2025" prominently displayed'}
+- "I am growing" / "Grateful" / "Blessed"
 - "She believed she could, so she did"
-- "Choose happiness"
-- "Good vibes only"
-- "Self-love is the best love"
-- "Bloom where you are planted"
-- "Live, laugh, love"
-- "Be your own kind of beautiful"
+- "Choose joy" / "Good vibes only"
+- "Self-love" / "Peace of mind"
+- "Bloom where planted" / "Create sunshine"
+- "Aligned, abundant, unstoppable"
 - "Inhale confidence, exhale doubt"
-- "Create your own sunshine"
+- "Money flows to me effortlessly" (if financial goals mentioned)
+- "Healthy mind, healthy body, healthy soul"
+- "Living my best life"
 - "${goals.split(',')[0].trim()}" featured prominently
+${selectedStyle === 'bold' ? '- Use BOLD, MODERN fonts with high contrast' : selectedStyle === 'polaroid' ? '- Use casual, handwritten-style captions' : '- Use soft, elegant script fonts'}
 
-QUALITY REQUIREMENTS:
+CRITICAL QUALITY REQUIREMENTS:
 - Professional magazine editorial quality
-- Consistent person/car/house identity throughout (use reference images)
-- Heavy overlap creating visual depth and interest
-- Warm color palette: beige, cream, soft gold, warm neutrals
+${hasSelfie ? `- ABSOLUTE FACIAL CONSISTENCY: Every person must be the EXACT SAME individual from reference photo
+- If you cannot maintain perfect facial consistency, DO NOT include that person photo
+- Better to show object/scene only than to show wrong person` : ''}
+- Consistent car/house identity throughout (match reference images exactly)
+- NO random stock photos, NO generic people
+- Visual variety: different poses, settings, outfits, but SAME person
 - All text must be legible and meaningful
-- NO random unrelated people - only use the reference images provided
+- Appropriate spacing and overlap for ${selectedStyle} style
 
 PRIMARY GOALS TO VISUALIZE: ${goals}
 
-Remember: This is a PERSONAL vision board - every person shown must be the same individual from the reference photo. Create a cohesive, inspiring, magazine-quality collage that tells their unique story of achievement and aspiration.`;
+REMEMBER: This is a PERSONAL vision board for ONE specific person. Every human face must be recognizably the same individual from the first reference image. Facial consistency is MORE IMPORTANT than quantity - show fewer photos of the person if needed to maintain perfect consistency.`;
 
     console.log(`Prompt length: ${collagePrompt.length} characters`);
 
