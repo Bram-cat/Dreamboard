@@ -209,25 +209,47 @@ ${
 
 CONTENT ELEMENTS - CREATE 18-24 DISTINCT PHOTO ELEMENTS:
 
+🚨 LOGICAL SCENE VALIDATION (CRITICAL - NO NONSENSICAL COMBINATIONS!) 🚨
+
+EACH SCENE MUST MAKE LOGICAL SENSE:
+✓ Gym workout → GYM SETTING (weights, equipment, fitness area)
+✓ Travel → TRAVEL LOCATION (airport terminal, beach, tourist spot)
+✓ Private jet → LUXURY TRAVEL (sitting, champagne, no exercise equipment)
+✓ Business → OFFICE OR CITY (desk, skyline, professional setting)
+✓ Wellness → SPA OR NATURE (yoga mat, meditation outdoors, peaceful)
+
+✗ FORBIDDEN COMBINATIONS (THESE MAKE NO SENSE):
+   ✗ Working out with dumbbells INSIDE a private jet
+   ✗ Gym equipment ON an airplane
+   ✗ Lifting weights while flying
+   ✗ Yoga in a car
+   ✗ Business suit at the gym
+   ✗ Exercise equipment in luxury settings (unless home gym)
+
+⚠️ BEFORE CREATING EACH SCENE, ASK:
+1. Does this activity belong in this location?
+2. Would a real person actually do this here?
+3. If NO → CHANGE THE SCENE to be logical
+
 PRIMARY SCENES WITH MAIN SUBJECT (6-8 larger photos showing diverse activities):
 ${
   hasSelfie
     ? `1. Main subject in sharp business attire, confident power pose, modern office or city skyline background
 2. Main subject at outdoor cafe or restaurant, stylish casual outfit, enjoying coffee/meal, social setting
 3. Main subject celebrating success with arms raised, big smile, golden hour lighting, achievement moment
-4. Main subject in gym workout clothes, active pose (lifting weights or running), fitness motivation
+4. Main subject in GYM SETTING wearing workout clothes, active pose (lifting weights or running) - MUST BE IN ACTUAL GYM with fitness equipment visible
 ${
   hasCar
     ? "5. Main subject with their dream car, proud expression, hand on hood, scenic mountain or coastal road"
-    : "5. Main subject traveling - airport, beach, or mountain view, adventure mode, backpack or suitcase"
+    : "5. Main subject traveling - INSIDE airport terminal OR standing at beach OR at tourist landmark, adventure mode, appropriate travel outfit"
 }
 ${
   hasHouse
     ? "6. Main subject in front of their dream house, holding keys, accomplished smile, beautiful exterior"
     : "6. Main subject in luxurious interior, reading or relaxing, cozy sophisticated space"
 }
-7. Main subject in ONE wellness scene ONLY: either gentle yoga pose OR peaceful meditation in nature (choose ONE, not both)
-8. Main subject at social gathering or event, dressed up, happy interaction, celebrating life`
+7. Main subject in wellness scene: EITHER gentle yoga pose on mat in nature OR peaceful meditation outdoors (choose ONE, not both, must be in appropriate peaceful setting)
+8. Main subject INSIDE private jet sitting comfortably with champagne (NO exercise equipment, NO gym activities, ONLY luxury relaxation)`
     : "Aspirational lifestyle and achievement scenes"
 }
 
@@ -324,15 +346,59 @@ ${
 CRITICAL QUALITY REQUIREMENTS:
 - Professional magazine editorial quality at 1344x768 resolution
 
-TEXT QUALITY (EXTREMELY IMPORTANT):
-- ALL TEXT MUST BE PERFECTLY SPELLED - no typos, no gibberish, no random letters
-- ALL TEXT MUST BE CRYSTAL CLEAR AND LEGIBLE - sharp, in-focus, readable
-- Check spelling: "ABUNDANT" not "ABUNNY", "UNSTOPPABLE" not "UNSTOPPY"
-- Check spelling: "GRATEFUL" not "GRATEFIL", "FINANCIAL" spelled correctly
-- If text is blurry or unclear, DO NOT INCLUDE IT - blank space is better than bad text
-- Use clean fonts: Bold sans-serif for headers, elegant script for quotes
-- Ensure high contrast: dark text on light background or vice versa
-- Text size must be large enough to read clearly
+🚨🚨🚨 TEXT QUALITY RULES (ABSOLUTELY CRITICAL - ZERO TOLERANCE FOR ERRORS) 🚨🚨🚨
+
+BEFORE INCLUDING ANY TEXT, YOU MUST VERIFY EVERY SINGLE WORD:
+
+✓ SPELL CHECK EVERY WORD INDIVIDUALLY:
+   - "FINANCIAL" ✓ (NOT "FINACIAL" ✗)
+   - "FREEDOM" ✓ (NOT "FREDOM" ✗)
+   - "ABUNDANT" ✓ (NOT "ABUNNY", "ABUND", "ABUNDNT" ✗)
+   - "UNSTOPPABLE" ✓ (NOT "UNSTOPPY", "UNSTOPABLE" ✗)
+   - "GRATEFUL" ✓ (NOT "GRATEFIL", "GRATEFULL" ✗)
+   - "MANIFEST" ✓ (NOT "MANIFST" ✗)
+   - "SUCCESS" ✓ (NOT "SUCESS", "SUCESSS" ✗)
+   - "WELLNESS" ✓ (NOT "WELNESS" ✗)
+   - "WARRIOR" ✓ (NOT "WARDER", "WARROIR" ✗)
+   - "FLOWS" ✓ (NOT "FLAWS" ✗)
+   - "FOR US" ✓ (NOT "FO RUS", "FORUS" ✗ - MUST HAVE SPACE!)
+
+✓ NO BROKEN WORDS:
+   - Words must be COMPLETE and UNBROKEN
+   - "FOR US" must have a space between words
+   - "ISN'T" must have apostrophe in correct place
+   - Never split words across lines incorrectly
+   - Example WRONG: "FO RUS", "SELF- CARE"
+   - Example CORRECT: "FOR US", "SELF-CARE"
+
+✓ NO GIBBERISH TEXT:
+   - Every word must be a REAL ENGLISH WORD
+   - NO random letter combinations like "WANEY", "FOREM", "WARDER"
+   - If you can't spell it correctly, DO NOT INCLUDE IT
+   - Better to have NO text than WRONG text
+
+✓ LEGIBILITY CHECK:
+   - Text must be CRYSTAL CLEAR and IN FOCUS
+   - High contrast: white text on dark OR black text on white
+   - Text size minimum 18px for quotes, 36px for headers
+   - NO blurry, distorted, or unclear text
+   - If clarity is compromised, REMOVE THE TEXT
+
+✓ LOGICAL PHRASES ONLY:
+   - Use ONLY the exact quotes provided in this prompt
+   - Do NOT invent new phrases or modify existing ones
+   - If a phrase doesn't fit, skip it - don't modify it
+   - Example: "SELF-CARE ISN'T SELFISH" is provided phrase
+   - NEVER change it to "SELF-CARE ISN'T FOREM WARDER" or nonsense
+
+⚠️ QUALITY GATE: Before finalizing image, verify EVERY text element:
+1. Is every word spelled correctly? (Check letter by letter)
+2. Are words properly spaced?
+3. Is text clearly readable?
+4. Is it a logical, real phrase?
+5. If ANY answer is NO → REMOVE THAT TEXT
+
+🛑 BETTER TO HAVE 5 PERFECT QUOTES THAN 12 BROKEN/MISSPELLED ONES
 
 FACIAL CONSISTENCY:
 ${

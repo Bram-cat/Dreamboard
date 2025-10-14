@@ -49,26 +49,40 @@ Create ONE comprehensive prompt describing a complete vision board collage that 
 
     const userPrompt = `User's Goals: ${goals}
 
-User uploaded: ${hasSelfie ? 'Selfie ✓' : ''} ${hasHouse ? 'Dream House ✓' : ''} ${hasCar ? 'Dream Car ✓' : ''} ${hasDestination ? 'Destination ✓' : ''}
+User uploaded: ${hasSelfie ? "Selfie ✓" : ""} ${
+      hasHouse ? "Dream House ✓" : ""
+    } ${hasCar ? "Dream Car ✓" : ""} ${hasDestination ? "Destination ✓" : ""}
 
 Generate 10-15 SHORT prompts (under 80 chars) for CONTEXTUAL COMPOSITE scenes:
 
 CRITICAL - Create composite scenarios based on uploads:
-${hasSelfie && hasCar ? '- "@userPhoto driving luxury sports car, happy, cinematic"' : ''}
-${hasSelfie && hasHouse ? '- "@userPhoto standing in front of modern dream house, proud"' : ''}
-${hasSelfie && hasDestination ? '- "@userPhoto celebrating at travel destination, arms raised"' : ''}
-${hasSelfie ? '- "@userPhoto doing yoga at sunset, peaceful, warm light"' : ''}
-${hasSelfie ? '- "@userPhoto at beach celebrating success, golden hour"' : ''}
+${
+  hasSelfie && hasCar
+    ? '- "@userPhoto driving luxury sp orts car, happy, cinematic"'
+    : ""
+}
+${
+  hasSelfie && hasHouse
+    ? '- "@userPhoto standing in front of modern dream house, proud"'
+    : ""
+}
+${
+  hasSelfie && hasDestination
+    ? '- "@userPhoto celebrating at travel destination, arms raised"'
+    : ""
+}
+${hasSelfie ? '- "@userPhoto doing yoga at sunset, peaceful, warm light"' : ""}
+${hasSelfie ? '- "@userPhoto at beach celebrating success, golden hour"' : ""}
 
 Additional prompts (under 80 chars each):
 
 REQUIRED IMAGES (select based on goals):
 1. Modern luxury dream house exterior
 2. Travel destination (Paris/Eiffel Tower, tropical beach, or mountain based on: ${goals})
-3. ${hasSelfie ? '@userPhoto' : 'Woman'} doing yoga or meditation
+3. ${hasSelfie ? "@userPhoto" : "Woman"} doing yoga or meditation
 4. Healthy lifestyle food (acai bowl, smoothie, or coffee)
 5. Nature scene (sunset, garden, or ocean)
-6. ${hasSelfie ? '@userPhoto' : 'Woman'} at beach or celebrating
+6. ${hasSelfie ? "@userPhoto" : "Woman"} at beach or celebrating
 7. Minimalist luxury interior
 8-12. Add more based on goals: ${goals}
    - If "money/wealth/financial": gold coins, luxury car, champagne
@@ -119,26 +133,56 @@ Return a JSON array of 8-12 short prompts: ["prompt 1", "prompt 2", ...]`;
       prompts = [];
 
       // Core prompts for all vision boards
-      prompts.push("Modern luxury dream house exterior, warm tones, film photography");
-      prompts.push("Paris Eiffel Tower street view, autumn, film aesthetic, warm light");
-      prompts.push(`${hasSelfie ? '@userPhoto' : 'Woman'} doing yoga at sunrise, peaceful, warm natural light`);
-      prompts.push("Healthy acai bowl with berries, overhead shot, aesthetic food photography");
-      prompts.push("Tropical beach sunset, turquoise water, paradise, warm tones");
-      prompts.push(`${hasSelfie ? '@userPhoto' : 'Woman'} at beach celebrating, arms raised, golden hour`);
-      prompts.push("Minimalist luxury interior, modern design, natural daylight");
+      prompts.push(
+        "Modern luxury dream house exterior, warm tones, film photography"
+      );
+      prompts.push(
+        "Paris Eiffel Tower street view, autumn, film aesthetic, warm light"
+      );
+      prompts.push(
+        `${
+          hasSelfie ? "@userPhoto" : "Woman"
+        } doing yoga at sunrise, peaceful, warm natural light`
+      );
+      prompts.push(
+        "Healthy acai bowl with berries, overhead shot, aesthetic food photography"
+      );
+      prompts.push(
+        "Tropical beach sunset, turquoise water, paradise, warm tones"
+      );
+      prompts.push(
+        `${
+          hasSelfie ? "@userPhoto" : "Woman"
+        } at beach celebrating, arms raised, golden hour`
+      );
+      prompts.push(
+        "Minimalist luxury interior, modern design, natural daylight"
+      );
       prompts.push("Morning coffee latte art, cozy aesthetic, warm tones");
 
       // Add goal-specific prompts
       keywords.forEach((keyword: string) => {
         const kw = keyword.toLowerCase();
-        if (kw.includes("money") || kw.includes("wealth") || kw.includes("rich")) {
-          prompts.push("Stack of gold coins and cash, abundance, overhead flat lay");
+        if (
+          kw.includes("money") ||
+          kw.includes("wealth") ||
+          kw.includes("rich")
+        ) {
+          prompts.push(
+            "Stack of gold coins and cash, abundance, overhead flat lay"
+          );
         }
         if (kw.includes("car") || kw.includes("vehicle")) {
-          prompts.push("Luxury sports car on scenic road, dream car, golden hour");
+          prompts.push(
+            "Luxury sports car on scenic road, dream car, golden hour"
+          );
         }
         if (kw.includes("fitness") || kw.includes("health")) {
-          prompts.push(`${hasSelfie ? '@userPhoto' : 'Woman'} working out, fitness journey, gym, natural light`);
+          prompts.push(
+            `${
+              hasSelfie ? "@userPhoto" : "Woman"
+            } working out, fitness journey, gym, natural light`
+          );
         }
         if (kw.includes("travel")) {
           prompts.push("Airplane window view clouds and sky, wanderlust vibes");
