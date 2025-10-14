@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import sharp from "sharp";
 
 export async function POST(request: NextRequest) {
   try {
-    const { goals, categorizedUploads, uploadContext, style } = await request.json();
+    const { goals, categorizedUploads, uploadContext, style } =
+      await request.json();
 
     if (!goals || typeof goals !== "string") {
       return NextResponse.json(
@@ -33,39 +35,50 @@ export async function POST(request: NextRequest) {
     // Prepare reference images for Gemini (convert data URIs to parts)
     const imageParts = [];
 
-    if (categorizedUploads?.selfie && categorizedUploads.selfie.startsWith('data:')) {
+    if (
+      categorizedUploads?.selfie &&
+      categorizedUploads.selfie.startsWith("data:")
+    ) {
       // Extract base64 data
-      const base64Data = categorizedUploads.selfie.split(',')[1];
-      const mimeType = categorizedUploads.selfie.split(';')[0].split(':')[1];
+      const base64Data = categorizedUploads.selfie.split(",")[1];
+      const mimeType = categorizedUploads.selfie.split(";")[0].split(":")[1];
       imageParts.push({
         inlineData: {
           data: base64Data,
-          mimeType: mimeType
-        }
+          mimeType: mimeType,
+        },
       });
       console.log("Added selfie as reference image");
     }
 
-    if (categorizedUploads?.dreamCar && categorizedUploads.dreamCar.startsWith('data:')) {
-      const base64Data = categorizedUploads.dreamCar.split(',')[1];
-      const mimeType = categorizedUploads.dreamCar.split(';')[0].split(':')[1];
+    if (
+      categorizedUploads?.dreamCar &&
+      categorizedUploads.dreamCar.startsWith("data:")
+    ) {
+      const base64Data = categorizedUploads.dreamCar.split(",")[1];
+      const mimeType = categorizedUploads.dreamCar.split(";")[0].split(":")[1];
       imageParts.push({
         inlineData: {
           data: base64Data,
-          mimeType: mimeType
-        }
+          mimeType: mimeType,
+        },
       });
       console.log("Added dream car as reference image");
     }
 
-    if (categorizedUploads?.dreamHouse && categorizedUploads.dreamHouse.startsWith('data:')) {
-      const base64Data = categorizedUploads.dreamHouse.split(',')[1];
-      const mimeType = categorizedUploads.dreamHouse.split(';')[0].split(':')[1];
+    if (
+      categorizedUploads?.dreamHouse &&
+      categorizedUploads.dreamHouse.startsWith("data:")
+    ) {
+      const base64Data = categorizedUploads.dreamHouse.split(",")[1];
+      const mimeType = categorizedUploads.dreamHouse
+        .split(";")[0]
+        .split(":")[1];
       imageParts.push({
         inlineData: {
           data: base64Data,
-          mimeType: mimeType
-        }
+          mimeType: mimeType,
+        },
       });
       console.log("Added dream house as reference image");
     }
@@ -78,7 +91,8 @@ export async function POST(request: NextRequest) {
     const hasHouse = uploadContext?.hasDreamHouse || false;
 
     // Style variations based on sample images
-    const selectedStyle = style || ['bold', 'polaroid', 'torn'][Math.floor(Math.random() * 3)];
+    const selectedStyle =
+      style || ["bold", "polaroid", "torn"][Math.floor(Math.random() * 3)];
     console.log("Selected style:", selectedStyle);
 
     // Define style-specific prompts
@@ -120,51 +134,116 @@ STYLE INSPIRATION: Torn magazine pages with soft aesthetic, handwritten quotes
 - Washi tape effect on some edges
 - Watercolor or soft textures in background
 - 85% coverage with gentle overlaps
-- Dreamy, aspirational mood`
+- Dreamy, aspirational mood`,
     };
 
     // Get the base prompt for selected style
-    const styleBasePrompt = stylePrompts[selectedStyle as keyof typeof stylePrompts] || stylePrompts.torn;
+    const styleBasePrompt =
+      stylePrompts[selectedStyle as keyof typeof stylePrompts] ||
+      stylePrompts.torn;
 
     // Create detailed prompt for vision board collage
     const collagePrompt = `${styleBasePrompt}
 
-CRITICAL FACIAL CONSISTENCY REQUIREMENTS:
-${hasSelfie ? `- The FIRST reference image shows the person who this vision board belongs to
-- This person's face MUST appear in EVERY photo that shows a person
-- CRITICAL: Maintain EXACT facial features across all representations:
-  * Same skin tone and complexion
-  * Same facial structure and bone structure
-  * Same eye shape, color, and expression style
-  * Same hair color, texture, and style
-  * Same nose shape and size
-  * Same mouth and smile
-  * Same overall facial proportions
-- Generate this SAME PERSON in different scenarios, outfits, and settings
-- NO random people, NO stock photos of other people
-- If you cannot maintain facial consistency, show the scene without a person
-- Every human figure must be recognizably the same individual from the reference photo` : ''}
-${imageParts.length > 0 ? `- Use the ${imageParts.length} reference image(s) provided` : ''}
-${hasCar ? `- The dream car from reference image must appear exactly as shown` : ''}
-${hasHouse ? `- The dream house from reference image must appear exactly as shown` : ''}
+⚠️⚠️⚠️ CRITICAL FACIAL CONSISTENCY REQUIREMENTS (TOP PRIORITY) ⚠️⚠️⚠️
+${
+  hasSelfie
+    ? `
+FACIAL CONSISTENCY IS THE #1 PRIORITY - MORE IMPORTANT THAN ANYTHING ELSE!
+
+The FIRST reference image shows the EXACT person who this vision board belongs to.
+
+STEP-BY-STEP REQUIREMENTS FOR EVERY PHOTO WITH A PERSON:
+
+1️⃣ STUDY THE REFERENCE PHOTO CAREFULLY:
+   - Memorize the person's EXACT facial features before generating any photos
+   - This is the TEMPLATE - every person photo must match this EXACTLY
+
+2️⃣ COPY THESE EXACT FEATURES TO EVERY PHOTO WITH A PERSON:
+   ✓ EXACT same face shape and bone structure
+   ✓ EXACT same skin tone (shade, undertone, complexion)
+   ✓ EXACT same eyes (shape, color, eyebrow shape)
+   ✓ EXACT same nose (shape, size, nostril shape)
+   ✓ EXACT same mouth (lip shape, smile, teeth)
+   ✓ EXACT same hair (color, texture, style)
+   ✓ EXACT same jawline, cheekbones, forehead
+   ✓ Person must be IMMEDIATELY recognizable as the same individual
+
+3️⃣ FORBIDDEN - NEVER DO THIS:
+   ✗ NO inventing new facial features
+   ✗ NO generic/stock photo faces
+   ✗ NO "similar looking" people
+   ✗ NO different faces in different photos
+   ✗ NO AI-generated random faces
+   ✗ NO approximations - must be EXACT match
+
+4️⃣ QUALITY CHECK BEFORE EACH PHOTO:
+   Ask: "Does this person's face EXACTLY match the reference photo?"
+   - If NO → Remove person, show only the scene/objects
+   - If MAYBE → Remove person, not good enough
+   - If YES, PERFECT MATCH → Keep the photo
+
+5️⃣ PRIORITY:
+   - Better to have 4 photos with PERFECT facial match
+   - Than 10 photos with slightly different faces
+   - The user WILL immediately notice any facial variation
+
+REMEMBER: This person is creating a vision board of THEMSELVES. They know their own face PERFECTLY. Any slight variation will be instantly noticed and the board will be unusable.`
+    : ""
+}
+${
+  imageParts.length > 0
+    ? `\n📸 ${imageParts.length} reference image(s) provided - USE THEM AS YOUR GUIDE FOR EVERY PHOTO!`
+    : ""
+}
+${
+  hasCar
+    ? `\n🚗 Dream car from reference must appear EXACTLY as shown`
+    : ""
+}
+${
+  hasHouse
+    ? `\n🏠 Dream house from reference must appear EXACTLY as shown`
+    : ""
+}
 
 CONTENT ELEMENTS - CREATE 18-24 DISTINCT PHOTO ELEMENTS:
 
 PRIMARY SCENES WITH MAIN SUBJECT (6-8 larger photos showing diverse activities):
-${hasSelfie ? `1. Main subject in sharp business attire, confident power pose, modern office or city skyline background
+${
+  hasSelfie
+    ? `1. Main subject in sharp business attire, confident power pose, modern office or city skyline background
 2. Main subject at outdoor cafe or restaurant, stylish casual outfit, enjoying coffee/meal, social setting
 3. Main subject celebrating success with arms raised, big smile, golden hour lighting, achievement moment
 4. Main subject in gym workout clothes, active pose (lifting weights or running), fitness motivation
-${hasCar ? '5. Main subject with their dream car, proud expression, hand on hood, scenic mountain or coastal road' : '5. Main subject traveling - airport, beach, or mountain view, adventure mode, backpack or suitcase'}
-${hasHouse ? '6. Main subject in front of their dream house, holding keys, accomplished smile, beautiful exterior' : '6. Main subject in luxurious interior, reading or relaxing, cozy sophisticated space'}
+${
+  hasCar
+    ? "5. Main subject with their dream car, proud expression, hand on hood, scenic mountain or coastal road"
+    : "5. Main subject traveling - airport, beach, or mountain view, adventure mode, backpack or suitcase"
+}
+${
+  hasHouse
+    ? "6. Main subject in front of their dream house, holding keys, accomplished smile, beautiful exterior"
+    : "6. Main subject in luxurious interior, reading or relaxing, cozy sophisticated space"
+}
 7. Main subject in ONE wellness scene ONLY: either gentle yoga pose OR peaceful meditation in nature (choose ONE, not both)
-8. Main subject at social gathering or event, dressed up, happy interaction, celebrating life` : 'Aspirational lifestyle and achievement scenes'}
+8. Main subject at social gathering or event, dressed up, happy interaction, celebrating life`
+    : "Aspirational lifestyle and achievement scenes"
+}
 
 LIFESTYLE & WELLNESS ELEMENTS (12-15 medium/small photos with diverse themes):
 
 WEALTH & SUCCESS:
-${hasHouse ? '- Dream house: modern architecture, landscaped yard, golden hour glow' : '- Luxury penthouse: floor-to-ceiling windows, city skyline, modern interior'}
-${hasCar ? '- Dream car: sleek on coastal highway, mountains backdrop, freedom vibe' : '- High-end sports car: luxury showroom or scenic mountain road'}
+${
+  hasHouse
+    ? "- Dream house: modern architecture, landscaped yard, golden hour glow"
+    : "- Luxury penthouse: floor-to-ceiling windows, city skyline, modern interior"
+}
+${
+  hasCar
+    ? "- Dream car: sleek on coastal highway, mountains backdrop, freedom vibe"
+    : "- High-end sports car: luxury showroom or scenic mountain road"
+}
 - Stacks of cash/money bills aesthetically arranged, wealth manifestation
 - Designer shopping bags (Chanel, Gucci, Louis Vuitton), luxury lifestyle
 - Gold jewelry, watches, elegant accessories, success symbols
@@ -205,7 +284,11 @@ CUTE & FUN ELEMENTS (add 2-3 if space allows):
 - Coffee and pastry: aesthetic cafe flat lay, croissant, latte art
 
 INSPIRATIONAL QUOTES & TEXT (scatter 8-12 quotes naturally):
-${selectedStyle === 'bold' ? '- Large bold text: "2025", "VISION BOARD", "MANIFEST", "SUCCESS"' : '- "2025" prominently displayed in elegant script'}
+${
+  selectedStyle === "bold"
+    ? '- Large bold text: "2025", "VISION BOARD", "MANIFEST", "SUCCESS"'
+    : '- "2025" prominently displayed in elegant script'
+}
 
 MANIFESTATION & SUCCESS:
 - "I am a money magnet" / "Abundance flows to me"
@@ -227,10 +310,16 @@ WELLNESS & SELF-LOVE:
 - "Inhale confidence, exhale doubt"
 
 PERSONAL GOALS:
-- "${goals.split(',')[0]?.trim() || 'My Goals'}" featured prominently
+- "${goals.split(",")[0]?.trim() || "My Goals"}" featured prominently
 - Add 2-3 words from user's goals as scattered text elements
 
-${selectedStyle === 'bold' ? 'Use BOLD UPPERCASE sans-serif fonts, high contrast black/white' : selectedStyle === 'polaroid' ? 'Use casual handwritten-style script, black ink on white' : 'Use elegant cursive/script fonts, soft gold or black text'}
+${
+  selectedStyle === "bold"
+    ? "Use BOLD UPPERCASE sans-serif fonts, high contrast black/white"
+    : selectedStyle === "polaroid"
+    ? "Use casual handwritten-style script, black ink on white"
+    : "Use elegant cursive/script fonts, soft gold or black text"
+}
 
 CRITICAL QUALITY REQUIREMENTS:
 - Professional magazine editorial quality at 1344x768 resolution
@@ -246,11 +335,15 @@ TEXT QUALITY (EXTREMELY IMPORTANT):
 - Text size must be large enough to read clearly
 
 FACIAL CONSISTENCY:
-${hasSelfie ? `- ABSOLUTE FACIAL CONSISTENCY: Every person must be the EXACT SAME individual from reference photo
+${
+  hasSelfie
+    ? `- ABSOLUTE FACIAL CONSISTENCY: Every person must be the EXACT SAME individual from reference photo
 - Same face, skin tone, features, hair style across ALL photos showing the person
 - If you cannot maintain perfect facial consistency, show the scene without a person
 - Better to show object/scene only than to show wrong person
-- NO random stock photos, NO generic people - ONLY use reference photo person` : '- NO random people if no selfie provided'}
+- NO random stock photos, NO generic people - ONLY use reference photo person`
+    : "- NO random people if no selfie provided"
+}
 
 VISUAL QUALITY:
 - Consistent car/house identity throughout (match reference images exactly)
@@ -277,69 +370,145 @@ REMEMBER: This is a PERSONAL vision board for ONE specific person. Every human f
         contents: contents,
         config: {
           imageConfig: {
-            aspectRatio: '16:9'  // 1344x768 - highest quality landscape format
-          }
-        }
+            aspectRatio: "16:9", // 1344x768 - highest quality landscape format
+          },
+        },
       });
 
       console.log("Gemini response received");
-      console.log("Response structure:", JSON.stringify({
-        hasCandidates: !!response.candidates,
-        numCandidates: response.candidates?.length || 0
-      }));
+      console.log(
+        "Response structure:",
+        JSON.stringify({
+          hasCandidates: !!response.candidates,
+          numCandidates: response.candidates?.length || 0,
+        })
+      );
 
       // Extract generated image from response
-      if (!response || !response.candidates || response.candidates.length === 0) {
+      if (
+        !response ||
+        !response.candidates ||
+        response.candidates.length === 0
+      ) {
         throw new Error("No image generated by Gemini");
       }
 
       const candidate = response.candidates[0];
-      if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+      if (
+        !candidate.content ||
+        !candidate.content.parts ||
+        candidate.content.parts.length === 0
+      ) {
         throw new Error("No content parts in Gemini response");
       }
 
       // Find the image part
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const imagePart = candidate.content.parts.find((part: any) =>
-        part.inlineData && part.inlineData.mimeType && part.inlineData.mimeType.startsWith('image/')
+      interface Part {
+        inlineData?: {
+          mimeType?: string;
+          data?: string;
+        };
+      }
+
+      const imagePart = candidate.content.parts.find((part: Part) =>
+        part.inlineData?.mimeType?.startsWith("image/")
       );
 
-      if (!imagePart || !imagePart.inlineData) {
+      if (!imagePart || !imagePart.inlineData || !imagePart.inlineData.data) {
         throw new Error("No image data in Gemini response");
       }
 
       // Convert base64 to data URI
-      const imageDataUri = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+      const originalImageData = imagePart.inlineData.data;
+      let imageDataUri = `data:${imagePart.inlineData.mimeType};base64,${originalImageData}`;
 
       console.log("✓ Vision board created successfully with Gemini!");
+
+      // Add watermark to free version
+      try {
+        console.log("Adding watermark to vision board...");
+
+        // Convert base64 to buffer
+        const imageBuffer = Buffer.from(originalImageData, 'base64');
+
+        // Create watermark text SVG
+        const watermarkSvg = Buffer.from(`
+          <svg width="300" height="80">
+            <style>
+              .title {
+                fill: #ffffff;
+                font-size: 24px;
+                font-weight: bold;
+                font-family: Arial, sans-serif;
+                opacity: 0.7;
+              }
+              .subtitle {
+                fill: #ffffff;
+                font-size: 14px;
+                font-family: Arial, sans-serif;
+                opacity: 0.6;
+              }
+            </style>
+            <text x="150" y="30" text-anchor="middle" class="title">DreamBoard</text>
+            <text x="150" y="55" text-anchor="middle" class="subtitle">Free Version - Upgrade for HD</text>
+          </svg>
+        `);
+
+        // Add watermark to bottom-right corner
+        const watermarkedBuffer = await sharp(imageBuffer)
+          .composite([
+            {
+              input: watermarkSvg,
+              gravity: 'southeast',
+              blend: 'over'
+            }
+          ])
+          .toBuffer();
+
+        // Convert back to base64 data URI
+        const watermarkedBase64 = watermarkedBuffer.toString('base64');
+        imageDataUri = `data:${imagePart.inlineData.mimeType};base64,${watermarkedBase64}`;
+
+        console.log("✓ Watermark added successfully!");
+      } catch (watermarkError) {
+        console.error("Failed to add watermark (continuing with unwatermarked image):", watermarkError);
+        // Continue with original image if watermark fails
+      }
 
       return NextResponse.json({
         collageUrl: imageDataUri,
         success: true,
-        model: "gemini-2.5-flash-image"
+        model: "gemini-2.5-flash-image",
       });
-
     } catch (apiError: unknown) {
       console.error("Gemini API error:", apiError);
       console.error("Error details:", JSON.stringify(apiError, null, 2));
 
-      if (apiError && typeof apiError === 'object') {
-        if ('message' in apiError) {
+      if (apiError && typeof apiError === "object") {
+        if ("message" in apiError) {
           throw new Error(`Gemini API error: ${(apiError as Error).message}`);
         }
-        if ('error' in apiError) {
-          const errObj = apiError as { error: { message?: string; details?: unknown } };
-          throw new Error(`Gemini API error: ${errObj.error.message || JSON.stringify(errObj.error)}`);
+        if ("error" in apiError) {
+          const errObj = apiError as {
+            error: { message?: string; details?: unknown };
+          };
+          throw new Error(
+            `Gemini API error: ${
+              errObj.error.message || JSON.stringify(errObj.error)
+            }`
+          );
         }
       }
       throw new Error(`Gemini API error: ${String(apiError)}`);
     }
-
   } catch (error: unknown) {
     console.error("Error creating vision board:", error);
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Failed to create vision board",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to create vision board",
         details: error instanceof Error ? error.stack : String(error),
       },
       { status: 500 }
