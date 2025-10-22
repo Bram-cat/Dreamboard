@@ -2,10 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import VisionBoardCanvas from "@/components/VisionBoardCanvas";
+import PolaroidCollage from "@/components/PolaroidCollage";
 
 interface GeneratedImage {
   url: string;
   keyword: string;
+  source?: string;
 }
 
 interface BoardElement {
@@ -172,8 +174,8 @@ export default function Home() {
       console.log("Generation mode:", generationMode);
 
       if (generationMode === "openai") {
-        // NEW: OpenAI + Gemini workflow
-        console.log("🎨 Generating vision board with OpenAI + Gemini...");
+        // NEW: DALL-E 3 + Gemini Imagen workflow (individual images for HTML collage)
+        console.log("🎨 Generating individual images with DALL-E 3 + Gemini Imagen...");
 
         // Extract keywords from goals (split by comma or use as-is)
         const keywords = goals.split(",").map((k) => k.trim()).filter((k) => k.length > 0);
@@ -186,28 +188,22 @@ export default function Home() {
           body: JSON.stringify({
             keywords,
             categorizedUploads,
-            numberOfImages: 15, // Generate 15 images for dense collage
           }),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          console.error("OpenAI endpoint error:", errorData);
-          throw new Error(errorData.details || errorData.error || "Failed to generate vision board with OpenAI");
+          console.error("Image generation error:", errorData);
+          throw new Error(errorData.details || errorData.error || "Failed to generate images");
         }
 
         const data = await response.json();
-        console.log(`✓ Generated ${data.generated_images?.length || 0} images with OpenAI`);
-        console.log("✓ Final vision board created with Gemini!");
+        console.log(`✓ Generated ${data.images?.length || 0} total images`);
+        console.log(`   - DALL-E 3: ${data.metadata?.dalle_count || 0}`);
+        console.log(`   - Gemini Imagen: ${data.metadata?.gemini_count || 0}`);
 
-        setOpenaiImages(data.generated_images || []);
-
-        const finalImage = {
-          url: data.final_vision_board,
-          keyword: "Vision Board 2025",
-        };
-
-        setImages([finalImage]);
+        // Store individual images for collage layout
+        setImages(data.images || []);
         setCollageReady(true);
       } else if (generationMode === "component") {
         // Component-based generation
@@ -772,8 +768,16 @@ export default function Home() {
               />
             )}
 
-            {/* Display OpenAI + Gemini or single-image collage */}
-            {collageReady && (generationMode === "openai" || generationMode === "single") && images.length > 0 && (
+            {/* Display OpenAI + Gemini HTML/CSS collage */}
+            {collageReady && generationMode === "openai" && images.length > 0 && (
+              <PolaroidCollage
+                images={images}
+                userKeywords={goals.split(",").map((k) => k.trim()).filter((k) => k.length > 0)}
+              />
+            )}
+
+            {/* Display single-image collage */}
+            {collageReady && generationMode === "single" && images.length > 0 && (
               <div className="relative">
                 {/* Fullscreen collage - no frames, no padding */}
                 <img
@@ -799,7 +803,7 @@ export default function Home() {
                   <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg"></div>
                   <p className="text-purple-600 font-medium text-lg">
                     {generationMode === "openai"
-                      ? "🎨 Generating vision board with OpenAI + Gemini..."
+                      ? "🎨 Generating 14 individual images with DALL-E 3 + Gemini Imagen..."
                       : generationMode === "component"
                       ? "🎨 Generating individual vision board elements..."
                       : "🎨 Creating your dense magazine-style vision board..."
@@ -807,7 +811,7 @@ export default function Home() {
                   </p>
                   <p className="text-purple-500 text-sm">
                     {generationMode === "openai"
-                      ? "Step 1: Creating concept images with OpenAI DALL-E 3"
+                      ? "Step 1: Generating 7 images with OpenAI DALL-E 3"
                       : generationMode === "component"
                       ? "Creating 20-30 separate elements with perfect facial consistency"
                       : "Generating 10-15+ elements with YOUR face across multiple scenes"
@@ -815,13 +819,13 @@ export default function Home() {
                   </p>
                   <p className="text-purple-500 text-sm">
                     {generationMode === "openai"
-                      ? "Step 2: Composing final vision board with Gemini AI"
+                      ? "Step 2: Generating 7 images with Gemini Imagen 3"
                       : "Including: travel, food, fitness, success, wealth & more"
                     }
                   </p>
                   <p className="text-purple-500 text-sm">
                     {generationMode === "openai"
-                      ? "Professional magazine-style layout with cohesive aesthetics"
+                      ? "Step 3: Creating HTML/CSS polaroid collage with text overlays"
                       : generationMode === "component"
                       ? "Each element can be edited and rearranged"
                       : "Creating dense collage with overlapping polaroids & quotes"
@@ -829,7 +833,7 @@ export default function Home() {
                   </p>
                   <p className="text-gray-500 text-xs">
                     {generationMode === "openai"
-                      ? "Takes 1-2 minutes for high-quality OpenAI generation"
+                      ? "Takes 2-3 minutes for 14 high-quality images (1.5s delay between each)"
                       : generationMode === "component"
                       ? "Takes 2-3 minutes for high-quality component generation"
                       : "Takes 30-60 seconds for magazine-quality output (1344x768)"
