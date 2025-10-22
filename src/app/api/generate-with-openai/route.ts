@@ -183,29 +183,46 @@ Professional photography style with soft, warm lighting.`;
 
     const genai = new GoogleGenAI({ apiKey: geminiApiKey });
 
-    const geminiPrompt = `You are a professional vision board designer. You have been given ${imageDataParts.length} images to compose into a beautiful, cohesive vision board.
+    const geminiPrompt = `You are a professional vision board designer. You have been given ${imageDataParts.length} images to arrange into a COLLAGE-STYLE vision board.
 
-${categorizedUploads?.selfie ? "The FIRST image is the user's selfie. Use this person's face in the final composition if appropriate." : ""}
+${categorizedUploads?.selfie ? "The FIRST image is the user's selfie. Include this person in the collage." : ""}
 
-Your task:
-1. Combine these images into ONE cohesive vision board layout
-2. Arrange them aesthetically with soft margins and balance
-3. Create a magazine-style collage with overlapping elements
-4. Keep lighting, tone, and saturation consistent across the composition
-5. Add subtle blending between images for visual harmony
-6. Use clean white or subtle borders for a polished look
-7. Create a 1344x768 (16:9) landscape composition
-8. Make it look like a professional Pinterest-style vision board
+🎨 CRITICAL LAYOUT REQUIREMENTS:
 
-Style guidelines:
-- Modern, minimalist aesthetic
-- Bright and inspiring
-- Cinematic quality
-- Soft, warm color palette
-- Professional photography feel
-- Clean composition with good visual hierarchy
+1. CREATE A POLAROID/PHOTO COLLAGE LAYOUT:
+   - Arrange the images as SEPARATE, DISTINCT PHOTO TILES
+   - Each image should be clearly visible as its own element
+   - Use white borders around each photo (like polaroid frames)
+   - Overlap the photos at various angles (rotate some by -5° to +5°)
+   - Create a scattered, organic magazine collage look
 
-Return a single, downloadable composite image at 1344x768 resolution.`;
+2. LAYOUT COMPOSITION:
+   - Place larger images (400-500px) in center and key positions
+   - Scatter smaller images (200-300px) around the edges
+   - Create depth by layering images on top of each other
+   - Leave the background visible between images (beige/cream color)
+   - Don't blend or merge the images - keep them as distinct photos
+
+3. POLAROID FRAME STYLE:
+   - Each photo should have a thick white border (20-30px)
+   - Add subtle drop shadows beneath each photo for depth
+   - Rotate photos at different angles for dynamic look
+   - Some photos slightly overlapping others
+
+4. BACKGROUND:
+   - Soft beige/cream/off-white background color
+   - Clean and minimal, letting photos stand out
+   - Professional vision board aesthetic
+
+5. FINAL OUTPUT:
+   - 1344x768 (16:9) landscape format
+   - High-quality, magazine-style collage
+   - Should look like physical photos scattered on a table
+   - Similar to Pinterest vision boards or mood boards
+
+REFERENCE STYLE: Think of physical vision boards where multiple printed photos are arranged and overlapped on a board - that's the aesthetic we want!
+
+Return a single composite image with all photos arranged as a collage.`;
 
     const response = await genai.models.generateContent({
       model: "gemini-2.5-flash-image",
