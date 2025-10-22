@@ -25,7 +25,6 @@ export default function PolaroidCollage({ images, userKeywords }: PolaroidCollag
         backgroundColor: "#F5F1E8",
         scale: 2, // Higher quality
         logging: false,
-        useCORS: true, // Allow cross-origin images
       });
 
       const link = document.createElement("a");
@@ -132,7 +131,6 @@ export default function PolaroidCollage({ images, userKeywords }: PolaroidCollag
                     src={image.url}
                     alt={image.keyword}
                     className="w-full h-full object-cover"
-                    crossOrigin="anonymous"
                   />
                 </div>
 

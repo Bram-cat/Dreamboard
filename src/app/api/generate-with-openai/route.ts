@@ -105,12 +105,28 @@ export async function POST(request: NextRequest) {
         if (response.ok) {
           const data = await response.json();
           if (data.data && data.data[0] && data.data[0].url) {
-            dalleImages.push({
-              url: data.data[0].url,
-              keyword: keyword,
-              source: "dall-e-3"
-            });
-            console.log(`  ✓ Generated DALL-E image ${i + 1}/7`);
+            const imageUrl = data.data[0].url;
+
+            // Download and convert to base64 to avoid CORS issues
+            try {
+              const imageResponse = await fetch(imageUrl);
+              if (imageResponse.ok) {
+                const arrayBuffer = await imageResponse.arrayBuffer();
+                const base64 = Buffer.from(arrayBuffer).toString("base64");
+                const dataUri = `data:image/png;base64,${base64}`;
+
+                dalleImages.push({
+                  url: dataUri,
+                  keyword: keyword,
+                  source: "dall-e-3"
+                });
+                console.log(`  ✓ Generated and converted DALL-E image ${i + 1}/7`);
+              } else {
+                console.error(`  ✗ Failed to download DALL-E image ${i + 1}`);
+              }
+            } catch (downloadError) {
+              console.error(`  ✗ Error downloading DALL-E image ${i + 1}:`, downloadError);
+            }
           }
         } else {
           const errorText = await response.text();
