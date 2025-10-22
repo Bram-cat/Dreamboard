@@ -18,8 +18,12 @@ export async function POST(request: NextRequest) {
 
     if (!openaiApiKey) {
       console.error("OPENAI_API_KEY not found in environment variables");
+      console.error("Please add OPENAI_API_KEY to your Vercel environment variables");
       return NextResponse.json(
-        { error: "OpenAI API key not configured" },
+        {
+          error: "OpenAI API key not configured",
+          details: "OPENAI_API_KEY environment variable is missing. Please add it in Vercel dashboard: Settings → Environment Variables → Add OPENAI_API_KEY"
+        },
         { status: 500 }
       );
     }

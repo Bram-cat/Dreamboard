@@ -191,7 +191,9 @@ export default function Home() {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to generate vision board with OpenAI");
+          const errorData = await response.json();
+          console.error("OpenAI endpoint error:", errorData);
+          throw new Error(errorData.details || errorData.error || "Failed to generate vision board with OpenAI");
         }
 
         const data = await response.json();
