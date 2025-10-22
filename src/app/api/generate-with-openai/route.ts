@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 
 export async function POST(request: NextRequest) {
   try {
-    const { keywords, categorizedUploads, numberOfImages = 10 } = await request.json();
+    const { keywords, categorizedUploads, numberOfImages = 15 } = await request.json();
 
     if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
       return NextResponse.json(
@@ -106,14 +106,32 @@ Requirements:
 
     console.log(`Expanded keywords (${expandedKeywords.length}):`, expandedKeywords.slice(0, numberOfImages));
 
-    // Generate exactly numberOfImages
+    // Generate exactly numberOfImages with improved prompts
     for (let i = 0; i < numberOfImages; i++) {
       const keyword = expandedKeywords[i];
-      const imagePrompt = `Create a beautiful, inspiring image representing "${keyword}".
-Style: Modern vision board aesthetic - bright, cinematic, professional photography.
-Mood: Aspirational, motivational, high-quality magazine editorial.
-Focus: Clear subject matter, warm lighting, aesthetic composition.
-Avoid: Text, logos, cluttered scenes.`;
+
+      // Create more detailed, specific prompts based on keyword type
+      let imagePrompt = "";
+
+      // Detect keyword category and create targeted prompts
+      if (keyword.toLowerCase().includes("wealth") || keyword.toLowerCase().includes("money") || keyword.toLowerCase().includes("financial")) {
+        imagePrompt = `Aspirational ${keyword} concept for vision board: stack of crisp dollar bills, luxury gold watch, modern minimalist office with skyline view, or elegant wallet with credit cards. Professional product photography, soft golden lighting, clean composition, high-end magazine quality. NO text or logos.`;
+      } else if (keyword.toLowerCase().includes("travel") || keyword.toLowerCase().includes("vacation") || keyword.toLowerCase().includes("adventure")) {
+        imagePrompt = `Stunning ${keyword} destination for vision board: exotic beach with turquoise water, European cobblestone street, tropical island paradise, or mountain vista. Travel magazine photography style, vibrant colors, dreamy atmosphere, wanderlust-inspiring. NO text or people.`;
+      } else if (keyword.toLowerCase().includes("fitness") || keyword.toLowerCase().includes("health") || keyword.toLowerCase().includes("wellness")) {
+        imagePrompt = `Inspiring ${keyword} scene for vision board: colorful acai bowl with fresh berries, yoga mat in serene nature setting, modern gym equipment, or green smoothie with tropical fruits. Health magazine aesthetic, bright natural lighting, fresh and vibrant. NO text.`;
+      } else if (keyword.toLowerCase().includes("luxury") || keyword.toLowerCase().includes("lifestyle") || keyword.toLowerCase().includes("success")) {
+        imagePrompt = `Luxurious ${keyword} imagery for vision board: designer shopping bags (Chanel, Gucci), champagne glasses clinking, modern architecture mansion, private jet interior, or walk-in closet. High-end lifestyle magazine photography, sophisticated composition, aspirational. NO text.`;
+      } else if (keyword.toLowerCase().includes("love") || keyword.toLowerCase().includes("relationship") || keyword.toLowerCase().includes("romance")) {
+        imagePrompt = `Beautiful ${keyword} scene for vision board: elegant bouquet of roses and peonies, romantic sunset, cozy candlelit setting, or heart-shaped arrangement. Romantic editorial photography, soft warm lighting, dreamy aesthetic. NO text or people's faces.`;
+      } else if (keyword.toLowerCase().includes("career") || keyword.toLowerCase().includes("business") || keyword.toLowerCase().includes("professional")) {
+        imagePrompt = `Professional ${keyword} scene for vision board: modern office workspace, city skyline at golden hour, sleek laptop setup, or executive desk. Business magazine photography, confident aesthetic, sharp professional quality, inspiring. NO text.`;
+      } else if (keyword.toLowerCase().includes("home") || keyword.toLowerCase().includes("house") || keyword.toLowerCase().includes("interior")) {
+        imagePrompt = `Dream ${keyword} for vision board: modern architectural exterior with landscaping, cozy luxurious living room, minimalist bedroom with natural light, or beautiful kitchen. Architectural Digest style photography, inviting atmosphere, high-end real estate quality. NO text.`;
+      } else {
+        // Generic vision board image for any other keyword
+        imagePrompt = `Create a beautiful, inspiring image representing "${keyword}" for a vision board. Style: High-quality magazine editorial photography, bright and aspirational, modern aesthetic, professional composition. Mood: Motivational, dreamy, goal-oriented, visually stunning. Technical: Sharp focus, warm cinematic lighting, vibrant colors, clean background, photorealistic quality. AVOID: Any text, logos, clutter, or busy scenes. FOCUS: Single clear subject that embodies the essence of "${keyword}".`;
+      }
 
       console.log(`  Generating image ${i + 1}/${numberOfImages} for: ${keyword}`);
 
@@ -137,30 +155,65 @@ Avoid: Text, logos, cluttered scenes.`;
           const data = await response.json();
           if (data.data && data.data[0] && data.data[0].url) {
             generatedImages.push(data.data[0].url);
-            console.log(`  ✓ Generated image ${i + 1}`);
+            console.log(`  ✓ Generated image ${i + 1}/${numberOfImages} successfully`);
+            console.log(`  Current total: ${generatedImages.length} images`);
+          } else {
+            console.error(`  ✗ OpenAI returned success but no image URL for image ${i + 1}`);
+            console.error(`  Response data:`, JSON.stringify(data));
           }
         } else {
           const errorText = await response.text();
-          console.error(`  ✗ Failed to generate image ${i + 1}:`, response.status, errorText);
+          console.error(`  ✗ Failed to generate image ${i + 1}/${numberOfImages}`);
+          console.error(`  HTTP Status: ${response.status}`);
+          console.error(`  Error details:`, errorText);
+
+          // Try to parse error for more details
+          try {
+            const errorJson = JSON.parse(errorText);
+            if (errorJson.error) {
+              console.error(`  OpenAI Error Message:`, errorJson.error.message);
+              console.error(`  OpenAI Error Type:`, errorJson.error.type);
+            }
+          } catch (e) {
+            // Error text wasn't JSON, already logged above
+          }
         }
 
-        // Add a small delay to avoid rate limiting
-        if (i < imagesToGenerate - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+        // Add a small delay to avoid rate limiting (1.5 seconds for safety)
+        if (i < numberOfImages - 1) {
+          console.log(`  ⏳ Waiting 1.5 seconds before next request...`);
+          await new Promise(resolve => setTimeout(resolve, 1500));
         }
       } catch (error) {
-        console.error(`Error generating image ${i + 1}:`, error);
+        console.error(`  ✗ Exception while generating image ${i + 1}/${numberOfImages}:`, error);
+        if (error instanceof Error) {
+          console.error(`  Exception message:`, error.message);
+          console.error(`  Exception stack:`, error.stack);
+        }
       }
     }
 
-    console.log(`✓ Generated ${generatedImages.length} images with OpenAI`);
+    console.log(`\n📊 GENERATION SUMMARY:`);
+    console.log(`   Target: ${numberOfImages} images`);
+    console.log(`   Successfully generated: ${generatedImages.length} images`);
+    console.log(`   Success rate: ${((generatedImages.length / numberOfImages) * 100).toFixed(1)}%`);
 
     if (generatedImages.length === 0) {
       console.error("❌ NO IMAGES GENERATED BY OPENAI!");
+      console.error("Possible causes:");
+      console.error("  1. Invalid or expired API key");
+      console.error("  2. Billing limit reached");
+      console.error("  3. Content policy violations in prompts");
+      console.error("  4. Network/connectivity issues");
       throw new Error("OpenAI failed to generate any images. Check API key and billing.");
     }
 
-    console.log("OpenAI Image URLs:", generatedImages);
+    if (generatedImages.length < numberOfImages) {
+      console.warn(`⚠️ WARNING: Only ${generatedImages.length}/${numberOfImages} images were generated successfully`);
+      console.warn("Check error logs above for details on failed generations");
+    }
+
+    console.log("✅ OpenAI Image URLs:", generatedImages);
 
     // STEP 2: Download and convert images to base64 for Gemini
     console.log("\n🔄 Step 2: Converting images to base64 for Gemini...");
