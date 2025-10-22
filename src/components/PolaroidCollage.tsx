@@ -6,7 +6,7 @@ import html2canvas from "html2canvas";
 interface Image {
   url: string;
   keyword: string;
-  source: string;
+  source?: string;
 }
 
 interface PolaroidCollageProps {
