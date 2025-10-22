@@ -169,6 +169,7 @@ export default function Home() {
       };
 
       console.log("User uploads:", uploadContext);
+      console.log("Generation mode:", generationMode);
 
       if (generationMode === "openai") {
         // NEW: OpenAI + Gemini workflow

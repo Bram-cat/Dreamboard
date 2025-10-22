@@ -116,7 +116,8 @@ Professional photography style with soft, warm lighting.`;
             console.log(`  ✓ Generated image ${i + 1}`);
           }
         } else {
-          console.error(`  ✗ Failed to generate image ${i + 1}`);
+          const errorText = await response.text();
+          console.error(`  ✗ Failed to generate image ${i + 1}:`, response.status, errorText);
         }
 
         // Add a small delay to avoid rate limiting
