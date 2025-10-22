@@ -68,8 +68,6 @@ export default function Home() {
   // Generation mode selection
   const [generationMode, setGenerationMode] = useState<"component" | "single" | "openai">("openai"); // Default to OpenAI mode
   const [boardElements, setBoardElements] = useState<BoardElement[]>([]);
-  const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0 });
-  const [openaiImages, setOpenaiImages] = useState<string[]>([]); // Store intermediate OpenAI images
 
   const handleGenerate = async () => {
     if (!goals.trim()) {
@@ -851,7 +849,6 @@ export default function Home() {
                     setStep("input");
                     setImages([]);
                     setBoardElements([]);
-                    setOpenaiImages([]);
                     setCategorizedUploads({
                       selfie: null,
                       dreamHouse: null,

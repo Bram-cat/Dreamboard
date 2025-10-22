@@ -150,7 +150,7 @@ export default function PolaroidCollage({ images, userKeywords }: PolaroidCollag
         {/* Additional decorative text overlays */}
         <div className="absolute bottom-8 right-8 z-50 text-right">
           <p className="text-lg font-bold text-purple-700 italic">
-            "Dream it. Believe it. Achieve it."
+            &ldquo;Dream it. Believe it. Achieve it.&rdquo;
           </p>
         </div>
       </div>
