@@ -305,35 +305,64 @@ CUTE & FUN ELEMENTS (add 2-3 if space allows):
 - Makeup/beauty products: aesthetic flatlay, skincare, cosmetics
 - Coffee and pastry: aesthetic cafe flat lay, croissant, latte art
 
-INSPIRATIONAL QUOTES & TEXT (scatter 8-12 quotes naturally):
-${
-  selectedStyle === "bold"
-    ? '- Large bold text: "2025", "VISION BOARD", "MANIFEST", "SUCCESS"'
-    : '- "2025" prominently displayed in elegant script'
-}
+🎯 PRE-APPROVED QUOTES (USE ONLY THESE - COPY EXACTLY, ZERO MODIFICATIONS!)
 
-MANIFESTATION & SUCCESS:
-- "I am a money magnet" / "Abundance flows to me"
-- "CEO mindset" / "Boss babe" / "Empire builder"
-- "Dream big, hustle harder"
-- "She believed she could, so she did"
-- "Making moves in silence" / "Success in progress"
+⚠️ CRITICAL: You MUST use quotes from this list EXACTLY as written.
+   Do NOT modify, shorten, or create new quotes.
+   If a quote doesn't fit, skip it - DO NOT change it.
+
+📋 CURATED QUOTE LIBRARY (Choose 8-12 from this list):
+
+YEAR & HEADERS:
+- "2025"
+- "VISION BOARD"
+- "DREAM BIG"
+
+MANIFESTATION & ABUNDANCE:
+- "I am a money magnet"
+- "Abundance flows to me"
+- "CEO mindset"
+- "Boss babe"
+- "She believed she could so she did"
+- "Success in progress"
+- "Making my dreams reality"
 
 GRATITUDE & MINDSET:
-- "Grateful" / "Blessed beyond measure" / "Thankful"
-- "I am growing" / "Leveling up" / "Evolving daily"
-- "Choose happiness" / "Good vibes only" / "Positive energy"
-- "Living my dream life" / "This is my year"
+- "Grateful"
+- "Blessed beyond measure"
+- "Thankful"
+- "I am growing"
+- "Leveling up"
+- "Good vibes only"
+- "Positive energy"
+- "This is my year"
+- "Living my best life"
 
-WELLNESS & SELF-LOVE:
-- "Self-care isn't selfish" / "Peace of mind"
-- "Healthy mind, body, soul" / "Wellness warrior"
-- "Glow from within" / "Radiate confidence"
-- "Inhale confidence, exhale doubt"
+WELLNESS & SELF-CARE:
+- "Peace of mind"
+- "Healthy body healthy mind"
+- "Wellness warrior"
+- "Glow from within"
+- "Radiate confidence"
+- "Self love is the best love"
 
-PERSONAL GOALS:
-- "${goals.split(",")[0]?.trim() || "My Goals"}" featured prominently
-- Add 2-3 words from user's goals as scattered text elements
+MOTIVATION & ACTION:
+- "Dream it wish it do it"
+- "Hustle and heart"
+- "Make it happen"
+- "Goals into reality"
+- "Trust the process"
+- "Keep going"
+
+PERSONAL GOALS (use if relevant):
+- "${goals.split(",")[0]?.trim() || "My Goals"}"
+
+✅ SELECTION RULES:
+1. Choose 8-12 quotes from the list above
+2. Copy them EXACTLY as written (letter-for-letter, spacing, punctuation)
+3. Mix different categories for variety
+4. If a quote doesn't fit the layout, SKIP IT - don't modify it
+5. Better to use 6 perfect quotes than 12 with typos
 
 ${
   selectedStyle === "bold"

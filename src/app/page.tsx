@@ -1,10 +1,19 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import VisionBoardCanvas from "@/components/VisionBoardCanvas";
 
 interface GeneratedImage {
   url: string;
   keyword: string;
+}
+
+interface BoardElement {
+  id: string;
+  type: "person" | "lifestyle" | "quote";
+  imageUrl: string;
+  description: string;
+  size?: "small" | "medium" | "large";
 }
 
 const INSPIRATIONAL_QUOTES = [
@@ -53,6 +62,11 @@ export default function Home() {
   const [step, setStep] = useState<"input" | "upload" | "preview">("input");
   const [collageReady, setCollageReady] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // New component-based mode
+  const [useComponentMode, setUseComponentMode] = useState(true); // Default to new mode
+  const [boardElements, setBoardElements] = useState<BoardElement[]>([]);
+  const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0 });
 
   const handleGenerate = async () => {
     if (!goals.trim()) {
@@ -155,36 +169,64 @@ export default function Home() {
 
       console.log("User uploads:", uploadContext);
 
-      // Generate complete dense collage with Gemini (like your sample images!)
-      console.log("Generating dense magazine-style collage with 10-15+ elements...");
-      const collageResponse = await fetch("/api/collage-direct", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          goals,
-          categorizedUploads,
-          uploadContext,
-          style: selectedStyle === "random" ? undefined : selectedStyle,
-        }),
-      });
+      if (useComponentMode) {
+        // NEW: Component-based generation
+        console.log("🎨 Generating component-based vision board...");
 
-      if (!collageResponse.ok) {
-        throw new Error("Failed to create vision board");
+        const response = await fetch("/api/generate-board-elements", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            goals,
+            categorizedUploads,
+            uploadContext,
+            style: selectedStyle === "random" ? undefined : selectedStyle,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to generate board elements");
+        }
+
+        const data = await response.json();
+        console.log(`✓ Generated ${data.totalElements} elements!`);
+
+        setBoardElements(data.elements);
+        setCollageReady(true);
+      } else {
+        // OLD: Single-image collage generation
+        console.log("Generating dense magazine-style collage with 10-15+ elements...");
+        const collageResponse = await fetch("/api/collage-direct", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            goals,
+            categorizedUploads,
+            uploadContext,
+            style: selectedStyle === "random" ? undefined : selectedStyle,
+          }),
+        });
+
+        if (!collageResponse.ok) {
+          throw new Error("Failed to create vision board");
+        }
+
+        const collageData = await collageResponse.json();
+        console.log("✓ Vision board created successfully!");
+
+        // Display the final collage
+        const finalCollageImage = {
+          url: collageData.collageUrl,
+          keyword: "Vision Board 2025",
+        };
+
+        setImages([finalCollageImage]);
+        setCollageReady(true);
       }
-
-      const collageData = await collageResponse.json();
-      console.log("✓ Vision board created successfully!");
-
-      // Display the final collage
-      const finalCollageImage = {
-        url: collageData.collageUrl,
-        keyword: "Vision Board 2025",
-      };
-
-      setImages([finalCollageImage]);
-      setCollageReady(true);
 
       console.log("Vision board ready!");
     } catch (err) {
@@ -600,8 +642,17 @@ export default function Home() {
         {/* Step 3: Final Vision Board Collage */}
         {step === "preview" && (
           <div className="space-y-6">
-            {/* Display the final collage fullscreen */}
-            {collageReady && images.length > 0 && (
+            {/* Display component-based vision board */}
+            {collageReady && useComponentMode && boardElements.length > 0 && (
+              <VisionBoardCanvas
+                elements={boardElements}
+                onElementClick={(id) => console.log("Element clicked:", id)}
+                onDownload={handleDownload}
+              />
+            )}
+
+            {/* Display old-style single image collage */}
+            {collageReady && !useComponentMode && images.length > 0 && (
               <div className="relative">
                 {/* Fullscreen collage - no frames, no padding */}
                 <img
@@ -626,18 +677,32 @@ export default function Home() {
                 <div className="animate-pulse space-y-4">
                   <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg"></div>
                   <p className="text-purple-600 font-medium text-lg">
-                    🎨 Creating your dense magazine-style vision board...
+                    {useComponentMode
+                      ? "🎨 Generating individual vision board elements..."
+                      : "🎨 Creating your dense magazine-style vision board..."
+                    }
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Generating 10-15+ elements with YOUR face across multiple scenes
+                    {useComponentMode
+                      ? "Creating 20-30 separate elements with perfect facial consistency"
+                      : "Generating 10-15+ elements with YOUR face across multiple scenes"
+                    }
                   </p>
                   <p className="text-purple-500 text-sm">
                     Including: travel, food, fitness, success, wealth & more
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Creating dense collage with overlapping polaroids & quotes
+                    {useComponentMode
+                      ? "Each element can be edited and rearranged"
+                      : "Creating dense collage with overlapping polaroids & quotes"
+                    }
                   </p>
-                  <p className="text-gray-500 text-xs">Takes 30-60 seconds for magazine-quality output (1344x768)</p>
+                  <p className="text-gray-500 text-xs">
+                    {useComponentMode
+                      ? "Takes 2-3 minutes for high-quality component generation"
+                      : "Takes 30-60 seconds for magazine-quality output (1344x768)"
+                    }
+                  </p>
                 </div>
               </div>
             )}
@@ -649,6 +714,7 @@ export default function Home() {
                   onClick={() => {
                     setStep("input");
                     setImages([]);
+                    setBoardElements([]);
                     setCategorizedUploads({
                       selfie: null,
                       dreamHouse: null,
