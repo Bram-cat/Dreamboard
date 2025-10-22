@@ -225,7 +225,8 @@ Return a single, downloadable composite image at 1344x768 resolution.`;
         topP: 0.9,
         topK: 32,
         maxOutputTokens: 8192,
-        responseMimeType: "image/png",
+        // Note: responseMimeType is not needed for gemini-2.5-flash-image
+        // The model automatically returns images
       },
     });
 
