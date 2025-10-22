@@ -63,10 +63,11 @@ export default function Home() {
   const [collageReady, setCollageReady] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // New component-based mode
-  const [useComponentMode, setUseComponentMode] = useState(true); // Default to new mode
+  // Generation mode selection
+  const [generationMode, setGenerationMode] = useState<"component" | "single" | "openai">("openai"); // Default to OpenAI mode
   const [boardElements, setBoardElements] = useState<BoardElement[]>([]);
   const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0 });
+  const [openaiImages, setOpenaiImages] = useState<string[]>([]); // Store intermediate OpenAI images
 
   const handleGenerate = async () => {
     if (!goals.trim()) {
@@ -169,8 +170,44 @@ export default function Home() {
 
       console.log("User uploads:", uploadContext);
 
-      if (useComponentMode) {
-        // NEW: Component-based generation
+      if (generationMode === "openai") {
+        // NEW: OpenAI + Gemini workflow
+        console.log("🎨 Generating vision board with OpenAI + Gemini...");
+
+        // Extract keywords from goals (split by comma or use as-is)
+        const keywords = goals.split(",").map((k) => k.trim()).filter((k) => k.length > 0);
+
+        const response = await fetch("/api/generate-with-openai", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            keywords,
+            categorizedUploads,
+            numberOfImages: 8, // Generate 8 images
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to generate vision board with OpenAI");
+        }
+
+        const data = await response.json();
+        console.log(`✓ Generated ${data.generated_images?.length || 0} images with OpenAI`);
+        console.log("✓ Final vision board created with Gemini!");
+
+        setOpenaiImages(data.generated_images || []);
+
+        const finalImage = {
+          url: data.final_vision_board,
+          keyword: "Vision Board 2025",
+        };
+
+        setImages([finalImage]);
+        setCollageReady(true);
+      } else if (generationMode === "component") {
+        // Component-based generation
         console.log("🎨 Generating component-based vision board...");
 
         const response = await fetch("/api/generate-board-elements", {
@@ -445,6 +482,63 @@ export default function Home() {
               className="w-full px-4 py-3 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 text-gray-800 mb-4"
               disabled={loading}
             />
+
+            {/* Generation Mode Selector */}
+            <div className="mb-6">
+              <label className="block text-gray-700 font-medium mb-3">
+                Generation Method:
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setGenerationMode("openai")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    generationMode === "openai"
+                      ? "border-purple-500 bg-purple-50"
+                      : "border-gray-200 hover:border-purple-300"
+                  }`}
+                >
+                  <div className="text-2xl mb-1">✨</div>
+                  <div className="font-semibold text-sm">OpenAI + Gemini</div>
+                  <div className="text-xs text-gray-600 mt-1">
+                    High-quality concept images
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setGenerationMode("component")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    generationMode === "component"
+                      ? "border-purple-500 bg-purple-50"
+                      : "border-gray-200 hover:border-purple-300"
+                  }`}
+                >
+                  <div className="text-2xl mb-1">🧩</div>
+                  <div className="font-semibold text-sm">Component-Based</div>
+                  <div className="text-xs text-gray-600 mt-1">
+                    Editable polaroid elements
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setGenerationMode("single")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    generationMode === "single"
+                      ? "border-purple-500 bg-purple-50"
+                      : "border-gray-200 hover:border-purple-300"
+                  }`}
+                >
+                  <div className="text-2xl mb-1">⚡</div>
+                  <div className="font-semibold text-sm">Single Collage</div>
+                  <div className="text-xs text-gray-600 mt-1">
+                    Fast, all-in-one image
+                  </div>
+                </button>
+              </div>
+            </div>
+
             <button
               onClick={handleGenerate}
               disabled={loading}
@@ -643,7 +737,7 @@ export default function Home() {
         {step === "preview" && (
           <div className="space-y-6">
             {/* Display component-based vision board */}
-            {collageReady && useComponentMode && boardElements.length > 0 && (
+            {collageReady && generationMode === "component" && boardElements.length > 0 && (
               <VisionBoardCanvas
                 elements={boardElements}
                 onElementClick={(id) => console.log("Element clicked:", id)}
@@ -651,8 +745,8 @@ export default function Home() {
               />
             )}
 
-            {/* Display old-style single image collage */}
-            {collageReady && !useComponentMode && images.length > 0 && (
+            {/* Display OpenAI + Gemini or single-image collage */}
+            {collageReady && (generationMode === "openai" || generationMode === "single") && images.length > 0 && (
               <div className="relative">
                 {/* Fullscreen collage - no frames, no padding */}
                 <img
@@ -677,28 +771,39 @@ export default function Home() {
                 <div className="animate-pulse space-y-4">
                   <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg"></div>
                   <p className="text-purple-600 font-medium text-lg">
-                    {useComponentMode
+                    {generationMode === "openai"
+                      ? "🎨 Generating vision board with OpenAI + Gemini..."
+                      : generationMode === "component"
                       ? "🎨 Generating individual vision board elements..."
                       : "🎨 Creating your dense magazine-style vision board..."
                     }
                   </p>
                   <p className="text-purple-500 text-sm">
-                    {useComponentMode
+                    {generationMode === "openai"
+                      ? "Step 1: Creating concept images with OpenAI DALL-E 3"
+                      : generationMode === "component"
                       ? "Creating 20-30 separate elements with perfect facial consistency"
                       : "Generating 10-15+ elements with YOUR face across multiple scenes"
                     }
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Including: travel, food, fitness, success, wealth & more
+                    {generationMode === "openai"
+                      ? "Step 2: Composing final vision board with Gemini AI"
+                      : "Including: travel, food, fitness, success, wealth & more"
+                    }
                   </p>
                   <p className="text-purple-500 text-sm">
-                    {useComponentMode
+                    {generationMode === "openai"
+                      ? "Professional magazine-style layout with cohesive aesthetics"
+                      : generationMode === "component"
                       ? "Each element can be edited and rearranged"
                       : "Creating dense collage with overlapping polaroids & quotes"
                     }
                   </p>
                   <p className="text-gray-500 text-xs">
-                    {useComponentMode
+                    {generationMode === "openai"
+                      ? "Takes 1-2 minutes for high-quality OpenAI generation"
+                      : generationMode === "component"
                       ? "Takes 2-3 minutes for high-quality component generation"
                       : "Takes 30-60 seconds for magazine-quality output (1344x768)"
                     }
