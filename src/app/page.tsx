@@ -487,15 +487,18 @@ export default function Home() {
             {/* Generation Mode Selector */}
             <div className="mb-6">
               <label className="block text-gray-700 font-medium mb-3">
-                Generation Method:
+                Generation Method: <span className="text-purple-600 font-bold">({generationMode.toUpperCase()})</span>
               </label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <button
                   type="button"
-                  onClick={() => setGenerationMode("openai")}
+                  onClick={() => {
+                    setGenerationMode("openai");
+                    console.log("Mode changed to: openai");
+                  }}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     generationMode === "openai"
-                      ? "border-purple-500 bg-purple-50"
+                      ? "border-purple-500 bg-purple-50 shadow-lg"
                       : "border-gray-200 hover:border-purple-300"
                   }`}
                 >
@@ -504,14 +507,22 @@ export default function Home() {
                   <div className="text-xs text-gray-600 mt-1">
                     High-quality concept images
                   </div>
+                  {generationMode === "openai" && (
+                    <div className="text-xs text-purple-600 mt-2 font-bold">
+                      ✓ SELECTED
+                    </div>
+                  )}
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setGenerationMode("component")}
+                  onClick={() => {
+                    setGenerationMode("component");
+                    console.log("Mode changed to: component");
+                  }}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     generationMode === "component"
-                      ? "border-purple-500 bg-purple-50"
+                      ? "border-purple-500 bg-purple-50 shadow-lg"
                       : "border-gray-200 hover:border-purple-300"
                   }`}
                 >
@@ -520,14 +531,22 @@ export default function Home() {
                   <div className="text-xs text-gray-600 mt-1">
                     Editable polaroid elements
                   </div>
+                  {generationMode === "component" && (
+                    <div className="text-xs text-purple-600 mt-2 font-bold">
+                      ✓ SELECTED
+                    </div>
+                  )}
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setGenerationMode("single")}
+                  onClick={() => {
+                    setGenerationMode("single");
+                    console.log("Mode changed to: single");
+                  }}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     generationMode === "single"
-                      ? "border-purple-500 bg-purple-50"
+                      ? "border-purple-500 bg-purple-50 shadow-lg"
                       : "border-gray-200 hover:border-purple-300"
                   }`}
                 >
@@ -536,6 +555,11 @@ export default function Home() {
                   <div className="text-xs text-gray-600 mt-1">
                     Fast, all-in-one image
                   </div>
+                  {generationMode === "single" && (
+                    <div className="text-xs text-purple-600 mt-2 font-bold">
+                      ✓ SELECTED
+                    </div>
+                  )}
                 </button>
               </div>
             </div>
@@ -821,6 +845,7 @@ export default function Home() {
                     setStep("input");
                     setImages([]);
                     setBoardElements([]);
+                    setOpenaiImages([]);
                     setCategorizedUploads({
                       selfie: null,
                       dreamHouse: null,
@@ -829,6 +854,7 @@ export default function Home() {
                     });
                     setCollageReady(false);
                     setGoals("");
+                    // Don't reset generation mode - keep user's preference
                   }}
                   className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
                 >
