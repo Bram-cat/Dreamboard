@@ -801,7 +801,7 @@ export default function Home() {
                   <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg"></div>
                   <p className="text-purple-600 font-medium text-lg">
                     {generationMode === "openai"
-                      ? "🎨 Generating 14 individual images with DALL-E 3 + Gemini Imagen..."
+                      ? "🎨 Generating 8-9 clean lifestyle images (NO random people)..."
                       : generationMode === "component"
                       ? "🎨 Generating individual vision board elements..."
                       : "🎨 Creating your dense magazine-style vision board..."
@@ -809,7 +809,7 @@ export default function Home() {
                   </p>
                   <p className="text-purple-500 text-sm">
                     {generationMode === "openai"
-                      ? "Step 1: Generating 7 images with OpenAI DALL-E 3"
+                      ? "Step 1: Generating 4 images with OpenAI DALL-E 3 (objects/scenes only)"
                       : generationMode === "component"
                       ? "Creating 20-30 separate elements with perfect facial consistency"
                       : "Generating 10-15+ elements with YOUR face across multiple scenes"
@@ -817,13 +817,13 @@ export default function Home() {
                   </p>
                   <p className="text-purple-500 text-sm">
                     {generationMode === "openai"
-                      ? "Step 2: Generating 7 images with Gemini Imagen 3"
+                      ? "Step 2: Generating 4 images with Gemini Imagen 3 (lifestyle scenes)"
                       : "Including: travel, food, fitness, success, wealth & more"
                     }
                   </p>
                   <p className="text-purple-500 text-sm">
                     {generationMode === "openai"
-                      ? "Step 3: Creating HTML/CSS polaroid collage with text overlays"
+                      ? "Step 3: Creating clean polaroid collage with handwritten affirmations"
                       : generationMode === "component"
                       ? "Each element can be edited and rearranged"
                       : "Creating dense collage with overlapping polaroids & quotes"
@@ -831,7 +831,7 @@ export default function Home() {
                   </p>
                   <p className="text-gray-500 text-xs">
                     {generationMode === "openai"
-                      ? "Takes 2-3 minutes for 14 high-quality images (1.5s delay between each)"
+                      ? "Takes ~1 minute for 8 images + your selfie (cleaner, 75% visibility)"
                       : generationMode === "component"
                       ? "Takes 2-3 minutes for high-quality component generation"
                       : "Takes 30-60 seconds for magazine-quality output (1344x768)"
