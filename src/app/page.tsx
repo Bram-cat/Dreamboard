@@ -186,7 +186,7 @@ export default function Home() {
           body: JSON.stringify({
             keywords,
             categorizedUploads,
-            numberOfImages: 8, // Generate 8 images
+            numberOfImages: 12, // Generate 12 images for dense collage
           }),
         });
 

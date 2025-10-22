@@ -82,20 +82,40 @@ Requirements:
     console.log("✓ OpenAI returned data");
 
     // Since DALL-E 3 only supports n=1, we need to make multiple requests
-    // For now, let's start with generating multiple images sequentially
     const generatedImages: string[] = [];
 
-    // Generate images for each keyword (up to numberOfImages)
-    const imagesToGenerate = Math.min(numberOfImages, keywords.length);
+    // If user provided few keywords, expand with vision board themes
+    const expandedKeywords = [...keywords];
+    const visionBoardThemes = [
+      "financial freedom and wealth",
+      "luxury lifestyle and success",
+      "dream vacation and travel",
+      "health and fitness goals",
+      "peaceful meditation and wellness",
+      "career achievement and growth",
+      "beautiful home and comfort",
+      "adventure and excitement",
+      "love and relationships",
+      "personal growth and confidence"
+    ];
 
-    for (let i = 0; i < imagesToGenerate; i++) {
-      const keyword = keywords[i % keywords.length];
-      const imagePrompt = `Generate a square, minimalist image symbolizing "${keyword}".
-It should fit a cohesive digital vision board aesthetic — bright, inspiring, cinematic, and modern.
-Avoid text, logos, or clutter. Use consistent color tones and lighting.
-Professional photography style with soft, warm lighting.`;
+    // Add themed keywords if we don't have enough
+    while (expandedKeywords.length < numberOfImages) {
+      expandedKeywords.push(visionBoardThemes[expandedKeywords.length % visionBoardThemes.length]);
+    }
 
-      console.log(`  Generating image ${i + 1}/${imagesToGenerate} for: ${keyword}`);
+    console.log(`Expanded keywords (${expandedKeywords.length}):`, expandedKeywords.slice(0, numberOfImages));
+
+    // Generate exactly numberOfImages
+    for (let i = 0; i < numberOfImages; i++) {
+      const keyword = expandedKeywords[i];
+      const imagePrompt = `Create a beautiful, inspiring image representing "${keyword}".
+Style: Modern vision board aesthetic - bright, cinematic, professional photography.
+Mood: Aspirational, motivational, high-quality magazine editorial.
+Focus: Clear subject matter, warm lighting, aesthetic composition.
+Avoid: Text, logos, cluttered scenes.`;
+
+      console.log(`  Generating image ${i + 1}/${numberOfImages} for: ${keyword}`);
 
       try {
         const response = await fetch("https://api.openai.com/v1/images/generations", {
