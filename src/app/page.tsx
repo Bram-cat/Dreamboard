@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import VisionBoardCanvas from "@/components/VisionBoardCanvas";
-import PolaroidCollage from "@/components/PolaroidCollage";
 
 interface GeneratedImage {
   url: string;
@@ -66,7 +65,7 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Generation mode selection
-  const [generationMode, setGenerationMode] = useState<"component" | "single" | "openai">("openai"); // Default to OpenAI mode
+  const [generationMode] = useState<"component" | "single" | "openai">("openai"); // Default to OpenAI mode
   const [boardElements, setBoardElements] = useState<BoardElement[]>([]);
 
   const handleGenerate = async () => {

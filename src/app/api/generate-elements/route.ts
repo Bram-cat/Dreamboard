@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 
 export async function POST(request: NextRequest) {
   try {
-    const { goals, categorizedUploads, uploadContext, elementType, elementDescription } =
+    const { categorizedUploads, elementType, elementDescription } =
       await request.json();
 
     if (!elementDescription || typeof elementDescription !== "string") {

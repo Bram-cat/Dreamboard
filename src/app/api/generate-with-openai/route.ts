@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
 
         const candidate = response.candidates?.[0];
         if (candidate?.content?.parts) {
-          const imagePart = candidate.content.parts.find((part: any) =>
+          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
             part.inlineData?.mimeType?.startsWith("image/")
           );
 
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
     // STEP 4: Prepare all images for final collage
     console.log("\n🎨 STEP 3/3: Creating final collage with Gemini (referencing sample1.png)...");
 
-    const imageDataParts: any[] = [];
+    const imageDataParts: Array<{ inlineData: { data: string; mimeType: string } }> = [];
 
     // Add user's uploads first
     if (categorizedUploads?.selfie) {
@@ -170,12 +170,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Add DALL-E images
-    dalleImages.forEach((base64, index) => {
+    dalleImages.forEach((base64) => {
       imageDataParts.push({ inlineData: { data: base64, mimeType: "image/png" } });
     });
 
     // Add Gemini images
-    geminiGeneratedImages.forEach((base64, index) => {
+    geminiGeneratedImages.forEach((base64) => {
       imageDataParts.push({ inlineData: { data: base64, mimeType: "image/png" } });
     });
 
@@ -237,7 +237,7 @@ CREATE THE COLLAGE NOW.`;
       throw new Error("No final collage generated");
     }
 
-    const finalImagePart = finalCandidate.content.parts.find((part: any) =>
+    const finalImagePart = finalCandidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
       part.inlineData?.mimeType?.startsWith("image/")
     );
 

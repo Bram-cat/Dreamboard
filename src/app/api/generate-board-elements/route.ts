@@ -12,7 +12,7 @@ interface BoardElement {
 
 export async function POST(request: NextRequest) {
   try {
-    const { goals, categorizedUploads, uploadContext, style } =
+    const { goals, categorizedUploads, uploadContext } =
       await request.json();
 
     if (!goals || typeof goals !== "string") {
