@@ -196,12 +196,14 @@ export default function Home() {
         }
 
         const data = await response.json();
-        console.log(`✓ Generated ${data.images?.length || 0} total images`);
+        console.log(`✓ Generated ${data.metadata?.total_images_used || 0} total images`);
         console.log(`   - DALL-E 3: ${data.metadata?.dalle_count || 0}`);
         console.log(`   - Gemini Imagen: ${data.metadata?.gemini_count || 0}`);
+        console.log(`   - User uploads: ${data.metadata?.user_uploads || 0}`);
+        console.log(`✓ Final collage created by Gemini matching sample1.png!`);
 
-        // Store individual images for collage layout
-        setImages(data.images || []);
+        // Store final vision board image (single collage)
+        setImages([{ url: data.final_vision_board, keyword: "Vision Board 2025" }]);
         setCollageReady(true);
       } else if (generationMode === "component") {
         // Component-based generation
@@ -487,7 +489,7 @@ export default function Home() {
                 <h3 className="font-bold text-purple-900">Clean Vision Board Design</h3>
               </div>
               <p className="text-sm text-gray-700">
-                Generates 8-9 lifestyle images (NO random people) + your selfie, arranged in a clean polaroid collage with handwritten affirmations. Matches sample.png style.
+                Generates 10 lifestyle images (5 DALL-E + 5 Gemini) with NO random people. Includes YOUR uploads (selfie, car, house, destination). Gemini creates final magazine-style collage matching sample1.png with bold text overlays.
               </p>
             </div>
 
@@ -697,18 +699,10 @@ export default function Home() {
               />
             )}
 
-            {/* Display OpenAI + Gemini HTML/CSS collage */}
-            {collageReady && generationMode === "openai" && images.length > 0 && (
-              <PolaroidCollage
-                images={images}
-                userKeywords={goals.split(",").map((k) => k.trim()).filter((k) => k.length > 0)}
-              />
-            )}
-
-            {/* Display single-image collage */}
-            {collageReady && generationMode === "single" && images.length > 0 && (
+            {/* Display Gemini final collage (magazine style like sample1.png) */}
+            {collageReady && images.length > 0 && (
               <div className="relative">
-                {/* Fullscreen collage - no frames, no padding */}
+                {/* Fullscreen collage - magazine style */}
                 <img
                   src={images[0].url}
                   alt="Your Vision Board 2025"
@@ -720,7 +714,7 @@ export default function Home() {
                   onClick={handleDownload}
                   className="absolute top-4 right-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
                 >
-                  📥 Download
+                  📥 Download Vision Board
                 </button>
               </div>
             )}
@@ -731,42 +725,19 @@ export default function Home() {
                 <div className="animate-pulse space-y-4">
                   <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg"></div>
                   <p className="text-purple-600 font-medium text-lg">
-                    {generationMode === "openai"
-                      ? "🎨 Generating 8-9 clean lifestyle images (NO random people)..."
-                      : generationMode === "component"
-                      ? "🎨 Generating individual vision board elements..."
-                      : "🎨 Creating your dense magazine-style vision board..."
-                    }
+                    🎨 Generating 10 lifestyle images + creating magazine-style collage...
                   </p>
                   <p className="text-purple-500 text-sm">
-                    {generationMode === "openai"
-                      ? "Step 1: Generating 4 images with OpenAI DALL-E 3 (objects/scenes only)"
-                      : generationMode === "component"
-                      ? "Creating 20-30 separate elements with perfect facial consistency"
-                      : "Generating 10-15+ elements with YOUR face across multiple scenes"
-                    }
+                    Step 1/3: Generating 5 images with OpenAI DALL-E 3 (objects/scenes only)
                   </p>
                   <p className="text-purple-500 text-sm">
-                    {generationMode === "openai"
-                      ? "Step 2: Generating 4 images with Gemini Imagen 3 (lifestyle scenes)"
-                      : "Including: travel, food, fitness, success, wealth & more"
-                    }
+                    Step 2/3: Generating 5 images with Gemini Imagen 3 (lifestyle scenes)
                   </p>
                   <p className="text-purple-500 text-sm">
-                    {generationMode === "openai"
-                      ? "Step 3: Creating clean polaroid collage with handwritten affirmations"
-                      : generationMode === "component"
-                      ? "Each element can be edited and rearranged"
-                      : "Creating dense collage with overlapping polaroids & quotes"
-                    }
+                    Step 3/3: Gemini composing final collage with sample1.png reference + bold text overlays
                   </p>
                   <p className="text-gray-500 text-xs">
-                    {generationMode === "openai"
-                      ? "Takes ~1 minute for 8 images + your selfie (cleaner, 75% visibility)"
-                      : generationMode === "component"
-                      ? "Takes 2-3 minutes for high-quality component generation"
-                      : "Takes 30-60 seconds for magazine-quality output (1344x768)"
-                    }
+                    Takes ~1.5 minutes (10 images + final composition matching sample1.png style)
                   </p>
                 </div>
               </div>

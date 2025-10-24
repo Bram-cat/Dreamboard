@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import fs from "fs/promises";
+import path from "path";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,25 +19,19 @@ export async function POST(request: NextRequest) {
     const geminiApiKey = process.env.GEMINI_API_KEY;
 
     if (!openaiApiKey) {
-      console.error("OPENAI_API_KEY not found in environment variables");
-      return NextResponse.json(
-        { error: "OpenAI API key not configured" },
-        { status: 500 }
-      );
+      console.error("OPENAI_API_KEY not found");
+      return NextResponse.json({ error: "OpenAI API key not configured" }, { status: 500 });
     }
 
     if (!geminiApiKey) {
-      console.error("GEMINI_API_KEY not found in environment variables");
-      return NextResponse.json(
-        { error: "Gemini API key not configured" },
-        { status: 500 }
-      );
+      console.error("GEMINI_API_KEY not found");
+      return NextResponse.json({ error: "Gemini API key not configured" }, { status: 500 });
     }
 
-    console.log("🎨 Starting DALL-E 3 + Gemini Imagen vision board generation...");
+    console.log("🎨 Starting 10-image generation + Gemini final collage...");
     console.log("📝 User keywords:", keywords);
 
-    // STEP 1: Expand keywords to ensure we have enough for 14 images
+    // STEP 1: Expand keywords
     const visionBoardThemes = [
       "financial freedom and wealth",
       "luxury lifestyle and success",
@@ -47,44 +43,22 @@ export async function POST(request: NextRequest) {
       "adventure and excitement",
       "love and relationships",
       "personal growth and confidence",
-      "luxury sports car",
-      "tropical beach paradise",
-      "modern office workspace",
-      "healthy lifestyle"
     ];
 
     const expandedKeywords = [...keywords];
-    while (expandedKeywords.length < 14) {
+    while (expandedKeywords.length < 10) {
       expandedKeywords.push(visionBoardThemes[expandedKeywords.length % visionBoardThemes.length]);
     }
 
-    console.log(`📊 Expanded to ${expandedKeywords.length} keywords for image generation`);
+    // STEP 2: Generate 5 images with OpenAI DALL-E 3
+    console.log("\n🎨 STEP 1/3: Generating 5 images with DALL-E 3...");
+    const dalleImages: string[] = [];
 
-    // STEP 2: Generate 4 images with OpenAI DALL-E 3 (reduced for cleaner layout)
-    console.log("\n🎨 STEP 1/2: Generating 4 images with OpenAI DALL-E 3...");
-    const dalleImages: Array<{url: string, keyword: string, source: string}> = [];
-
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       const keyword = expandedKeywords[i];
+      const imagePrompt = `Vision board lifestyle image: "${keyword}". CRITICAL: NO people, NO faces, NO humans - only objects, scenery, or empty spaces. High-quality editorial photography, aspirational aesthetic, vibrant colors. NO text or logos.`;
 
-      // Create category-specific prompts - NO PEOPLE, only objects and scenes
-      let imagePrompt = "";
-
-      if (keyword.toLowerCase().includes("wealth") || keyword.toLowerCase().includes("money") || keyword.toLowerCase().includes("financial")) {
-        imagePrompt = `Product photography for vision board: stack of hundred dollar bills fanned out, luxury gold watch on marble, or elegant leather wallet with credit cards. NO people, NO faces, just objects. Cinematic lighting, aspirational aesthetic, high-end magazine quality. NO text or logos.`;
-      } else if (keyword.toLowerCase().includes("travel") || keyword.toLowerCase().includes("vacation") || keyword.toLowerCase().includes("beach")) {
-        imagePrompt = `Travel destination landscape for vision board: pristine turquoise beach with palm trees, exotic tropical island view, or sunset over ocean. NO people, NO faces, just scenery. Travel magazine photography, vibrant colors, dreamy aesthetic. NO text.`;
-      } else if (keyword.toLowerCase().includes("fitness") || keyword.toLowerCase().includes("health") || keyword.toLowerCase().includes("wellness")) {
-        imagePrompt = `Wellness still life for vision board: colorful acai bowl with fresh berries and granola, green smoothie bowl with toppings, yoga mat rolled up in nature, or gym dumbbells arrangement. NO people, NO faces, just objects. Health magazine aesthetic, bright natural lighting. NO text.`;
-      } else if (keyword.toLowerCase().includes("luxury") || keyword.toLowerCase().includes("car") || keyword.toLowerCase().includes("sports car")) {
-        imagePrompt = `Luxury lifestyle item for vision board: sleek white sports car exterior shot, champagne glasses clinking (no hands visible), or penthouse city view through windows. NO people, NO faces, just objects and scenery. High-end magazine photography. NO text.`;
-      } else if (keyword.toLowerCase().includes("home") || keyword.toLowerCase().includes("house")) {
-        imagePrompt = `Dream home architecture for vision board: modern house exterior with landscaping, luxurious empty living room with designer furniture, minimalist bedroom interior, or beautiful kitchen design. NO people, NO faces, just spaces. Architectural Digest style. NO text.`;
-      } else {
-        imagePrompt = `Inspiring lifestyle image for vision board: "${keyword}". IMPORTANT: NO people, NO faces, NO humans - only objects, scenery, or empty spaces. Style: High-quality editorial photography, bright aspirational aesthetic, modern magazine quality. Cinematic lighting, vibrant colors, clean composition. NO text, logos, or clutter.`;
-      }
-
-      console.log(`  [${i + 1}/4] Generating DALL-E image for: "${keyword}"`);
+      console.log(`  [${i + 1}/5] Generating: "${keyword}"`);
 
       try {
         const response = await fetch("https://api.openai.com/v1/images/generations", {
@@ -104,171 +78,194 @@ export async function POST(request: NextRequest) {
 
         if (response.ok) {
           const data = await response.json();
-          if (data.data && data.data[0] && data.data[0].url) {
+          if (data.data?.[0]?.url) {
             const imageUrl = data.data[0].url;
-
-            // Download and convert to base64 to avoid CORS issues
-            try {
-              const imageResponse = await fetch(imageUrl);
-              if (imageResponse.ok) {
-                const arrayBuffer = await imageResponse.arrayBuffer();
-                const base64 = Buffer.from(arrayBuffer).toString("base64");
-                const dataUri = `data:image/png;base64,${base64}`;
-
-                dalleImages.push({
-                  url: dataUri,
-                  keyword: keyword,
-                  source: "dall-e-3"
-                });
-                console.log(`  ✓ Generated and converted DALL-E image ${i + 1}/4`);
-              } else {
-                console.error(`  ✗ Failed to download DALL-E image ${i + 1}`);
-              }
-            } catch (downloadError) {
-              console.error(`  ✗ Error downloading DALL-E image ${i + 1}:`, downloadError);
+            const imageResponse = await fetch(imageUrl);
+            if (imageResponse.ok) {
+              const arrayBuffer = await imageResponse.arrayBuffer();
+              const base64 = Buffer.from(arrayBuffer).toString("base64");
+              dalleImages.push(base64);
+              console.log(`  ✓ Generated ${i + 1}/5`);
             }
           }
-        } else {
-          const errorText = await response.text();
-          console.error(`  ✗ DALL-E failed for image ${i + 1}:`, response.status, errorText);
         }
 
-        // Rate limiting delay
-        if (i < 3) {
-          await new Promise(resolve => setTimeout(resolve, 1500));
-        }
+        if (i < 4) await new Promise(resolve => setTimeout(resolve, 1500));
       } catch (error) {
-        console.error(`  ✗ Error generating DALL-E image ${i + 1}:`, error);
+        console.error(`  ✗ Error ${i + 1}:`, error);
       }
     }
 
-    console.log(`✅ Generated ${dalleImages.length}/4 DALL-E images successfully`);
+    console.log(`✅ DALL-E: ${dalleImages.length}/5 images`);
 
-    // STEP 3: Generate 4 images with Gemini Imagen 3 (reduced for cleaner layout)
-    console.log("\n🎨 STEP 2/2: Generating 4 images with Gemini Imagen 3...");
-    const geminiImages: Array<{url: string, keyword: string, source: string}> = [];
+    // STEP 3: Generate 5 images with Gemini Imagen
+    console.log("\n🎨 STEP 2/3: Generating 5 images with Gemini Imagen...");
+    const geminiGeneratedImages: string[] = [];
     const genai = new GoogleGenAI({ apiKey: geminiApiKey });
 
-    for (let i = 4; i < 8; i++) {
+    for (let i = 5; i < 10; i++) {
       const keyword = expandedKeywords[i];
+      const geminiPrompt = `Vision board image: "${keyword}". CRITICAL: NO people, NO faces, NO humans. Only objects, scenery, empty spaces. Professional photography, aspirational, vibrant. NO text.`;
 
-      const geminiPrompt = `Create a high-quality photograph for a vision board: "${keyword}".
-
-CRITICAL REQUIREMENTS:
-- NO people, NO faces, NO humans whatsoever
-- Only objects, scenery, empty spaces, or still life
-- Professional magazine photography aesthetic
-- Bright, aspirational, motivational mood
-- Cinematic lighting with vibrant colors
-- Clean composition, clear subject matter
-- High resolution, photorealistic quality
-
-IMPORTANT:
-- NO text, words, letters, or logos
-- NO people or human figures
-- Objects and scenery only
-- Vision board / mood board style`;
-
-      console.log(`  [${i + 1}/8] Generating Gemini image for: "${keyword}"`);
+      console.log(`  [${i + 1}/10] Generating: "${keyword}"`);
 
       try {
         const response = await genai.models.generateContent({
           model: "gemini-2.5-flash-image",
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: geminiPrompt,
-                },
-              ],
-            },
-          ],
-          config: {
-            temperature: 0.7,
-            topP: 0.9,
-            topK: 32,
-            maxOutputTokens: 8192,
-          },
+          contents: [{
+            role: "user",
+            parts: [{ text: geminiPrompt }],
+          }],
+          config: { temperature: 0.7, topP: 0.9, topK: 32, maxOutputTokens: 8192 },
         });
-
-        // Extract image from response
-        interface Part {
-          inlineData?: {
-            data?: string;
-            mimeType?: string;
-          };
-        }
 
         const candidate = response.candidates?.[0];
         if (candidate?.content?.parts) {
-          const imagePart = candidate.content.parts.find((part: Part) =>
+          const imagePart = candidate.content.parts.find((part: any) =>
             part.inlineData?.mimeType?.startsWith("image/")
           );
 
           if (imagePart?.inlineData?.data) {
-            const imageDataUri = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
-            geminiImages.push({
-              url: imageDataUri,
-              keyword: keyword,
-              source: "gemini-imagen-3"
-            });
-            console.log(`  ✓ Generated Gemini image ${i + 1}/8`);
+            geminiGeneratedImages.push(imagePart.inlineData.data);
+            console.log(`  ✓ Generated ${i + 1}/10`);
           }
         }
 
-        // Rate limiting delay
-        if (i < 7) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+        if (i < 9) await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (error) {
-        console.error(`  ✗ Error generating Gemini image ${i + 1}:`, error);
+        console.error(`  ✗ Error ${i + 1}:`, error);
       }
     }
 
-    console.log(`✅ Generated ${geminiImages.length}/4 Gemini images successfully`);
+    console.log(`✅ Gemini: ${geminiGeneratedImages.length}/5 images`);
 
-    // STEP 4: Combine all images
-    const allImages = [...dalleImages, ...geminiImages];
+    // STEP 4: Prepare all images for final collage
+    console.log("\n🎨 STEP 3/3: Creating final collage with Gemini (referencing sample1.png)...");
 
-    console.log(`\n📊 FINAL SUMMARY:`);
-    console.log(`   DALL-E 3 images: ${dalleImages.length}/4`);
-    console.log(`   Gemini Imagen images: ${geminiImages.length}/4`);
-    console.log(`   Total AI images: ${allImages.length}/8`);
+    const imageDataParts: any[] = [];
 
-    if (allImages.length === 0) {
-      throw new Error("No images were generated. Please check API keys and billing.");
-    }
-
-    // STEP 5: Add user's selfie if provided
+    // Add user's uploads first
     if (categorizedUploads?.selfie) {
-      allImages.unshift({
-        url: categorizedUploads.selfie,
-        keyword: "You",
-        source: "user-upload"
-      });
-      console.log(`   + User selfie added`);
-      console.log(`   Grand total: ${allImages.length} images`);
+      const base64 = categorizedUploads.selfie.split(",")[1];
+      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/jpeg" } });
+      console.log("  + User selfie");
     }
 
-    // Return all individual images to frontend for HTML/CSS collage
+    if (categorizedUploads?.dreamCar) {
+      const base64 = categorizedUploads.dreamCar.split(",")[1];
+      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/jpeg" } });
+      console.log("  + Dream car");
+    }
+
+    if (categorizedUploads?.dreamHouse) {
+      const base64 = categorizedUploads.dreamHouse.split(",")[1];
+      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/jpeg" } });
+      console.log("  + Dream house");
+    }
+
+    if (categorizedUploads?.destination) {
+      const base64 = categorizedUploads.destination.split(",")[1];
+      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/jpeg" } });
+      console.log("  + Destination");
+    }
+
+    // Add DALL-E images
+    dalleImages.forEach((base64, index) => {
+      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/png" } });
+    });
+
+    // Add Gemini images
+    geminiGeneratedImages.forEach((base64, index) => {
+      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/png" } });
+    });
+
+    console.log(`  Total images for collage: ${imageDataParts.length}`);
+
+    // Load reference sample1.png
+    const samplePath = path.join(process.cwd(), "public", "sample1.png");
+    const sampleBuffer = await fs.readFile(samplePath);
+    const sampleBase64 = sampleBuffer.toString("base64");
+
+    // Add reference image
+    imageDataParts.unshift({
+      inlineData: { data: sampleBase64, mimeType: "image/png" }
+    });
+
+    // Create final collage prompt
+    const finalPrompt = `You are an expert vision board designer. Create a PHYSICAL MAGAZINE-STYLE COLLAGE matching the EXACT style of the FIRST reference image.
+
+REFERENCE STYLE (First Image):
+- Physical magazine cutout aesthetic
+- Bold text labels in various fonts (handwritten, magazine clippings, stickers)
+- Overlapping photos at angles
+- Text overlays: "2025", "VISION BOARD", user keywords in BOLD
+- Energetic, inspiring, magazine collage vibe
+- Mix of photo sizes
+- Some photos tilted/rotated
+- Background visible between images
+
+USER'S VISION BOARD:
+Keywords: ${keywords.join(", ")}
+
+INSTRUCTIONS:
+1. Use ALL ${imageDataParts.length - 1} provided images (skip the first reference image)
+2. Arrange in magazine collage style like reference
+3. Add BOLD TEXT LABELS for each keyword: ${keywords.map(k => `"${k.toUpperCase()}"`).join(", ")}
+4. Add "2025" prominently
+5. Add "VISION BOARD" title
+6. Add affirmations: "FINANCIAL FREEDOM", "PASSIVE INCOME", "SUCCESS", "positive mindset"
+7. Magazine cutout aesthetic - photos at angles, overlapping
+8. Vibrant, energetic, inspiring
+9. 1344x768 landscape format
+
+CREATE THE COLLAGE NOW.`;
+
+    const finalResponse = await genai.models.generateContent({
+      model: "gemini-2.5-flash-image",
+      contents: [{
+        role: "user",
+        parts: [
+          ...imageDataParts,
+          { text: finalPrompt },
+        ],
+      }],
+      config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
+    });
+
+    const finalCandidate = finalResponse.candidates?.[0];
+    if (!finalCandidate?.content?.parts) {
+      throw new Error("No final collage generated");
+    }
+
+    const finalImagePart = finalCandidate.content.parts.find((part: any) =>
+      part.inlineData?.mimeType?.startsWith("image/")
+    );
+
+    if (!finalImagePart?.inlineData?.data) {
+      throw new Error("No final image data");
+    }
+
+    const finalVisionBoard = `data:${finalImagePart.inlineData.mimeType};base64,${finalImagePart.inlineData.data}`;
+
+    console.log("✅ Final collage created successfully!");
+
     return NextResponse.json({
       status: "success",
-      images: allImages,
+      final_vision_board: finalVisionBoard,
       metadata: {
         dalle_count: dalleImages.length,
-        gemini_count: geminiImages.length,
-        total_count: allImages.length,
-        user_keywords: keywords,
+        gemini_count: geminiGeneratedImages.length,
+        user_uploads: Object.keys(categorizedUploads || {}).length,
+        total_images_used: imageDataParts.length - 1, // Minus reference
       },
     });
 
   } catch (error: unknown) {
-    console.error("❌ Error in image generation workflow:", error);
+    console.error("❌ Error:", error);
     return NextResponse.json(
       {
         status: "error",
-        error: "Failed to generate images",
+        error: "Failed to generate vision board",
         details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
