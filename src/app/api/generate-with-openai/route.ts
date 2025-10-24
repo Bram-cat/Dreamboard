@@ -28,10 +28,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Gemini API key not configured" }, { status: 500 });
     }
 
-    console.log("🎨 Starting 10-image generation + Gemini final collage...");
+    console.log("🎨 Starting image generation with user uploads integration...");
     console.log("📝 User keywords:", keywords);
 
-    // STEP 1: Expand keywords
+    // Check what user uploaded
+    const hasSelfie = !!categorizedUploads?.selfie;
+    const hasDreamHouse = !!categorizedUploads?.dreamHouse;
+    const hasDreamCar = !!categorizedUploads?.dreamCar;
+    const hasDestination = !!categorizedUploads?.destination;
+
+    console.log("📸 User uploads:", { hasSelfie, hasDreamHouse, hasDreamCar, hasDestination });
+
+    // STEP 1: Expand keywords to 10 total
     const visionBoardThemes = [
       "financial freedom and wealth",
       "luxury lifestyle and success",
@@ -50,15 +58,133 @@ export async function POST(request: NextRequest) {
       expandedKeywords.push(visionBoardThemes[expandedKeywords.length % visionBoardThemes.length]);
     }
 
-    // STEP 2: Generate 5 images with OpenAI DALL-E 3
-    console.log("\n🎨 STEP 1/3: Generating 5 images with DALL-E 3...");
+    // STEP 2: Generate scenario images using user uploads + Gemini image editing
+    console.log("\n🎨 STEP 1/3: Generating dream scenario images with user uploads...");
+    const genai = new GoogleGenAI({ apiKey: geminiApiKey });
+    const allGeneratedImages: string[] = [];
+    let scenarioCount = 0;
+
+    // Generate scenarios for user uploads
+    if (hasSelfie && hasDreamHouse) {
+      console.log("  [Scenario 1] Generating: User at their dream house");
+      try {
+        const selfieBase64 = categorizedUploads.selfie.split(",")[1];
+        const houseBase64 = categorizedUploads.dreamHouse.split(",")[1];
+
+        const response = await genai.models.generateContent({
+          model: "gemini-2.5-flash-image",
+          contents: [{
+            role: "user",
+            parts: [
+              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
+              { inlineData: { data: houseBase64, mimeType: "image/jpeg" } },
+              { text: "Create a realistic photo showing this person standing in front of or inside this house, looking happy and proud. Professional photography, natural lighting, aspirational real estate aesthetic. The person should be clearly visible and recognizable." }
+            ]
+          }],
+          config: { temperature: 0.7, topP: 0.9, topK: 32, maxOutputTokens: 8192 },
+        });
+
+        const candidate = response.candidates?.[0];
+        if (candidate?.content?.parts) {
+          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+            part.inlineData?.mimeType?.startsWith("image/")
+          );
+          if (imagePart?.inlineData?.data) {
+            allGeneratedImages.push(imagePart.inlineData.data);
+            scenarioCount++;
+            console.log(`  ✓ Created scenario: User + Dream House`);
+          }
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error("  ✗ Error generating house scenario:", error);
+      }
+    }
+
+    if (hasSelfie && hasDreamCar) {
+      console.log("  [Scenario 2] Generating: User with their dream car");
+      try {
+        const selfieBase64 = categorizedUploads.selfie.split(",")[1];
+        const carBase64 = categorizedUploads.dreamCar.split(",")[1];
+
+        const response = await genai.models.generateContent({
+          model: "gemini-2.5-flash-image",
+          contents: [{
+            role: "user",
+            parts: [
+              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
+              { inlineData: { data: carBase64, mimeType: "image/jpeg" } },
+              { text: "Create a realistic photo showing this person standing next to or sitting in this car, looking excited and successful. Professional photography, natural lighting, luxury lifestyle aesthetic. The person should be clearly visible and recognizable." }
+            ]
+          }],
+          config: { temperature: 0.7, topP: 0.9, topK: 32, maxOutputTokens: 8192 },
+        });
+
+        const candidate = response.candidates?.[0];
+        if (candidate?.content?.parts) {
+          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+            part.inlineData?.mimeType?.startsWith("image/")
+          );
+          if (imagePart?.inlineData?.data) {
+            allGeneratedImages.push(imagePart.inlineData.data);
+            scenarioCount++;
+            console.log(`  ✓ Created scenario: User + Dream Car`);
+          }
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error("  ✗ Error generating car scenario:", error);
+      }
+    }
+
+    if (hasSelfie && hasDestination) {
+      console.log("  [Scenario 3] Generating: User at their dream destination");
+      try {
+        const selfieBase64 = categorizedUploads.selfie.split(",")[1];
+        const destinationBase64 = categorizedUploads.destination.split(",")[1];
+
+        const response = await genai.models.generateContent({
+          model: "gemini-2.5-flash-image",
+          contents: [{
+            role: "user",
+            parts: [
+              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
+              { inlineData: { data: destinationBase64, mimeType: "image/jpeg" } },
+              { text: "Create a realistic photo showing this person at this beautiful destination, looking happy and relaxed. Professional travel photography, natural lighting, vacation aesthetic. The person should be clearly visible and recognizable in the scene." }
+            ]
+          }],
+          config: { temperature: 0.7, topP: 0.9, topK: 32, maxOutputTokens: 8192 },
+        });
+
+        const candidate = response.candidates?.[0];
+        if (candidate?.content?.parts) {
+          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+            part.inlineData?.mimeType?.startsWith("image/")
+          );
+          if (imagePart?.inlineData?.data) {
+            allGeneratedImages.push(imagePart.inlineData.data);
+            scenarioCount++;
+            console.log(`  ✓ Created scenario: User + Destination`);
+          }
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error("  ✗ Error generating destination scenario:", error);
+      }
+    }
+
+    console.log(`✅ Generated ${scenarioCount} scenario images with user uploads`);
+
+    // STEP 2B: Generate remaining lifestyle images with DALL-E 3 (NO people)
+    const remainingCount = 10 - scenarioCount;
+    console.log(`\n🎨 STEP 2/3: Generating ${remainingCount} lifestyle images with DALL-E 3...`);
     const dalleImages: string[] = [];
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < remainingCount; i++) {
       const keyword = expandedKeywords[i];
       const imagePrompt = `Vision board lifestyle image: "${keyword}". CRITICAL: NO people, NO faces, NO humans - only objects, scenery, or empty spaces. High-quality editorial photography, aspirational aesthetic, vibrant colors. NO text or logos.`;
 
-      console.log(`  [${i + 1}/5] Generating: "${keyword}"`);
+      console.log(`  [${i + 1}/${remainingCount}] Generating: "${keyword}"`);
 
       try {
         const response = await fetch("https://api.openai.com/v1/images/generations", {
@@ -85,99 +211,35 @@ export async function POST(request: NextRequest) {
               const arrayBuffer = await imageResponse.arrayBuffer();
               const base64 = Buffer.from(arrayBuffer).toString("base64");
               dalleImages.push(base64);
-              console.log(`  ✓ Generated ${i + 1}/5`);
+              console.log(`  ✓ Generated ${i + 1}/${remainingCount}`);
             }
           }
         }
 
-        if (i < 4) await new Promise(resolve => setTimeout(resolve, 1500));
+        if (i < remainingCount - 1) await new Promise(resolve => setTimeout(resolve, 1500));
       } catch (error) {
         console.error(`  ✗ Error ${i + 1}:`, error);
       }
     }
 
-    console.log(`✅ DALL-E: ${dalleImages.length}/5 images`);
+    console.log(`✅ DALL-E: ${dalleImages.length}/${remainingCount} images`);
 
-    // STEP 3: Generate 5 images with Gemini Imagen
-    console.log("\n🎨 STEP 2/3: Generating 5 images with Gemini Imagen...");
-    const geminiGeneratedImages: string[] = [];
-    const genai = new GoogleGenAI({ apiKey: geminiApiKey });
-
-    for (let i = 5; i < 10; i++) {
-      const keyword = expandedKeywords[i];
-      const geminiPrompt = `Vision board image: "${keyword}". CRITICAL: NO people, NO faces, NO humans. Only objects, scenery, empty spaces. Professional photography, aspirational, vibrant. NO text.`;
-
-      console.log(`  [${i + 1}/10] Generating: "${keyword}"`);
-
-      try {
-        const response = await genai.models.generateContent({
-          model: "gemini-2.5-flash-image",
-          contents: [{
-            role: "user",
-            parts: [{ text: geminiPrompt }],
-          }],
-          config: { temperature: 0.7, topP: 0.9, topK: 32, maxOutputTokens: 8192 },
-        });
-
-        const candidate = response.candidates?.[0];
-        if (candidate?.content?.parts) {
-          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-            part.inlineData?.mimeType?.startsWith("image/")
-          );
-
-          if (imagePart?.inlineData?.data) {
-            geminiGeneratedImages.push(imagePart.inlineData.data);
-            console.log(`  ✓ Generated ${i + 1}/10`);
-          }
-        }
-
-        if (i < 9) await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (error) {
-        console.error(`  ✗ Error ${i + 1}:`, error);
-      }
-    }
-
-    console.log(`✅ Gemini: ${geminiGeneratedImages.length}/5 images`);
-
-    // STEP 4: Prepare all images for final collage
+    // STEP 3: Prepare all images for final collage
     console.log("\n🎨 STEP 3/3: Creating final collage with Gemini (referencing sample1.png)...");
 
     const imageDataParts: Array<{ inlineData: { data: string; mimeType: string } }> = [];
 
-    // Add user's uploads first
-    if (categorizedUploads?.selfie) {
-      const base64 = categorizedUploads.selfie.split(",")[1];
-      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/jpeg" } });
-      console.log("  + User selfie");
-    }
+    // Add scenario images (user integrated into their dreams)
+    allGeneratedImages.forEach((base64) => {
+      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/png" } });
+    });
+    console.log(`  + ${allGeneratedImages.length} scenario images (user in their dream life)`);
 
-    if (categorizedUploads?.dreamCar) {
-      const base64 = categorizedUploads.dreamCar.split(",")[1];
-      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/jpeg" } });
-      console.log("  + Dream car");
-    }
-
-    if (categorizedUploads?.dreamHouse) {
-      const base64 = categorizedUploads.dreamHouse.split(",")[1];
-      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/jpeg" } });
-      console.log("  + Dream house");
-    }
-
-    if (categorizedUploads?.destination) {
-      const base64 = categorizedUploads.destination.split(",")[1];
-      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/jpeg" } });
-      console.log("  + Destination");
-    }
-
-    // Add DALL-E images
+    // Add DALL-E lifestyle images (NO people)
     dalleImages.forEach((base64) => {
       imageDataParts.push({ inlineData: { data: base64, mimeType: "image/png" } });
     });
-
-    // Add Gemini images
-    geminiGeneratedImages.forEach((base64) => {
-      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/png" } });
-    });
+    console.log(`  + ${dalleImages.length} lifestyle images`);
 
     console.log(`  Total images for collage: ${imageDataParts.length}`);
 
@@ -253,10 +315,10 @@ CREATE THE COLLAGE NOW.`;
       status: "success",
       final_vision_board: finalVisionBoard,
       metadata: {
+        scenario_images: scenarioCount,
         dalle_count: dalleImages.length,
-        gemini_count: geminiGeneratedImages.length,
-        user_uploads: Object.keys(categorizedUploads || {}).length,
         total_images_used: imageDataParts.length - 1, // Minus reference
+        has_user_scenarios: scenarioCount > 0,
       },
     });
 

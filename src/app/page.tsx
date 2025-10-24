@@ -196,9 +196,8 @@ export default function Home() {
 
         const data = await response.json();
         console.log(`✓ Generated ${data.metadata?.total_images_used || 0} total images`);
-        console.log(`   - DALL-E 3: ${data.metadata?.dalle_count || 0}`);
-        console.log(`   - Gemini Imagen: ${data.metadata?.gemini_count || 0}`);
-        console.log(`   - User uploads: ${data.metadata?.user_uploads || 0}`);
+        console.log(`   - Scenario images (user in dream life): ${data.metadata?.scenario_images || 0}`);
+        console.log(`   - DALL-E 3 lifestyle images: ${data.metadata?.dalle_count || 0}`);
         console.log(`✓ Final collage created by Gemini matching sample1.png!`);
 
         // Store final vision board image (single collage)
@@ -488,7 +487,7 @@ export default function Home() {
                 <h3 className="font-bold text-purple-900">Clean Vision Board Design</h3>
               </div>
               <p className="text-sm text-gray-700">
-                Generates 10 lifestyle images (5 DALL-E + 5 Gemini) with NO random people. Includes YOUR uploads (selfie, car, house, destination). Gemini creates final magazine-style collage matching sample1.png with bold text overlays.
+                Uses Gemini AI to edit YOUR uploads into dream scenarios (you at your dream house, driving your dream car, at your destination). Generates additional lifestyle images with DALL-E 3. Final magazine-style collage matches sample1.png with bold text overlays.
               </p>
             </div>
 
@@ -724,19 +723,19 @@ export default function Home() {
                 <div className="animate-pulse space-y-4">
                   <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg"></div>
                   <p className="text-purple-600 font-medium text-lg">
-                    🎨 Generating 10 lifestyle images + creating magazine-style collage...
+                    🎨 Creating your personalized vision board...
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Step 1/3: Generating 5 images with OpenAI DALL-E 3 (objects/scenes only)
+                    Step 1/3: Using Gemini AI to edit YOUR images into dream scenarios
                   </p>
                   <p className="text-purple-500 text-sm">
-                    Step 2/3: Generating 5 images with Gemini Imagen 3 (lifestyle scenes)
+                    Step 2/3: Generating lifestyle images with DALL-E 3 (objects/scenes only)
                   </p>
                   <p className="text-purple-500 text-sm">
                     Step 3/3: Gemini composing final collage with sample1.png reference + bold text overlays
                   </p>
                   <p className="text-gray-500 text-xs">
-                    Takes ~1.5 minutes (10 images + final composition matching sample1.png style)
+                    Takes ~2 minutes (scenario editing + lifestyle images + final composition)
                   </p>
                 </div>
               </div>
