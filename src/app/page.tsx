@@ -2,6 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import VisionBoardCanvas from "@/components/VisionBoardCanvas";
+import {
+  MagazineCollageTemplate,
+  CleanGridTemplate,
+  NeutralBeigeTemplate,
+  PolaroidScatteredTemplate,
+  TornPaperAffirmationsTemplate,
+  TemplateType,
+} from "@/components/templates";
 
 interface GeneratedImage {
   url: string;
@@ -50,6 +58,7 @@ interface CategorizedUploads {
 
 export default function Home() {
   const [goals, setGoals] = useState("");
+  const [keywords, setKeywords] = useState<string[]>([]);
   const [images, setImages] = useState<GeneratedImage[]>([]);
   const [categorizedUploads, setCategorizedUploads] = useState<CategorizedUploads>({
     selfie: null,
@@ -58,10 +67,12 @@ export default function Home() {
     destination: null
   });
   const [selectedStyle, setSelectedStyle] = useState<"bold" | "polaroid" | "torn" | "random">("random");
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | "ai" | "random">("ai");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState<"input" | "upload" | "preview">("input");
   const [collageReady, setCollageReady] = useState(false);
+  const [useHtmlTemplate, setUseHtmlTemplate] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Generation mode selection
@@ -175,7 +186,8 @@ export default function Home() {
         console.log("🎨 Generating individual images with DALL-E 3 + Gemini Imagen...");
 
         // Extract keywords from goals (split by comma or use as-is)
-        const keywords = goals.split(",").map((k) => k.trim()).filter((k) => k.length > 0);
+        const extractedKeywords = goals.split(",").map((k) => k.trim()).filter((k) => k.length > 0);
+        setKeywords(extractedKeywords);
 
         const response = await fetch("/api/generate-with-openai", {
           method: "POST",
@@ -183,8 +195,9 @@ export default function Home() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            keywords,
+            keywords: extractedKeywords,
             categorizedUploads,
+            useHtmlTemplate,
           }),
         });
 
@@ -198,10 +211,18 @@ export default function Home() {
         console.log(`✓ Generated ${data.metadata?.total_images_used || 0} total images`);
         console.log(`   - Scenario images (user in dream life): ${data.metadata?.scenario_images || 0}`);
         console.log(`   - DALL-E 3 lifestyle images: ${data.metadata?.dalle_count || 0}`);
-        console.log(`✓ Final collage created by Gemini matching sample1.png!`);
 
-        // Store final vision board image (single collage)
-        setImages([{ url: data.final_vision_board, keyword: "Vision Board 2025" }]);
+        // If using HTML template, store individual images, otherwise store final AI collage
+        if (useHtmlTemplate && data.individual_images) {
+          console.log(`✓ Using HTML template: ${selectedTemplate}`);
+          setImages(data.individual_images.map((url: string, idx: number) => ({
+            url,
+            keyword: extractedKeywords[idx] || `Vision ${idx + 1}`
+          })));
+        } else {
+          console.log(`✓ Final collage created by Gemini matching sample1.png!`);
+          setImages([{ url: data.final_vision_board, keyword: "Vision Board 2025" }]);
+        }
         setCollageReady(true);
       } else if (generationMode === "component") {
         // Component-based generation
@@ -605,60 +626,86 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Style Selection */}
+            {/* Template Selection */}
             <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 mb-6">
-              <h3 className="font-bold text-gray-800 mb-3 text-center">Choose Your Vision Board Style</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <h3 className="font-bold text-gray-800 mb-3 text-center">Choose Your Vision Board Template</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <button
-                  onClick={() => setSelectedStyle("bold")}
+                  onClick={() => { setSelectedTemplate("ai"); setUseHtmlTemplate(false); }}
                   className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedStyle === "bold"
+                    selectedTemplate === "ai"
                       ? "border-purple-600 bg-purple-100 shadow-lg"
                       : "border-gray-300 bg-white hover:border-purple-400"
                   }`}
                 >
-                  <div className="text-2xl mb-2">💪</div>
-                  <div className="font-bold text-sm">Bold</div>
-                  <div className="text-xs text-gray-600">Graphic & modern</div>
+                  <div className="text-2xl mb-2">🤖</div>
+                  <div className="font-bold text-sm">AI Generated</div>
+                  <div className="text-xs text-gray-600">Gemini creates unique collage</div>
                 </button>
 
                 <button
-                  onClick={() => setSelectedStyle("polaroid")}
+                  onClick={() => { setSelectedTemplate("magazine"); setUseHtmlTemplate(true); }}
                   className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedStyle === "polaroid"
+                    selectedTemplate === "magazine"
+                      ? "border-purple-600 bg-purple-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-purple-400"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">📰</div>
+                  <div className="font-bold text-sm">Magazine Collage</div>
+                  <div className="text-xs text-gray-600">Bold scattered photos</div>
+                </button>
+
+                <button
+                  onClick={() => { setSelectedTemplate("grid"); setUseHtmlTemplate(true); }}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedTemplate === "grid"
                       ? "border-pink-600 bg-pink-100 shadow-lg"
                       : "border-gray-300 bg-white hover:border-pink-400"
                   }`}
                 >
-                  <div className="text-2xl mb-2">📸</div>
-                  <div className="font-bold text-sm">Polaroid</div>
-                  <div className="text-xs text-gray-600">Scattered photos</div>
+                  <div className="text-2xl mb-2">📊</div>
+                  <div className="font-bold text-sm">Clean Grid</div>
+                  <div className="text-xs text-gray-600">Organized 3x3 layout</div>
                 </button>
 
                 <button
-                  onClick={() => setSelectedStyle("torn")}
+                  onClick={() => { setSelectedTemplate("neutral"); setUseHtmlTemplate(true); }}
                   className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedStyle === "torn"
-                      ? "border-purple-600 bg-purple-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-purple-400"
+                    selectedTemplate === "neutral"
+                      ? "border-amber-600 bg-amber-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-amber-400"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">🤎</div>
+                  <div className="font-bold text-sm">Neutral Beige</div>
+                  <div className="text-xs text-gray-600">Soft earthy tones</div>
+                </button>
+
+                <button
+                  onClick={() => { setSelectedTemplate("polaroid"); setUseHtmlTemplate(true); }}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedTemplate === "polaroid"
+                      ? "border-blue-600 bg-blue-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-blue-400"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">📸</div>
+                  <div className="font-bold text-sm">Polaroid Scattered</div>
+                  <div className="text-xs text-gray-600">Vintage photo style</div>
+                </button>
+
+                <button
+                  onClick={() => { setSelectedTemplate("torn"); setUseHtmlTemplate(true); }}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedTemplate === "torn"
+                      ? "border-green-600 bg-green-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-green-400"
                   }`}
                 >
                   <div className="text-2xl mb-2">✨</div>
                   <div className="font-bold text-sm">Torn Paper</div>
-                  <div className="text-xs text-gray-600">Soft & dreamy</div>
-                </button>
-
-                <button
-                  onClick={() => setSelectedStyle("random")}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedStyle === "random"
-                      ? "border-gradient-to-r from-purple-600 to-pink-600 bg-gradient-to-r from-purple-100 to-pink-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-purple-400"
-                  }`}
-                >
-                  <div className="text-2xl mb-2">🎲</div>
-                  <div className="font-bold text-sm">Surprise Me</div>
-                  <div className="text-xs text-gray-600">Random style</div>
+                  <div className="text-xs text-gray-600">Affirmations overlays</div>
                 </button>
               </div>
             </div>
@@ -697,23 +744,66 @@ export default function Home() {
               />
             )}
 
-            {/* Display Gemini final collage (magazine style like sample1.png) */}
+            {/* Display HTML Template or Gemini final collage */}
             {collageReady && images.length > 0 && (
               <div className="relative">
-                {/* Fullscreen collage - magazine style */}
-                <img
-                  src={images[0].url}
-                  alt="Your Vision Board 2025"
-                  className="w-full h-auto rounded-lg shadow-2xl"
-                />
-
-                {/* Download button overlay */}
-                <button
-                  onClick={handleDownload}
-                  className="absolute top-4 right-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
-                >
-                  📥 Download Vision Board
-                </button>
+                {useHtmlTemplate ? (
+                  // Render HTML template with individual images
+                  <>
+                    {selectedTemplate === "magazine" && (
+                      <MagazineCollageTemplate
+                        images={images.map((img) => img.url)}
+                        keywords={keywords}
+                      />
+                    )}
+                    {selectedTemplate === "grid" && (
+                      <CleanGridTemplate
+                        images={images.map((img) => img.url)}
+                        keywords={keywords}
+                      />
+                    )}
+                    {selectedTemplate === "neutral" && (
+                      <NeutralBeigeTemplate
+                        images={images.map((img) => img.url)}
+                        keywords={keywords}
+                      />
+                    )}
+                    {selectedTemplate === "polaroid" && (
+                      <PolaroidScatteredTemplate
+                        images={images.map((img) => img.url)}
+                        keywords={keywords}
+                      />
+                    )}
+                    {selectedTemplate === "torn" && (
+                      <TornPaperAffirmationsTemplate
+                        images={images.map((img) => img.url)}
+                        keywords={keywords}
+                      />
+                    )}
+                    {/* Download button for HTML templates */}
+                    <button
+                      onClick={handleDownload}
+                      className="absolute top-4 right-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg z-50"
+                    >
+                      📥 Download Vision Board
+                    </button>
+                  </>
+                ) : (
+                  // Render AI-generated Gemini collage
+                  <>
+                    <img
+                      src={images[0].url}
+                      alt="Your Vision Board 2025"
+                      className="w-full h-auto rounded-lg shadow-2xl"
+                    />
+                    <button
+                      onClick={handleDownload}
+                      className="absolute top-4 right-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
+                    >
+                      📥 Download Vision Board
+                    </button>
+                  </>
+                )}
               </div>
             )}
 

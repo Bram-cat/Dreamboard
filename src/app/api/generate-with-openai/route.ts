@@ -5,7 +5,7 @@ import path from "path";
 
 export async function POST(request: NextRequest) {
   try {
-    const { keywords, categorizedUploads } = await request.json();
+    const { keywords, categorizedUploads, useHtmlTemplate } = await request.json();
 
     if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
       return NextResponse.json(
@@ -311,9 +311,17 @@ CREATE THE COLLAGE NOW.`;
 
     console.log("✅ Final collage created successfully!");
 
+    // Prepare individual images for HTML templates if needed
+    const individualImages = useHtmlTemplate
+      ? [...allGeneratedImages, ...dalleImages].map(
+          (base64) => `data:image/png;base64,${base64}`
+        )
+      : [];
+
     return NextResponse.json({
       status: "success",
       final_vision_board: finalVisionBoard,
+      individual_images: useHtmlTemplate ? individualImages : undefined,
       metadata: {
         scenario_images: scenarioCount,
         dalle_count: dalleImages.length,
