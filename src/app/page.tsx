@@ -480,84 +480,15 @@ export default function Home() {
               disabled={loading}
             />
 
-            {/* Generation Mode Selector */}
-            <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-3">
-                Generation Method: <span className="text-purple-600 font-bold">({generationMode.toUpperCase()})</span>
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setGenerationMode("openai");
-                    console.log("Mode changed to: openai");
-                  }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    generationMode === "openai"
-                      ? "border-purple-500 bg-purple-50 shadow-lg"
-                      : "border-gray-200 hover:border-purple-300"
-                  }`}
-                >
-                  <div className="text-2xl mb-1">✨</div>
-                  <div className="font-semibold text-sm">OpenAI + Gemini</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    High-quality concept images
-                  </div>
-                  {generationMode === "openai" && (
-                    <div className="text-xs text-purple-600 mt-2 font-bold">
-                      ✓ SELECTED
-                    </div>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setGenerationMode("component");
-                    console.log("Mode changed to: component");
-                  }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    generationMode === "component"
-                      ? "border-purple-500 bg-purple-50 shadow-lg"
-                      : "border-gray-200 hover:border-purple-300"
-                  }`}
-                >
-                  <div className="text-2xl mb-1">🧩</div>
-                  <div className="font-semibold text-sm">Component-Based</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    Editable polaroid elements
-                  </div>
-                  {generationMode === "component" && (
-                    <div className="text-xs text-purple-600 mt-2 font-bold">
-                      ✓ SELECTED
-                    </div>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setGenerationMode("single");
-                    console.log("Mode changed to: single");
-                  }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    generationMode === "single"
-                      ? "border-purple-500 bg-purple-50 shadow-lg"
-                      : "border-gray-200 hover:border-purple-300"
-                  }`}
-                >
-                  <div className="text-2xl mb-1">⚡</div>
-                  <div className="font-semibold text-sm">Single Collage</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    Fast, all-in-one image
-                  </div>
-                  {generationMode === "single" && (
-                    <div className="text-xs text-purple-600 mt-2 font-bold">
-                      ✓ SELECTED
-                    </div>
-                  )}
-                </button>
+            {/* Info about the generation method */}
+            <div className="mb-6 p-4 bg-purple-50 border-2 border-purple-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="text-2xl">✨</div>
+                <h3 className="font-bold text-purple-900">Clean Vision Board Design</h3>
               </div>
+              <p className="text-sm text-gray-700">
+                Generates 8-9 lifestyle images (NO random people) + your selfie, arranged in a clean polaroid collage with handwritten affirmations. Matches sample.png style.
+              </p>
             </div>
 
             <button
