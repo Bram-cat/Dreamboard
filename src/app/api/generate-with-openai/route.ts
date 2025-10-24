@@ -58,133 +58,116 @@ export async function POST(request: NextRequest) {
       expandedKeywords.push(visionBoardThemes[expandedKeywords.length % visionBoardThemes.length]);
     }
 
-    // STEP 2: Generate scenario images using user uploads + Gemini image editing
-    console.log("\n🎨 STEP 1/3: Generating dream scenario images with user uploads...");
+    // STEP 2: Generate 4-5 variations of EACH user upload
+    console.log("\n🎨 STEP 1/3: Creating 4-5 variations of each user upload...");
     const genai = new GoogleGenAI({ apiKey: geminiApiKey });
     const allGeneratedImages: string[] = [];
     let scenarioCount = 0;
 
-    // Generate scenarios for user uploads
-    if (hasSelfie && hasDreamHouse) {
-      console.log("  [Scenario 1] Generating: User at their dream house");
-      try {
-        const selfieBase64 = categorizedUploads.selfie.split(",")[1];
-        const houseBase64 = categorizedUploads.dreamHouse.split(",")[1];
+    // Helper function to generate variations of an image
+    const generateVariations = async (imageBase64: string, imageName: string, variations: string[]) => {
+      for (let i = 0; i < variations.length; i++) {
+        const prompt = variations[i];
+        console.log(`  [${scenarioCount + 1}] Generating: ${imageName} - ${prompt.substring(0, 50)}...`);
 
-        const response = await genai.models.generateContent({
-          model: "gemini-2.5-flash-image",
-          contents: [{
-            role: "user",
-            parts: [
-              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
-              { inlineData: { data: houseBase64, mimeType: "image/jpeg" } },
-              { text: "Create a realistic photo showing this person standing in front of or inside this house, looking happy and proud. Professional photography, natural lighting, aspirational real estate aesthetic. The person should be clearly visible and recognizable." }
-            ]
-          }],
-          config: { temperature: 0.7, topP: 0.9, topK: 32, maxOutputTokens: 8192 },
-        });
+        try {
+          const response = await genai.models.generateContent({
+            model: "gemini-2.5-flash-image",
+            contents: [{
+              role: "user",
+              parts: [
+                { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
+                { text: prompt }
+              ]
+            }],
+            config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
+          });
 
-        const candidate = response.candidates?.[0];
-        if (candidate?.content?.parts) {
-          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-            part.inlineData?.mimeType?.startsWith("image/")
-          );
-          if (imagePart?.inlineData?.data) {
-            allGeneratedImages.push(imagePart.inlineData.data);
-            scenarioCount++;
-            console.log(`  ✓ Created scenario: User + Dream House`);
+          const candidate = response.candidates?.[0];
+          if (candidate?.content?.parts) {
+            const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+              part.inlineData?.mimeType?.startsWith("image/")
+            );
+            if (imagePart?.inlineData?.data) {
+              allGeneratedImages.push(imagePart.inlineData.data);
+              scenarioCount++;
+              console.log(`  ✓ Created variation ${scenarioCount}`);
+            }
           }
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error(`  ✗ Error generating variation:`, error);
         }
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (error) {
-        console.error("  ✗ Error generating house scenario:", error);
       }
+    };
+
+    // Generate 4-5 variations for each upload
+    if (hasSelfie) {
+      const selfieBase64 = categorizedUploads.selfie.split(",")[1];
+      const selfieVariations = [
+        "Transform this person into a confident CEO at a modern office, sitting at a desk with a laptop, looking successful and empowered. Soft natural lighting, professional corporate aesthetic. The person should look polished and powerful.",
+        "Show this person meditating peacefully in a beautiful zen garden or yoga studio, wearing comfortable activewear. Serene atmosphere, natural lighting, wellness aesthetic. The person should look calm and centered.",
+        "Create a glamorous photo of this person at a luxury event, wearing elegant clothing, holding a champagne glass. Sophisticated party atmosphere, warm lighting, aspirational lifestyle. The person should look confident and radiant.",
+        "Show this person traveling in style - at an airport lounge, wearing chic travel outfit with designer luggage. Bright natural lighting, jet-setter aesthetic. The person should look excited and adventurous.",
+      ];
+      await generateVariations(selfieBase64, "Selfie", selfieVariations);
     }
 
-    if (hasSelfie && hasDreamCar) {
-      console.log("  [Scenario 2] Generating: User with their dream car");
-      try {
-        const selfieBase64 = categorizedUploads.selfie.split(",")[1];
-        const carBase64 = categorizedUploads.dreamCar.split(",")[1];
-
-        const response = await genai.models.generateContent({
-          model: "gemini-2.5-flash-image",
-          contents: [{
-            role: "user",
-            parts: [
-              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
-              { inlineData: { data: carBase64, mimeType: "image/jpeg" } },
-              { text: "Create a realistic photo showing this person standing next to or sitting in this car, looking excited and successful. Professional photography, natural lighting, luxury lifestyle aesthetic. The person should be clearly visible and recognizable." }
-            ]
-          }],
-          config: { temperature: 0.7, topP: 0.9, topK: 32, maxOutputTokens: 8192 },
-        });
-
-        const candidate = response.candidates?.[0];
-        if (candidate?.content?.parts) {
-          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-            part.inlineData?.mimeType?.startsWith("image/")
-          );
-          if (imagePart?.inlineData?.data) {
-            allGeneratedImages.push(imagePart.inlineData.data);
-            scenarioCount++;
-            console.log(`  ✓ Created scenario: User + Dream Car`);
-          }
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (error) {
-        console.error("  ✗ Error generating car scenario:", error);
-      }
+    if (hasDreamHouse) {
+      const houseBase64 = categorizedUploads.dreamHouse.split(",")[1];
+      const houseVariations = [
+        "Transform this house with beautiful landscaping, blooming flowers in the garden, golden hour lighting. Make it look like a dream home from a luxury magazine. Add subtle enhancements like warm interior lights visible through windows.",
+        "Show this house at sunset with dramatic sky, perfectly manicured lawn, luxury car in the driveway. Aspirational real estate photography style. Make it look inviting and successful.",
+        "Create a cozy morning scene of this house with soft sunrise lighting, dewdrops on grass, birds flying nearby. Peaceful residential aesthetic. Make it feel like home.",
+      ];
+      await generateVariations(houseBase64, "Dream House", houseVariations);
     }
 
-    if (hasSelfie && hasDestination) {
-      console.log("  [Scenario 3] Generating: User at their dream destination");
-      try {
-        const selfieBase64 = categorizedUploads.selfie.split(",")[1];
-        const destinationBase64 = categorizedUploads.destination.split(",")[1];
-
-        const response = await genai.models.generateContent({
-          model: "gemini-2.5-flash-image",
-          contents: [{
-            role: "user",
-            parts: [
-              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
-              { inlineData: { data: destinationBase64, mimeType: "image/jpeg" } },
-              { text: "Create a realistic photo showing this person at this beautiful destination, looking happy and relaxed. Professional travel photography, natural lighting, vacation aesthetic. The person should be clearly visible and recognizable in the scene." }
-            ]
-          }],
-          config: { temperature: 0.7, topP: 0.9, topK: 32, maxOutputTokens: 8192 },
-        });
-
-        const candidate = response.candidates?.[0];
-        if (candidate?.content?.parts) {
-          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-            part.inlineData?.mimeType?.startsWith("image/")
-          );
-          if (imagePart?.inlineData?.data) {
-            allGeneratedImages.push(imagePart.inlineData.data);
-            scenarioCount++;
-            console.log(`  ✓ Created scenario: User + Destination`);
-          }
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (error) {
-        console.error("  ✗ Error generating destination scenario:", error);
-      }
+    if (hasDreamCar) {
+      const carBase64 = categorizedUploads.dreamCar.split(",")[1];
+      const carVariations = [
+        "Show this car on a scenic coastal highway during golden hour, with ocean views in the background. Professional automotive photography, dramatic lighting. Make it look luxurious and aspirational.",
+        "Place this car in front of a modern luxury home or upscale shopping district. Clean urban aesthetic, bright daylight. Make it look successful and sophisticated.",
+        "Show this car in motion on an open road with beautiful mountain or desert landscape. Dynamic automotive photography. Make it look powerful and free.",
+      ];
+      await generateVariations(carBase64, "Dream Car", carVariations);
     }
 
-    console.log(`✅ Generated ${scenarioCount} scenario images with user uploads`);
+    if (hasDestination) {
+      const destinationBase64 = categorizedUploads.destination.split(",")[1];
+      const destinationVariations = [
+        "Enhance this destination with perfect golden hour lighting, add subtle elements like birds flying or gentle waves. Make it look like paradise - a travel magazine cover photo.",
+        "Transform this location into the ultimate vacation spot - add luxury elements like elegant lounge chairs, champagne, tropical flowers. Aspirational travel aesthetic.",
+        "Show this destination at sunrise or sunset with dramatic colorful sky. Add peaceful atmosphere, make it look serene and breathtaking.",
+      ];
+      await generateVariations(destinationBase64, "Destination", destinationVariations);
+    }
 
-    // STEP 2B: Generate remaining lifestyle images with DALL-E 3 (NO people)
+    console.log(`✅ Generated ${scenarioCount} variations from user uploads`);
+
+    // STEP 2B: Generate remaining lifestyle images with DALL-E 3 (feminine aesthetic, NO people)
     const remainingCount = 10 - scenarioCount;
-    console.log(`\n🎨 STEP 2/3: Generating ${remainingCount} lifestyle images with DALL-E 3...`);
+    console.log(`\n🎨 STEP 2/3: Generating ${remainingCount} feminine aesthetic lifestyle images...`);
     const dalleImages: string[] = [];
 
-    for (let i = 0; i < remainingCount; i++) {
-      const keyword = expandedKeywords[i];
-      const imagePrompt = `Vision board lifestyle image: "${keyword}". CRITICAL: NO people, NO faces, NO humans - only objects, scenery, or empty spaces. High-quality editorial photography, aspirational aesthetic, vibrant colors. NO text or logos.`;
+    // Feminine aesthetic prompts
+    const feminineAestheticPrompts = [
+      "Elegant coffee setup with pink macarons, fresh roses in a vase, marble countertop, natural morning light. Soft feminine aesthetic, Pinterest-worthy flatlay. NO people.",
+      "Luxurious spa setting with candles, rose petals, essential oil bottles, fluffy white towels. Serene wellness aesthetic, soft lighting. NO people.",
+      "Cozy reading nook with fluffy blankets, fairy lights, stack of books, warm tea in pretty mug. Hygge aesthetic, golden hour lighting. NO people.",
+      "Chic walk-in closet with designer handbags, high heels, jewelry displayed elegantly. Luxury fashion aesthetic, bright organized space. NO people.",
+      "Beautiful desk workspace with fresh flowers, rose gold accessories, MacBook, inspirational journal. Girl boss aesthetic, natural light. NO people.",
+      "Dreamy bedroom with white linens, soft pillows, fairy lights, plants, pastel decor. Peaceful aesthetic, morning sunshine. NO people.",
+      "Champagne glasses clinking at sunset, elegant table setting with flowers and candles. Celebration aesthetic, golden hour. NO people.",
+      "Yoga mat with crystals, sage, meditation cushion in bright airy space. Spiritual wellness aesthetic, natural lighting. NO people.",
+      "Glamorous vanity table with makeup brushes, perfume bottles, mirror with lights, fresh flowers. Beauty aesthetic, soft romantic lighting. NO people.",
+      "Tropical poolside with palm trees, elegant lounge chair, refreshing drinks, designer sunglasses. Vacation aesthetic, sunny paradise. NO people.",
+    ];
 
-      console.log(`  [${i + 1}/${remainingCount}] Generating: "${keyword}"`);
+    for (let i = 0; i < remainingCount && i < feminineAestheticPrompts.length; i++) {
+      const imagePrompt = feminineAestheticPrompts[i];
+
+      console.log(`  [${i + 1}/${remainingCount}] Generating feminine aesthetic image ${i + 1}`);
 
       try {
         const response = await fetch("https://api.openai.com/v1/images/generations", {
