@@ -3,7 +3,7 @@
 import React from "react";
 
 interface NeutralBeigeTemplateProps {
-  images: string[]; // 8-10 images
+  images: string[]; // 12-15 images
   keywords: string[];
 }
 
@@ -17,159 +17,143 @@ export default function NeutralBeigeTemplate({
     { label: keywords[2] || "TRAVEL", emoji: "✈️" },
     { label: keywords[3] || "HEALTH", emoji: "🧘" },
     { label: keywords[4] || "LOVE", emoji: "💕" },
+    { label: keywords[5] || "WEALTH", emoji: "💰" },
+    { label: keywords[6] || "PEACE", emoji: "🌸" },
   ];
 
   return (
-    <div className="relative w-full h-[768px] bg-gradient-to-br from-amber-50 via-stone-100 to-neutral-100 overflow-hidden">
-      {/* Grid layout - 3x3 with center text */}
-      <div className="grid grid-cols-3 grid-rows-3 gap-1 w-full h-full p-2">
-        {/* Image 1 - Top Left */}
-        <div className="relative overflow-hidden rounded-sm">
-          {images[0] && (
-            <img
-              src={images[0]}
-              alt="Vision 1"
-              className="w-full h-full object-cover"
-            />
-          )}
-          <div className="absolute top-2 left-2 bg-amber-100/80 backdrop-blur-sm px-2 py-1 rounded-sm">
-            <p className="text-[10px] font-medium text-amber-900 uppercase tracking-wide">
-              {sections[0].label}
-            </p>
+    <div className="relative w-full h-[768px] bg-gradient-to-br from-amber-50 via-stone-50 to-neutral-100 overflow-hidden">
+      {/* Dense masonry-style layout */}
+      <div className="absolute inset-0 p-1">
+        {/* Top row - 4 columns */}
+        <div className="flex gap-1 h-[32%]">
+          <div className="relative flex-1 overflow-hidden rounded-sm">
+            {images[0] && <img src={images[0]} alt="Vision 1" className="w-full h-full object-cover" />}
+            <div className="absolute top-2 left-2 bg-amber-100/90 backdrop-blur-sm px-2 py-1 rounded-sm shadow">
+              <p className="text-[9px] font-semibold text-amber-900 uppercase tracking-wide">{sections[0].label}</p>
+            </div>
+          </div>
+
+          <div className="relative flex-1 overflow-hidden rounded-sm">
+            {images[1] && <img src={images[1]} alt="Vision 2" className="w-full h-full object-cover" />}
+            <div className="absolute top-2 right-2 text-xl">{sections[1].emoji}</div>
+          </div>
+
+          <div className="relative flex-1 overflow-hidden rounded-sm">
+            {images[2] && <img src={images[2]} alt="Vision 3" className="w-full h-full object-cover" />}
+            <div className="absolute bottom-2 left-2 bg-stone-200/90 backdrop-blur-sm px-2 py-1 rounded-sm shadow">
+              <p className="text-[9px] font-semibold text-stone-900 uppercase tracking-wide">{sections[2].label}</p>
+            </div>
+          </div>
+
+          <div className="relative flex-1 overflow-hidden rounded-sm">
+            {images[3] && <img src={images[3]} alt="Vision 4" className="w-full h-full object-cover" />}
           </div>
         </div>
 
-        {/* Image 2 - Top Center */}
-        <div className="relative overflow-hidden rounded-sm">
-          {images[1] && (
-            <img
-              src={images[1]}
-              alt="Vision 2"
-              className="w-full h-full object-cover"
-            />
-          )}
-          <div className="absolute top-2 right-2 text-2xl">{sections[1].emoji}</div>
-        </div>
-
-        {/* Image 3 - Top Right */}
-        <div className="relative overflow-hidden rounded-sm">
-          {images[2] && (
-            <img
-              src={images[2]}
-              alt="Vision 3"
-              className="w-full h-full object-cover"
-            />
-          )}
-          <div className="absolute bottom-2 right-2 bg-stone-100/80 backdrop-blur-sm px-2 py-1 rounded-sm">
-            <p className="text-[10px] font-medium text-stone-900 uppercase tracking-wide">
-              {sections[2].label}
-            </p>
+        {/* Middle row - Center text with flanking images */}
+        <div className="flex gap-1 h-[36%] mt-1">
+          <div className="relative w-[30%] overflow-hidden rounded-sm">
+            {images[4] && <img src={images[4]} alt="Vision 5" className="w-full h-full object-cover" />}
+            <div className="absolute top-2 left-2 text-xl">{sections[3].emoji}</div>
           </div>
-        </div>
 
-        {/* Image 4 - Middle Left */}
-        <div className="relative overflow-hidden rounded-sm">
-          {images[3] && (
-            <img
-              src={images[3]}
-              alt="Vision 4"
-              className="w-full h-full object-cover"
-            />
-          )}
-        </div>
+          {/* Center text panel - larger */}
+          <div className="relative flex-1 flex items-center justify-center bg-gradient-to-br from-stone-50 via-amber-50 to-neutral-50 rounded-sm border border-stone-200/50">
+            <div className="text-center space-y-2 px-6">
+              <div className="text-2xl mb-1">✨</div>
+              <p className="text-7xl font-extralight text-stone-800 tracking-wide">2025</p>
+              <div className="space-y-0.5">
+                <p className="text-2xl font-serif text-stone-700 italic tracking-wider">VISION</p>
+                <p className="text-3xl font-serif font-bold text-stone-900 tracking-wide">BOARD</p>
+              </div>
+              <div className="pt-2 flex justify-center gap-2 text-xs text-stone-600">
+                {sections.slice(0, 3).map((s, i) => (
+                  <span key={i} className="opacity-60">{s.emoji}</span>
+                ))}
+              </div>
+            </div>
+          </div>
 
-        {/* Center - Main Text */}
-        <div className="relative flex items-center justify-center bg-gradient-to-br from-amber-50 to-stone-100 rounded-sm">
-          <div className="text-center space-y-2">
-            <div className="text-3xl mb-2">✨</div>
-            <p className="text-6xl font-light text-stone-800">2025</p>
-            <div className="space-y-1">
-              <p className="text-xl font-serif text-stone-700 italic">
-                VISION
-              </p>
-              <p className="text-2xl font-serif font-bold text-stone-900">
-                BOARD
-              </p>
+          <div className="relative w-[30%] overflow-hidden rounded-sm">
+            {images[5] && <img src={images[5]} alt="Vision 6" className="w-full h-full object-cover" />}
+            <div className="absolute bottom-2 right-2 bg-neutral-200/90 backdrop-blur-sm px-2 py-1 rounded-sm shadow">
+              <p className="text-[9px] font-semibold text-neutral-900 uppercase tracking-wide">{sections[4].label}</p>
             </div>
           </div>
         </div>
 
-        {/* Image 5 - Middle Right */}
-        <div className="relative overflow-hidden rounded-sm">
-          {images[4] && (
-            <img
-              src={images[4]}
-              alt="Vision 5"
-              className="w-full h-full object-cover"
-            />
-          )}
-          <div className="absolute bottom-2 left-2 bg-neutral-100/80 backdrop-blur-sm px-2 py-1 rounded-sm">
-            <p className="text-[10px] font-medium text-neutral-900 uppercase tracking-wide">
-              {sections[3].label}
-            </p>
+        {/* Bottom row - 4 columns */}
+        <div className="flex gap-1 h-[31%] mt-1">
+          <div className="relative flex-1 overflow-hidden rounded-sm">
+            {images[6] && <img src={images[6]} alt="Vision 7" className="w-full h-full object-cover" />}
+            <div className="absolute bottom-2 left-2 text-xl">{sections[5].emoji}</div>
           </div>
-        </div>
 
-        {/* Image 6 - Bottom Left */}
-        <div className="relative overflow-hidden rounded-sm">
-          {images[5] && (
-            <img
-              src={images[5]}
-              alt="Vision 6"
-              className="w-full h-full object-cover"
-            />
-          )}
-        </div>
+          <div className="relative flex-1 overflow-hidden rounded-sm">
+            {images[7] && <img src={images[7]} alt="Vision 8" className="w-full h-full object-cover" />}
+          </div>
 
-        {/* Image 7 - Bottom Center */}
-        <div className="relative overflow-hidden rounded-sm">
-          {images[6] && (
-            <img
-              src={images[6]}
-              alt="Vision 7"
-              className="w-full h-full object-cover"
-            />
-          )}
-          <div className="absolute top-2 left-2 text-2xl">{sections[4].emoji}</div>
-        </div>
+          <div className="relative flex-1 overflow-hidden rounded-sm">
+            {images[8] && <img src={images[8]} alt="Vision 9" className="w-full h-full object-cover" />}
+            <div className="absolute top-2 right-2 bg-stone-100/90 backdrop-blur-sm px-2 py-1 rounded-sm shadow">
+              <p className="text-[9px] font-semibold text-stone-900 uppercase tracking-wide">{sections[6].label}</p>
+            </div>
+          </div>
 
-        {/* Image 8 - Bottom Right */}
-        <div className="relative overflow-hidden rounded-sm">
-          {images[7] && (
-            <img
-              src={images[7]}
-              alt="Vision 8"
-              className="w-full h-full object-cover"
-            />
-          )}
-          <div className="absolute bottom-2 right-2 bg-stone-100/80 backdrop-blur-sm px-2 py-1 rounded-sm">
-            <p className="text-[10px] font-medium text-stone-900 uppercase tracking-wide">
-              {sections[4].label}
-            </p>
+          <div className="relative flex-1 overflow-hidden rounded-sm">
+            {images[9] && <img src={images[9]} alt="Vision 10" className="w-full h-full object-cover" />}
           </div>
         </div>
       </div>
 
-      {/* Optional decorative text overlays */}
-      {images[8] && (
-        <div className="absolute top-[200px] right-8 w-24 h-28 overflow-hidden rounded-sm shadow-lg border-2 border-white transform rotate-12">
-          <img
-            src={images[8]}
-            alt="Vision 9"
-            className="w-full h-full object-cover"
-          />
+      {/* Overlay polaroid-style images for 11-15 */}
+      {images[10] && (
+        <div className="absolute top-[12%] left-[3%] w-28 h-32 bg-white p-2 rounded-sm shadow-2xl transform -rotate-8 z-10">
+          <div className="w-full h-[80%] overflow-hidden">
+            <img src={images[10]} alt="Vision 11" className="w-full h-full object-cover" />
+          </div>
+          <p className="text-[8px] text-center text-stone-600 mt-1" style={{fontFamily: 'cursive'}}>{keywords[7] || ""}</p>
         </div>
       )}
 
-      {images[9] && (
-        <div className="absolute bottom-[200px] left-8 w-24 h-28 overflow-hidden rounded-sm shadow-lg border-2 border-white transform -rotate-12">
-          <img
-            src={images[9]}
-            alt="Vision 10"
-            className="w-full h-full object-cover"
-          />
+      {images[11] && (
+        <div className="absolute top-[8%] right-[4%] w-32 h-36 bg-white p-2 rounded-sm shadow-2xl transform rotate-12 z-10">
+          <div className="w-full h-[80%] overflow-hidden">
+            <img src={images[11]} alt="Vision 12" className="w-full h-full object-cover" />
+          </div>
+          <p className="text-[8px] text-center text-stone-600 mt-1" style={{fontFamily: 'cursive'}}>{keywords[8] || ""}</p>
         </div>
       )}
+
+      {images[12] && (
+        <div className="absolute bottom-[8%] left-[6%] w-30 h-34 bg-white p-2 rounded-sm shadow-2xl transform rotate-6 z-10">
+          <div className="w-full h-[80%] overflow-hidden">
+            <img src={images[12]} alt="Vision 13" className="w-full h-full object-cover" />
+          </div>
+        </div>
+      )}
+
+      {images[13] && (
+        <div className="absolute bottom-[10%] right-[5%] w-28 h-32 bg-white p-2 rounded-sm shadow-2xl transform -rotate-10 z-10">
+          <div className="w-full h-[80%] overflow-hidden">
+            <img src={images[13]} alt="Vision 14" className="w-full h-full object-cover" />
+          </div>
+        </div>
+      )}
+
+      {images[14] && (
+        <div className="absolute top-[42%] left-[2%] w-26 h-30 bg-white p-2 rounded-sm shadow-2xl transform rotate-15 z-10">
+          <div className="w-full h-[80%] overflow-hidden">
+            <img src={images[14]} alt="Vision 15" className="w-full h-full object-cover" />
+          </div>
+        </div>
+      )}
+
+      {/* Subtle text overlays */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-stone-800/80 backdrop-blur-sm px-4 py-1 rounded-full shadow-lg z-5">
+        <p className="text-xs font-light text-amber-50 tracking-widest">MY DREAMS & GOALS</p>
+      </div>
     </div>
   );
 }

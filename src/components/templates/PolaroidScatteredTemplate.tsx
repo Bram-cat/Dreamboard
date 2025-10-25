@@ -3,7 +3,7 @@
 import React from "react";
 
 interface PolaroidScatteredTemplateProps {
-  images: string[]; // 8-10 images
+  images: string[]; // 12-15 images
   keywords: string[];
 }
 
@@ -11,54 +11,52 @@ export default function PolaroidScatteredTemplate({
   images,
   keywords,
 }: PolaroidScatteredTemplateProps) {
+  // Densely packed polaroid positions matching sample2.png style
   const polaroidPositions = [
-    { top: "8%", left: "5%", rotate: "-8deg", size: "large" },
-    { top: "5%", left: "35%", rotate: "12deg", size: "small" },
-    { top: "12%", right: "8%", rotate: "-6deg", size: "medium" },
-    { top: "35%", left: "8%", rotate: "5deg", size: "medium" },
-    { top: "40%", left: "45%", rotate: "-10deg", size: "large" },
-    { top: "38%", right: "5%", rotate: "8deg", size: "small" },
-    { bottom: "8%", left: "12%", rotate: "7deg", size: "medium" },
-    { bottom: "10%", left: "42%", rotate: "-5deg", size: "small" },
-    { bottom: "5%", right: "10%", rotate: "10deg", size: "large" },
+    { top: "2%", left: "2%", rotate: "-8deg", size: "medium", zIndex: 12 },
+    { top: "0%", left: "25%", rotate: "5deg", size: "medium", zIndex: 11 },
+    { top: "3%", left: "48%", rotate: "-12deg", size: "small", zIndex: 10 },
+    { top: "0%", right: "18%", rotate: "8deg", size: "medium", zIndex: 13 },
+    { top: "1%", right: "0%", rotate: "-5deg", size: "medium", zIndex: 9 },
+    { top: "28%", left: "0%", rotate: "7deg", size: "medium", zIndex: 8 },
+    { top: "30%", left: "22%", rotate: "-10deg", size: "small", zIndex: 7 },
+    { top: "32%", right: "22%", rotate: "12deg", size: "medium", zIndex: 14 },
+    { top: "28%", right: "1%", rotate: "-6deg", size: "medium", zIndex: 6 },
+    { bottom: "25%", left: "1%", rotate: "-15deg", size: "medium", zIndex: 5 },
+    { bottom: "28%", left: "23%", rotate: "8deg", size: "small", zIndex: 4 },
+    { bottom: "26%", right: "1%", rotate: "-8deg", size: "medium", zIndex: 15 },
+    { bottom: "2%", left: "3%", rotate: "10deg", size: "medium", zIndex: 3 },
+    { bottom: "0%", left: "28%", rotate: "-7deg", size: "medium", zIndex: 2 },
+    { bottom: "1%", right: "2%", rotate: "6deg", size: "medium", zIndex: 1 },
   ];
 
   const sizeClasses = {
-    small: "w-32 h-36",
-    medium: "w-40 h-44",
-    large: "w-48 h-56",
+    small: "w-36 h-40",
+    medium: "w-44 h-52",
   };
 
   return (
-    <div className="relative w-full h-[768px] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.8),transparent_50%)]"></div>
+    <div className="relative w-full h-[768px] bg-gradient-to-br from-slate-100 via-stone-50 to-neutral-100 overflow-hidden">
+      {/* Subtle background texture */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.9),transparent_70%)]"></div>
 
-      {/* Center text card */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-lg shadow-2xl transform rotate-1 z-20">
-        <div className="text-center space-y-3">
-          <p className="text-5xl font-bold text-gray-800">2025</p>
-          <h2 className="text-3xl font-serif font-light text-gray-700">
-            Guided Vision Board
+      {/* Center text card - compact design */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-8 py-6 rounded-sm shadow-2xl transform -rotate-2 z-20 border-4 border-white">
+        <div className="text-center space-y-2">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-widest">800+</p>
+          <p className="text-sm font-bold text-gray-600">elements</p>
+          <p className="text-3xl font-light text-gray-800 italic" style={{ fontFamily: 'Georgia, serif' }}>2025</p>
+          <h2 className="text-4xl font-serif font-normal text-gray-900 leading-tight">
+            Guided<br/>Vision board
           </h2>
-          <p className="text-sm text-gray-500 italic">
+          <p className="text-sm text-gray-600" style={{ fontFamily: 'cursive' }}>
             affirmations included ♡
           </p>
-          <div className="mt-4 space-y-1">
-            {keywords.slice(0, 3).map((keyword, idx) => (
-              <p
-                key={idx}
-                className="text-xs font-medium text-gray-600 uppercase tracking-wide"
-              >
-                {keyword}
-              </p>
-            ))}
-          </div>
         </div>
       </div>
 
-      {/* Polaroid images scattered */}
-      {images.slice(0, 9).map((image, idx) => {
+      {/* Polaroid images - densely scattered to fill all space */}
+      {images.slice(0, 15).map((image, idx) => {
         const pos = polaroidPositions[idx] || polaroidPositions[0];
         const sizeClass =
           sizeClasses[pos.size as keyof typeof sizeClasses] || sizeClasses.medium;
@@ -66,15 +64,18 @@ export default function PolaroidScatteredTemplate({
         return (
           <div
             key={idx}
-            className={`absolute ${sizeClass} bg-white p-2 shadow-2xl hover:shadow-3xl transition-shadow duration-300 cursor-pointer`}
+            className={`absolute ${sizeClass} bg-white p-3 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer`}
             style={{
-              ...pos,
+              top: pos.top,
+              left: pos.left,
+              right: pos.right,
+              bottom: pos.bottom,
               transform: `rotate(${pos.rotate})`,
-              zIndex: idx < 5 ? 10 : 5,
+              zIndex: pos.zIndex,
             }}
           >
             {/* Polaroid photo */}
-            <div className="w-full h-[75%] bg-gray-200 overflow-hidden">
+            <div className="w-full h-[80%] bg-gray-100 overflow-hidden">
               <img
                 src={image}
                 alt={`Vision ${idx + 1}`}
@@ -82,46 +83,14 @@ export default function PolaroidScatteredTemplate({
               />
             </div>
             {/* Polaroid caption area */}
-            <div className="w-full h-[25%] flex items-center justify-center">
-              <p className="text-[10px] font-handwriting text-gray-700">
-                {keywords[idx] || `Goal ${idx + 1}`}
+            <div className="w-full h-[20%] flex items-center justify-center">
+              <p className="text-xs text-gray-700" style={{ fontFamily: 'cursive' }}>
+                {keywords[idx] || ""}
               </p>
             </div>
           </div>
         );
       })}
-
-      {/* Optional 10th image */}
-      {images[9] && (
-        <div
-          className="absolute top-[45%] left-[20%] w-36 h-40 bg-white p-2 shadow-2xl transform rotate-15"
-          style={{ zIndex: 15 }}
-        >
-          <div className="w-full h-[75%] bg-gray-200 overflow-hidden">
-            <img
-              src={images[9]}
-              alt="Vision 10"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="w-full h-[25%] flex items-center justify-center">
-            <p className="text-[10px] font-handwriting text-gray-700">
-              {keywords[9] || "Bonus"}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Decorative elements */}
-      <div className="absolute top-[15%] right-[30%] text-4xl transform rotate-12 z-0">
-        ✨
-      </div>
-      <div className="absolute bottom-[20%] left-[25%] text-4xl transform -rotate-12 z-0">
-        💫
-      </div>
-      <div className="absolute top-[60%] right-[15%] text-3xl transform rotate-45 z-0">
-        ⭐
-      </div>
     </div>
   );
 }

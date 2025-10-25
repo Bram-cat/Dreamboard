@@ -255,18 +255,31 @@ export async function POST(request: NextRequest) {
     console.log(`\n🎨 STEP 2/3: Generating ${remainingCount} feminine aesthetic lifestyle images...`);
     const dalleImages: string[] = [];
 
-    // Feminine aesthetic prompts
+    // Enhanced feminine aesthetic prompts - more thoughtful and aspirational
     const feminineAestheticPrompts = [
-      "Elegant coffee setup with pink macarons, fresh roses in a vase, marble countertop, natural morning light. Soft feminine aesthetic, Pinterest-worthy flatlay. NO people.",
-      "Luxurious spa setting with candles, rose petals, essential oil bottles, fluffy white towels. Serene wellness aesthetic, soft lighting. NO people.",
-      "Cozy reading nook with fluffy blankets, fairy lights, stack of books, warm tea in pretty mug. Hygge aesthetic, golden hour lighting. NO people.",
-      "Chic walk-in closet with designer handbags, high heels, jewelry displayed elegantly. Luxury fashion aesthetic, bright organized space. NO people.",
-      "Beautiful desk workspace with fresh flowers, rose gold accessories, MacBook, inspirational journal. Girl boss aesthetic, natural light. NO people.",
-      "Dreamy bedroom with white linens, soft pillows, fairy lights, plants, pastel decor. Peaceful aesthetic, morning sunshine. NO people.",
-      "Champagne glasses clinking at sunset, elegant table setting with flowers and candles. Celebration aesthetic, golden hour. NO people.",
-      "Yoga mat with crystals, sage, meditation cushion in bright airy space. Spiritual wellness aesthetic, natural lighting. NO people.",
-      "Glamorous vanity table with makeup brushes, perfume bottles, mirror with lights, fresh flowers. Beauty aesthetic, soft romantic lighting. NO people.",
-      "Tropical poolside with palm trees, elegant lounge chair, refreshing drinks, designer sunglasses. Vacation aesthetic, sunny paradise. NO people.",
+      "Luxurious morning coffee ritual: artisan latte with heart design, delicate pink macarons on vintage china, single peony in crystal vase, soft morning sunlight streaming through gauze curtains onto white marble. Dreamy lifestyle magazine aesthetic. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Spa sanctuary moment: lit candles in amber glass, scattered rose petals, natural linen towels perfectly folded, eucalyptus branches, smooth stones, diffuser mist. Serene wellness retreat vibe, soft warm lighting. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Cozy reading corner: oversized knit blanket draped over velvet armchair, stack of beautiful books with gold lettering, steaming tea in elegant porcelain cup, vintage brass reading lamp, succulent on side table. Golden hour glow through lace curtains. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Dream closet organization: luxury handbags displayed on glass shelves, designer heels arranged by color, delicate jewelry in velvet-lined drawers, full-length ornate mirror, chandelier lighting. Fashion blogger aesthetic. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Girl boss workspace: MacBook on white desk, fresh white peonies in vase, rose gold pen set, inspirational quotes in gold frame, planner open with handwritten goals, coffee in chic mug, natural light. Productive elegance. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Dreamy bedroom sanctuary: white linen bedding with layers of plush pillows, fairy lights draped above headboard, potted fiddle leaf fig, soft blush throw blanket, bedside table with crystal lamp and journal. Peaceful morning light. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Celebration table setting: champagne flutes catching golden hour light, elegant white plates with gold rim, fresh flowers centerpiece, taper candles in brass holders, silk napkins. Sophisticated dinner party aesthetic. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Wellness meditation space: yoga mat in sunlit room, selenite crystals arranged intentionally, burning sage bundle in abalone shell, meditation cushion, plants, diffuser, prayer beads. Spiritual self-care sanctuary. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Glamorous vanity station: Hollywood-style mirror with warm bulbs, makeup brushes in rose gold holder, perfume bottles displayed artfully, fresh white flowers, vintage jewelry tray, plush velvet stool. Beauty influencer aesthetic. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Luxury vacation vibes: infinity pool overlooking ocean, designer sunglasses on marble table, tropical cocktail with orchid garnish, white cabana with flowing curtains, palm trees swaying. Paradise travel aesthetic, golden hour. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Fresh flowers in abundance: overflowing floral arrangement with roses, peonies, ranunculus in elegant vase, petals scattered on marble surface, soft window light. Romantic luxury flower shop aesthetic. CRITICAL: NO people, NO faces, NO humans.",
+
+      "Chic Parisian balcony: wrought iron bistro set, croissant and espresso on vintage tray, fresh flowers in window box, Eiffel Tower view in soft focus, morning mist. European elegance. CRITICAL: NO people, NO faces, NO humans.",
     ];
 
     for (let i = 0; i < remainingCount && i < feminineAestheticPrompts.length; i++) {
