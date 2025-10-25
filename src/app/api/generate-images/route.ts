@@ -109,10 +109,28 @@ Create this specific scene: ${scenario.description}
 The person in the scene MUST be the same individual from the reference photo. Match their appearance precisely.
 If you cannot maintain perfect facial consistency, DO NOT create the image.
 
-Style: Professional photography, natural lighting, warm tones, high quality 1344x768 output, photorealistic.`
+VISUAL QUALITY REQUIREMENTS:
+- Ultra high definition, photorealistic detail
+- Professional cinematic lighting with depth
+- Rich colors with high saturation and contrast
+- Sharp focus on subject, subtle bokeh background
+- Magazine editorial quality composition
+- Golden hour warm lighting or dramatic studio lighting
+- 8K quality, professional photographer aesthetic
+- Perfect exposure, no blown highlights or crushed shadows`
           : `Create this specific scene: ${scenario.description}
 
-Style: Professional photography, natural lighting, warm tones, high quality 1344x768 output, photorealistic, aesthetic.`;
+VISUAL QUALITY REQUIREMENTS:
+- Ultra high definition, photorealistic detail
+- Professional cinematic lighting with depth and dimension
+- Rich, vibrant colors with high saturation and contrast
+- Sharp focus with professional depth of field
+- Magazine editorial quality composition
+- Golden hour warm lighting or dramatic professional lighting
+- 8K quality output, luxury photography aesthetic
+- Perfect exposure balance, dynamic range optimization
+- Premium lifestyle photography style
+- Award-winning photography composition and lighting`;
 
         contents.push({ text: enhancedPrompt });
 

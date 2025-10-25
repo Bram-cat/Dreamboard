@@ -780,12 +780,15 @@ export default function Home() {
                         keywords={keywords}
                       />
                     )}
-                    {/* Download button for HTML templates */}
+                    {/* Download button for HTML templates - repositioned to bottom-right */}
                     <button
                       onClick={handleDownload}
-                      className="absolute top-4 right-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg z-50"
+                      className="absolute bottom-6 right-6 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 z-50 flex items-center gap-2"
                     >
-                      📥 Download Vision Board
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Download Vision Board
                     </button>
                   </>
                 ) : (
@@ -798,35 +801,52 @@ export default function Home() {
                     />
                     <button
                       onClick={handleDownload}
-                      className="absolute top-4 right-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
+                      className="absolute bottom-6 right-6 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 flex items-center gap-2"
                     >
-                      📥 Download Vision Board
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Download Vision Board
                     </button>
                   </>
                 )}
               </div>
             )}
 
-            {/* Loading state */}
+            {/* Loading state with enhanced spinner animation */}
             {!collageReady && (
               <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
-                <div className="animate-pulse space-y-4">
-                  <div className="h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg"></div>
-                  <p className="text-purple-600 font-medium text-lg">
-                    🎨 Creating your personalized vision board...
-                  </p>
-                  <p className="text-purple-500 text-sm">
-                    Step 1/3: Using Gemini AI to edit YOUR images into dream scenarios
-                  </p>
-                  <p className="text-purple-500 text-sm">
-                    Step 2/3: Generating lifestyle images with DALL-E 3 (objects/scenes only)
-                  </p>
-                  <p className="text-purple-500 text-sm">
-                    Step 3/3: Gemini composing final collage with sample1.png reference + bold text overlays
-                  </p>
-                  <p className="text-gray-500 text-xs">
-                    Takes ~2 minutes (scenario editing + lifestyle images + final composition)
-                  </p>
+                <div className="space-y-6">
+                  {/* Animated spinner */}
+                  <div className="flex justify-center">
+                    <div className="relative w-24 h-24">
+                      <div className="absolute inset-0 border-8 border-purple-200 rounded-full"></div>
+                      <div className="absolute inset-0 border-8 border-transparent border-t-purple-600 rounded-full animate-spin"></div>
+                      <div className="absolute inset-2 border-8 border-transparent border-t-pink-600 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+                    </div>
+                  </div>
+
+                  {/* Preview placeholder with shimmer effect */}
+                  <div className="relative h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-40 animate-shimmer"></div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <p className="text-purple-600 font-bold text-xl flex items-center justify-center gap-2">
+                      <svg className="w-6 h-6 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                      </svg>
+                      Creating your personalized vision board...
+                    </p>
+                    <div className="space-y-2">
+                      <p className="text-purple-500 text-sm">🎨 Step 1/3: Using Gemini AI to edit YOUR images into dream scenarios</p>
+                      <p className="text-purple-500 text-sm">✨ Step 2/3: Generating lifestyle images with DALL-E 3</p>
+                      <p className="text-purple-500 text-sm">🖼️ Step 3/3: Composing final collage with bold text overlays</p>
+                    </div>
+                    <p className="text-gray-500 text-xs mt-4">
+                      ⏱️ Takes ~2 minutes (scenario editing + lifestyle images + final composition)
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
