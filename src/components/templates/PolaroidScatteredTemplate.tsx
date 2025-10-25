@@ -26,33 +26,33 @@ export default function PolaroidScatteredTemplate({
   // Randomly select 3-4 quotes
   const selectedQuotes = quotesPool.slice(0, 3 + Math.floor(Math.random() * 2));
 
-  // Evenly distributed polaroid positions - fill all corners and edges
+  // Densely packed polaroid grid - completely fills canvas with 15 polaroids
   const polaroidPositions = [
-    // Top row - 5 polaroids
-    { top: "1%", left: "1%", rotate: "-8deg", size: "medium", zIndex: 12 },
-    { top: "2%", left: "18%", rotate: "5deg", size: "medium", zIndex: 11 },
-    { top: "0%", left: "36%", rotate: "-10deg", size: "medium", zIndex: 10 },
-    { top: "3%", right: "18%", rotate: "8deg", size: "medium", zIndex: 13 },
-    { top: "1%", right: "1%", rotate: "-5deg", size: "medium", zIndex: 9 },
+    // Top row - 5 polaroids across entire width
+    { top: "1%", left: "1%", rotate: "-8deg", size: "small", zIndex: 12 },
+    { top: "2%", left: "19%", rotate: "5deg", size: "small", zIndex: 11 },
+    { top: "0%", left: "38%", rotate: "-3deg", size: "small", zIndex: 10 },
+    { top: "2%", left: "57%", rotate: "7deg", size: "small", zIndex: 13 },
+    { top: "1%", left: "76%", rotate: "-5deg", size: "small", zIndex: 9 },
 
-    // Middle row - 5 polaroids
-    { top: "31%", left: "0%", rotate: "7deg", size: "medium", zIndex: 8 },
-    { top: "33%", left: "17%", rotate: "-12deg", size: "medium", zIndex: 7 },
-    { top: "32%", right: "18%", rotate: "10deg", size: "medium", zIndex: 14 },
-    { top: "30%", right: "0%", rotate: "-6deg", size: "medium", zIndex: 6 },
+    // Upper-middle row - 5 polaroids (left side, skip center for card, right side)
+    { top: "23%", left: "0%", rotate: "6deg", size: "small", zIndex: 8 },
+    { top: "24%", left: "18%", rotate: "-9deg", size: "small", zIndex: 7 },
+    { top: "22%", left: "58%", rotate: "8deg", size: "small", zIndex: 14 },
+    { top: "23%", left: "76%", rotate: "-4deg", size: "small", zIndex: 6 },
+    { top: "24%", left: "37%", rotate: "3deg", size: "small", zIndex: 16 },
 
-    // Bottom row - 6 polaroids to fill bottom-left corner
-    { bottom: "28%", left: "1%", rotate: "-10deg", size: "medium", zIndex: 5 },
-    { bottom: "1%", left: "1%", rotate: "8deg", size: "medium", zIndex: 3 },
-    { bottom: "0%", left: "18%", rotate: "-7deg", size: "medium", zIndex: 2 },
-    { bottom: "2%", left: "35%", rotate: "5deg", size: "medium", zIndex: 4 },
-    { bottom: "30%", right: "1%", rotate: "-8deg", size: "medium", zIndex: 15 },
-    { bottom: "1%", right: "1%", rotate: "6deg", size: "medium", zIndex: 1 },
+    // Bottom row - 5 polaroids to densely fill bottom including bottom-left corner
+    { bottom: "1%", left: "0%", rotate: "7deg", size: "small", zIndex: 2 },
+    { bottom: "2%", left: "18%", rotate: "-6deg", size: "small", zIndex: 1 },
+    { bottom: "0%", left: "37%", rotate: "4deg", size: "small", zIndex: 4 },
+    { bottom: "1%", left: "57%", rotate: "-8deg", size: "small", zIndex: 3 },
+    { bottom: "2%", left: "76%", rotate: "5deg", size: "small", zIndex: 5 },
   ];
 
   const sizeClasses = {
-    small: "w-36 h-40",
-    medium: "w-40 h-48",
+    small: "w-32 h-40",
+    medium: "w-36 h-44",
   };
 
   return (
@@ -61,7 +61,7 @@ export default function PolaroidScatteredTemplate({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.9),transparent_70%)]"></div>
 
       {/* Center text card - compact design without keywords */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-8 py-6 rounded-sm shadow-2xl transform -rotate-2 z-20 border-4 border-white">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-8 py-6 rounded-sm shadow-2xl transform -rotate-2 z-30 border-4 border-white">
         <div className="text-center space-y-2">
           <p className="text-xs font-medium text-gray-500 uppercase tracking-widest">800+</p>
           <p className="text-sm font-bold text-gray-600">elements</p>
@@ -86,10 +86,9 @@ export default function PolaroidScatteredTemplate({
             key={idx}
             className={`absolute ${sizeClass} bg-white p-3 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer`}
             style={{
-              top: pos.top,
-              left: pos.left,
-              right: pos.right,
-              bottom: pos.bottom,
+              ...(pos.top && { top: pos.top }),
+              ...(pos.left !== undefined && { left: pos.left }),
+              ...(pos.bottom && { bottom: pos.bottom }),
               transform: `rotate(${pos.rotate})`,
               zIndex: pos.zIndex,
             }}
@@ -112,28 +111,28 @@ export default function PolaroidScatteredTemplate({
         );
       })}
 
-      {/* Quote boxes positioned strategically - big and visible */}
+      {/* Quote boxes positioned strategically between polaroids */}
       {selectedQuotes[0] && (
-        <div className="absolute bottom-[48%] right-[38%] bg-white/98 backdrop-blur-sm px-6 py-4 shadow-2xl transform rotate-2 z-25 max-w-[220px] border-2 border-white">
-          <p className="text-base font-serif italic text-gray-900 leading-relaxed text-center">{selectedQuotes[0]}</p>
+        <div className="absolute top-[46%] left-[9%] bg-white/98 backdrop-blur-sm px-4 py-3 shadow-2xl transform rotate-2 z-25 max-w-[140px] border-2 border-white">
+          <p className="text-xs font-serif italic text-gray-900 leading-relaxed text-center">{selectedQuotes[0]}</p>
         </div>
       )}
 
       {selectedQuotes[1] && (
-        <div className="absolute bottom-[5%] right-[35%] bg-rose-50/98 backdrop-blur-sm px-5 py-3 shadow-2xl transform -rotate-3 z-25 max-w-[200px] border-2 border-white">
-          <p className="text-sm font-light text-gray-800 leading-relaxed text-center tracking-wide">{selectedQuotes[1]}</p>
+        <div className="absolute bottom-[23%] right-[10%] bg-rose-50/98 backdrop-blur-sm px-4 py-3 shadow-2xl transform -rotate-3 z-25 max-w-[130px] border-2 border-white">
+          <p className="text-xs font-light text-gray-800 leading-relaxed text-center tracking-wide">{selectedQuotes[1]}</p>
         </div>
       )}
 
       {selectedQuotes[2] && (
-        <div className="absolute top-[48%] left-[40%] bg-amber-50/98 backdrop-blur-sm px-5 py-3 shadow-2xl transform rotate-4 z-25 max-w-[180px] border-2 border-white">
-          <p className="text-sm font-medium text-gray-800 leading-tight text-center">{selectedQuotes[2]}</p>
+        <div className="absolute bottom-[22%] left-[39%] bg-amber-50/98 backdrop-blur-sm px-4 py-2 shadow-2xl transform rotate-4 z-25 max-w-[120px] border-2 border-white">
+          <p className="text-xs font-medium text-gray-800 leading-tight text-center">{selectedQuotes[2]}</p>
         </div>
       )}
 
       {selectedQuotes[3] && (
-        <div className="absolute bottom-[48%] left-[5%] bg-stone-50/98 backdrop-blur-sm px-5 py-3 shadow-2xl transform -rotate-5 z-25 max-w-[190px] border-2 border-white">
-          <p className="text-sm font-serif italic text-gray-900 leading-relaxed text-center">{selectedQuotes[3]}</p>
+        <div className="absolute top-[45%] right-[9%] bg-stone-50/98 backdrop-blur-sm px-4 py-2 shadow-2xl transform -rotate-5 z-25 max-w-[130px] border-2 border-white">
+          <p className="text-xs font-serif italic text-gray-900 leading-relaxed text-center">{selectedQuotes[3]}</p>
         </div>
       )}
     </div>
