@@ -21,6 +21,21 @@ export default function NeutralBeigeTemplate({
     { label: keywords[6] || "PEACE", emoji: "🌸" },
   ];
 
+  // Inspirational quotes pool
+  const quotesPool = [
+    "I am worthy of my dreams",
+    "Every day I grow stronger",
+    "My potential is limitless",
+    "I create my own reality",
+    "Success flows to me naturally",
+    "I am grateful for this journey",
+    "My best days are ahead",
+    "I trust the process",
+  ];
+
+  // Randomly select 3-4 quotes
+  const selectedQuotes = quotesPool.slice(0, 3 + Math.floor(Math.random() * 2));
+
   return (
     <div className="relative w-full h-[768px] bg-gradient-to-br from-amber-50 via-stone-50 to-neutral-100 overflow-hidden">
       {/* Dense masonry-style layout */}
@@ -107,9 +122,9 @@ export default function NeutralBeigeTemplate({
         </div>
       </div>
 
-      {/* Overlay polaroid-style images for 11-15 */}
+      {/* Overlay polaroid-style images for 11-15 - positioned to not block main content */}
       {images[10] && (
-        <div className="absolute top-[12%] left-[3%] w-28 h-32 bg-white p-2 rounded-sm shadow-2xl transform -rotate-8 z-10">
+        <div className="absolute bottom-[2%] left-[2%] w-24 h-28 bg-white p-2 rounded-sm shadow-2xl transform -rotate-8 z-10">
           <div className="w-full h-[80%] overflow-hidden">
             <img src={images[10]} alt="Vision 11" className="w-full h-full object-cover" />
           </div>
@@ -118,7 +133,7 @@ export default function NeutralBeigeTemplate({
       )}
 
       {images[11] && (
-        <div className="absolute top-[8%] right-[4%] w-32 h-36 bg-white p-2 rounded-sm shadow-2xl transform rotate-12 z-10">
+        <div className="absolute bottom-[2%] right-[2%] w-26 h-30 bg-white p-2 rounded-sm shadow-2xl transform rotate-10 z-10">
           <div className="w-full h-[80%] overflow-hidden">
             <img src={images[11]} alt="Vision 12" className="w-full h-full object-cover" />
           </div>
@@ -127,7 +142,7 @@ export default function NeutralBeigeTemplate({
       )}
 
       {images[12] && (
-        <div className="absolute bottom-[8%] left-[6%] w-30 h-34 bg-white p-2 rounded-sm shadow-2xl transform rotate-6 z-10">
+        <div className="absolute bottom-[32%] left-[2%] w-22 h-26 bg-white p-2 rounded-sm shadow-2xl transform rotate-6 z-10">
           <div className="w-full h-[80%] overflow-hidden">
             <img src={images[12]} alt="Vision 13" className="w-full h-full object-cover" />
           </div>
@@ -135,7 +150,7 @@ export default function NeutralBeigeTemplate({
       )}
 
       {images[13] && (
-        <div className="absolute bottom-[10%] right-[5%] w-28 h-32 bg-white p-2 rounded-sm shadow-2xl transform -rotate-10 z-10">
+        <div className="absolute bottom-[32%] right-[2%] w-24 h-28 bg-white p-2 rounded-sm shadow-2xl transform -rotate-8 z-10">
           <div className="w-full h-[80%] overflow-hidden">
             <img src={images[13]} alt="Vision 14" className="w-full h-full object-cover" />
           </div>
@@ -143,7 +158,7 @@ export default function NeutralBeigeTemplate({
       )}
 
       {images[14] && (
-        <div className="absolute top-[42%] left-[2%] w-26 h-30 bg-white p-2 rounded-sm shadow-2xl transform rotate-15 z-10">
+        <div className="absolute bottom-[15%] left-[15%] w-20 h-24 bg-white p-2 rounded-sm shadow-2xl transform rotate-12 z-10">
           <div className="w-full h-[80%] overflow-hidden">
             <img src={images[14]} alt="Vision 15" className="w-full h-full object-cover" />
           </div>
@@ -154,6 +169,31 @@ export default function NeutralBeigeTemplate({
       <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-stone-800/80 backdrop-blur-sm px-4 py-1 rounded-full shadow-lg z-5">
         <p className="text-xs font-light text-amber-50 tracking-widest">MY DREAMS & GOALS</p>
       </div>
+
+      {/* Quote boxes positioned at bottom edges - big and visible */}
+      {selectedQuotes[0] && (
+        <div className="absolute bottom-[34%] right-[28%] bg-white/95 backdrop-blur-sm px-5 py-3 shadow-2xl transform rotate-3 z-15 max-w-[200px]">
+          <p className="text-sm font-serif italic text-gray-800 leading-relaxed text-center">{selectedQuotes[0]}</p>
+        </div>
+      )}
+
+      {selectedQuotes[1] && (
+        <div className="absolute bottom-[1%] left-[35%] bg-amber-50/95 backdrop-blur-sm px-5 py-3 shadow-2xl transform -rotate-2 z-15 max-w-[180px]">
+          <p className="text-xs font-light text-stone-900 leading-relaxed text-center tracking-wide">{selectedQuotes[1]}</p>
+        </div>
+      )}
+
+      {selectedQuotes[2] && (
+        <div className="absolute top-[2%] left-[45%] bg-stone-100/95 backdrop-blur-sm px-4 py-2 shadow-xl transform rotate-1 z-15 max-w-[160px]">
+          <p className="text-xs font-medium text-gray-700 leading-tight text-center">{selectedQuotes[2]}</p>
+        </div>
+      )}
+
+      {selectedQuotes[3] && (
+        <div className="absolute bottom-[34%] left-[28%] bg-neutral-100/95 backdrop-blur-sm px-4 py-3 shadow-xl transform -rotate-4 z-15 max-w-[170px]">
+          <p className="text-xs font-serif italic text-gray-800 leading-relaxed text-center">{selectedQuotes[3]}</p>
+        </div>
+      )}
     </div>
   );
 }

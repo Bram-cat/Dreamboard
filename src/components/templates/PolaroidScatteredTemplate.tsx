@@ -11,28 +11,43 @@ export default function PolaroidScatteredTemplate({
   images,
   keywords,
 }: PolaroidScatteredTemplateProps) {
-  // Densely packed polaroid positions matching sample2.png style
+  // Inspirational quotes pool
+  const quotesPool = [
+    "I am worthy of my dreams",
+    "Every day I grow stronger",
+    "My potential is limitless",
+    "I create my own reality",
+    "Success flows to me naturally",
+    "I am grateful for this journey",
+    "My best days are ahead",
+    "I trust the process",
+  ];
+
+  // Randomly select 3-4 quotes
+  const selectedQuotes = quotesPool.slice(0, 3 + Math.floor(Math.random() * 2));
+
+  // Densely packed polaroid positions - tighter spacing, more overlap
   const polaroidPositions = [
-    { top: "2%", left: "2%", rotate: "-8deg", size: "medium", zIndex: 12 },
-    { top: "0%", left: "25%", rotate: "5deg", size: "medium", zIndex: 11 },
-    { top: "3%", left: "48%", rotate: "-12deg", size: "small", zIndex: 10 },
-    { top: "0%", right: "18%", rotate: "8deg", size: "medium", zIndex: 13 },
-    { top: "1%", right: "0%", rotate: "-5deg", size: "medium", zIndex: 9 },
-    { top: "28%", left: "0%", rotate: "7deg", size: "medium", zIndex: 8 },
-    { top: "30%", left: "22%", rotate: "-10deg", size: "small", zIndex: 7 },
-    { top: "32%", right: "22%", rotate: "12deg", size: "medium", zIndex: 14 },
-    { top: "28%", right: "1%", rotate: "-6deg", size: "medium", zIndex: 6 },
-    { bottom: "25%", left: "1%", rotate: "-15deg", size: "medium", zIndex: 5 },
-    { bottom: "28%", left: "23%", rotate: "8deg", size: "small", zIndex: 4 },
-    { bottom: "26%", right: "1%", rotate: "-8deg", size: "medium", zIndex: 15 },
-    { bottom: "2%", left: "3%", rotate: "10deg", size: "medium", zIndex: 3 },
-    { bottom: "0%", left: "28%", rotate: "-7deg", size: "medium", zIndex: 2 },
-    { bottom: "1%", right: "2%", rotate: "6deg", size: "medium", zIndex: 1 },
+    { top: "1%", left: "1%", rotate: "-8deg", size: "medium", zIndex: 12 },
+    { top: "2%", left: "20%", rotate: "5deg", size: "medium", zIndex: 11 },
+    { top: "0%", left: "40%", rotate: "-12deg", size: "medium", zIndex: 10 },
+    { top: "3%", right: "18%", rotate: "8deg", size: "medium", zIndex: 13 },
+    { top: "1%", right: "1%", rotate: "-5deg", size: "medium", zIndex: 9 },
+    { top: "25%", left: "0%", rotate: "7deg", size: "medium", zIndex: 8 },
+    { top: "27%", left: "19%", rotate: "-10deg", size: "medium", zIndex: 7 },
+    { top: "26%", right: "19%", rotate: "12deg", size: "medium", zIndex: 14 },
+    { top: "24%", right: "0%", rotate: "-6deg", size: "medium", zIndex: 6 },
+    { bottom: "23%", left: "0%", rotate: "-15deg", size: "medium", zIndex: 5 },
+    { bottom: "25%", left: "18%", rotate: "8deg", size: "medium", zIndex: 4 },
+    { bottom: "24%", right: "0%", rotate: "-8deg", size: "medium", zIndex: 15 },
+    { bottom: "1%", left: "2%", rotate: "10deg", size: "medium", zIndex: 3 },
+    { bottom: "0%", left: "22%", rotate: "-7deg", size: "medium", zIndex: 2 },
+    { bottom: "2%", right: "1%", rotate: "6deg", size: "medium", zIndex: 1 },
   ];
 
   const sizeClasses = {
     small: "w-36 h-40",
-    medium: "w-44 h-52",
+    medium: "w-40 h-48",
   };
 
   return (
@@ -91,6 +106,31 @@ export default function PolaroidScatteredTemplate({
           </div>
         );
       })}
+
+      {/* Quote boxes positioned strategically - big and visible */}
+      {selectedQuotes[0] && (
+        <div className="absolute bottom-[48%] right-[38%] bg-white/98 backdrop-blur-sm px-6 py-4 shadow-2xl transform rotate-2 z-25 max-w-[220px] border-2 border-white">
+          <p className="text-base font-serif italic text-gray-900 leading-relaxed text-center">{selectedQuotes[0]}</p>
+        </div>
+      )}
+
+      {selectedQuotes[1] && (
+        <div className="absolute bottom-[5%] right-[35%] bg-rose-50/98 backdrop-blur-sm px-5 py-3 shadow-2xl transform -rotate-3 z-25 max-w-[200px] border-2 border-white">
+          <p className="text-sm font-light text-gray-800 leading-relaxed text-center tracking-wide">{selectedQuotes[1]}</p>
+        </div>
+      )}
+
+      {selectedQuotes[2] && (
+        <div className="absolute top-[48%] left-[40%] bg-amber-50/98 backdrop-blur-sm px-5 py-3 shadow-2xl transform rotate-4 z-25 max-w-[180px] border-2 border-white">
+          <p className="text-sm font-medium text-gray-800 leading-tight text-center">{selectedQuotes[2]}</p>
+        </div>
+      )}
+
+      {selectedQuotes[3] && (
+        <div className="absolute bottom-[48%] left-[5%] bg-stone-50/98 backdrop-blur-sm px-5 py-3 shadow-2xl transform -rotate-5 z-25 max-w-[190px] border-2 border-white">
+          <p className="text-sm font-serif italic text-gray-900 leading-relaxed text-center">{selectedQuotes[3]}</p>
+        </div>
+      )}
     </div>
   );
 }
