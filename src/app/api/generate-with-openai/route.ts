@@ -101,52 +101,157 @@ export async function POST(request: NextRequest) {
       }
     };
 
-    // Generate 4-5 variations for each upload
+    // PRIORITY: Generate user WITH their items (combo shots)
+    if (hasSelfie && hasDreamHouse) {
+      const selfieBase64 = categorizedUploads.selfie.split(",")[1];
+      const houseBase64 = categorizedUploads.dreamHouse.split(",")[1];
+      const comboPrompts = [
+        "Show this person standing proudly in front of this house, looking successful. The person is clearly visible as the homeowner. Beautiful landscaping, golden hour lighting.",
+        "Show this person relaxing in the backyard/patio of this house, looking content and at home. Natural lifestyle photography."
+      ];
+      for (const prompt of comboPrompts) {
+        console.log(`  [Combo ${scenarioCount + 1}] User WITH house`);
+        try {
+          const response = await genai.models.generateContent({
+            model: "gemini-2.5-flash-image",
+            contents: [{ role: "user", parts: [
+              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
+              { inlineData: { data: houseBase64, mimeType: "image/jpeg" } },
+              { text: prompt }
+            ]}],
+            config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
+          });
+          const candidate = response.candidates?.[0];
+          if (candidate?.content?.parts) {
+            const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+              part.inlineData?.mimeType?.startsWith("image/")
+            );
+            if (imagePart?.inlineData?.data) {
+              allGeneratedImages.push(imagePart.inlineData.data);
+              scenarioCount++;
+              console.log(`  ✓ Created combo ${scenarioCount}`);
+            }
+          }
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error("  ✗ Error:", error);
+        }
+      }
+    }
+
+    if (hasSelfie && hasDreamCar) {
+      const selfieBase64 = categorizedUploads.selfie.split(",")[1];
+      const carBase64 = categorizedUploads.dreamCar.split(",")[1];
+      const comboPrompts = [
+        "Show this person leaning against this car confidently, looking stylish. The person is the owner. Professional automotive lifestyle photography.",
+        "Show this person sitting in driver's seat of this car, excited and ready for adventure. View showing both person and vehicle clearly."
+      ];
+      for (const prompt of comboPrompts) {
+        console.log(`  [Combo ${scenarioCount + 1}] User WITH car`);
+        try {
+          const response = await genai.models.generateContent({
+            model: "gemini-2.5-flash-image",
+            contents: [{ role: "user", parts: [
+              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
+              { inlineData: { data: carBase64, mimeType: "image/jpeg" } },
+              { text: prompt }
+            ]}],
+            config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
+          });
+          const candidate = response.candidates?.[0];
+          if (candidate?.content?.parts) {
+            const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+              part.inlineData?.mimeType?.startsWith("image/")
+            );
+            if (imagePart?.inlineData?.data) {
+              allGeneratedImages.push(imagePart.inlineData.data);
+              scenarioCount++;
+              console.log(`  ✓ Created combo ${scenarioCount}`);
+            }
+          }
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error("  ✗ Error:", error);
+        }
+      }
+    }
+
+    if (hasSelfie && hasDestination) {
+      const selfieBase64 = categorizedUploads.selfie.split(",")[1];
+      const destinationBase64 = categorizedUploads.destination.split(",")[1];
+      const comboPrompts = [
+        "Show this person at this destination, looking happy and carefree on vacation. Person clearly visible enjoying the scenery.",
+        "Show this person posing at this destination during golden hour, wearing vacation outfit, relaxed and joyful. Professional travel photography."
+      ];
+      for (const prompt of comboPrompts) {
+        console.log(`  [Combo ${scenarioCount + 1}] User AT destination`);
+        try {
+          const response = await genai.models.generateContent({
+            model: "gemini-2.5-flash-image",
+            contents: [{ role: "user", parts: [
+              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
+              { inlineData: { data: destinationBase64, mimeType: "image/jpeg" } },
+              { text: prompt }
+            ]}],
+            config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
+          });
+          const candidate = response.candidates?.[0];
+          if (candidate?.content?.parts) {
+            const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+              part.inlineData?.mimeType?.startsWith("image/")
+            );
+            if (imagePart?.inlineData?.data) {
+              allGeneratedImages.push(imagePart.inlineData.data);
+              scenarioCount++;
+              console.log(`  ✓ Created combo ${scenarioCount}`);
+            }
+          }
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error("  ✗ Error:", error);
+        }
+      }
+    }
+
+    // Then generate solo selfie variations
     if (hasSelfie) {
       const selfieBase64 = categorizedUploads.selfie.split(",")[1];
       const selfieVariations = [
-        "Transform this person into a confident CEO at a modern office, sitting at a desk with a laptop, looking successful and empowered. Soft natural lighting, professional corporate aesthetic. The person should look polished and powerful.",
-        "Show this person meditating peacefully in a beautiful zen garden or yoga studio, wearing comfortable activewear. Serene atmosphere, natural lighting, wellness aesthetic. The person should look calm and centered.",
-        "Create a glamorous photo of this person at a luxury event, wearing elegant clothing, holding a champagne glass. Sophisticated party atmosphere, warm lighting, aspirational lifestyle. The person should look confident and radiant.",
-        "Show this person traveling in style - at an airport lounge, wearing chic travel outfit with designer luggage. Bright natural lighting, jet-setter aesthetic. The person should look excited and adventurous.",
+        "Transform this person into a confident CEO at a modern office, sitting at a desk with a laptop, looking successful and empowered.",
+        "Show this person meditating peacefully in a beautiful zen garden, wearing activewear. Serene wellness aesthetic.",
+        "Create a glamorous photo of this person at a luxury event, wearing elegant clothing, holding champagne. Sophisticated party atmosphere.",
       ];
-      await generateVariations(selfieBase64, "Selfie", selfieVariations);
+      await generateVariations(selfieBase64, "Selfie Solo", selfieVariations);
     }
 
+    // Generate standalone item variations (fewer since we did combos)
     if (hasDreamHouse) {
       const houseBase64 = categorizedUploads.dreamHouse.split(",")[1];
-      const houseVariations = [
-        "Transform this house with beautiful landscaping, blooming flowers in the garden, golden hour lighting. Make it look like a dream home from a luxury magazine. Add subtle enhancements like warm interior lights visible through windows.",
-        "Show this house at sunset with dramatic sky, perfectly manicured lawn, luxury car in the driveway. Aspirational real estate photography style. Make it look inviting and successful.",
-        "Create a cozy morning scene of this house with soft sunrise lighting, dewdrops on grass, birds flying nearby. Peaceful residential aesthetic. Make it feel like home.",
-      ];
-      await generateVariations(houseBase64, "Dream House", houseVariations);
+      await generateVariations(houseBase64, "House Solo", [
+        "Transform this house with beautiful landscaping, blooming flowers, golden hour lighting. Luxury magazine aesthetic."
+      ]);
     }
 
     if (hasDreamCar) {
       const carBase64 = categorizedUploads.dreamCar.split(",")[1];
-      const carVariations = [
-        "Show this car on a scenic coastal highway during golden hour, with ocean views in the background. Professional automotive photography, dramatic lighting. Make it look luxurious and aspirational.",
-        "Place this car in front of a modern luxury home or upscale shopping district. Clean urban aesthetic, bright daylight. Make it look successful and sophisticated.",
-        "Show this car in motion on an open road with beautiful mountain or desert landscape. Dynamic automotive photography. Make it look powerful and free.",
-      ];
-      await generateVariations(carBase64, "Dream Car", carVariations);
+      await generateVariations(carBase64, "Car Solo", [
+        "Show this car on scenic coastal highway during golden hour. Professional automotive photography, dramatic lighting."
+      ]);
     }
 
     if (hasDestination) {
       const destinationBase64 = categorizedUploads.destination.split(",")[1];
-      const destinationVariations = [
-        "Enhance this destination with perfect golden hour lighting, add subtle elements like birds flying or gentle waves. Make it look like paradise - a travel magazine cover photo.",
-        "Transform this location into the ultimate vacation spot - add luxury elements like elegant lounge chairs, champagne, tropical flowers. Aspirational travel aesthetic.",
-        "Show this destination at sunrise or sunset with dramatic colorful sky. Add peaceful atmosphere, make it look serene and breathtaking.",
-      ];
-      await generateVariations(destinationBase64, "Destination", destinationVariations);
+      await generateVariations(destinationBase64, "Destination Solo", [
+        "Enhance this destination with perfect golden hour lighting. Paradise travel magazine cover photo."
+      ]);
     }
 
     console.log(`✅ Generated ${scenarioCount} variations from user uploads`);
 
     // STEP 2B: Generate remaining lifestyle images with DALL-E 3 (feminine aesthetic, NO people)
-    const remainingCount = 10 - scenarioCount;
+    // Target 12-15 total images to fill the board better
+    const targetTotal = 15;
+    const remainingCount = targetTotal - scenarioCount;
     console.log(`\n🎨 STEP 2/3: Generating ${remainingCount} feminine aesthetic lifestyle images...`);
     const dalleImages: string[] = [];
 
@@ -236,34 +341,39 @@ export async function POST(request: NextRequest) {
       inlineData: { data: sampleBase64, mimeType: "image/png" }
     });
 
-    // Create final collage prompt
-    const finalPrompt = `You are an expert vision board designer. Create a PHYSICAL MAGAZINE-STYLE COLLAGE matching the EXACT style of the FIRST reference image.
+    // Create final collage prompt with REDUCED OVERLAP
+    const finalPrompt = `You are an expert vision board designer. Create a PHYSICAL MAGAZINE-STYLE COLLAGE matching the style of the FIRST reference image.
 
 REFERENCE STYLE (First Image):
 - Physical magazine cutout aesthetic
 - Bold text labels in various fonts (handwritten, magazine clippings, stickers)
-- Overlapping photos at angles
+- Photos at angles with MINIMAL overlap
 - Text overlays: "2025", "VISION BOARD", user keywords in BOLD
 - Energetic, inspiring, magazine collage vibe
-- Mix of photo sizes
-- Some photos tilted/rotated
-- Background visible between images
 
 USER'S VISION BOARD:
 Keywords: ${keywords.join(", ")}
+Total images to use: ${imageDataParts.length - 1} images
 
-INSTRUCTIONS:
-1. Use ALL ${imageDataParts.length - 1} provided images (skip the first reference image)
-2. Arrange in magazine collage style like reference
-3. Add BOLD TEXT LABELS for each keyword: ${keywords.map(k => `"${k.toUpperCase()}"`).join(", ")}
-4. Add "2025" prominently
-5. Add "VISION BOARD" title
-6. Add affirmations: "FINANCIAL FREEDOM", "PASSIVE INCOME", "SUCCESS", "positive mindset"
-7. Magazine cutout aesthetic - photos at angles, overlapping
-8. Vibrant, energetic, inspiring
-9. 1344x768 landscape format
+CRITICAL LAYOUT REQUIREMENTS:
+1. Use ALL ${imageDataParts.length - 1} images (skip the first reference image)
+2. EVERY IMAGE MUST BE AT LEAST 70% VISIBLE - avoid heavy overlap
+3. Arrange photos to FILL THE ENTIRE BOARD - use all available space
+4. Vary photo sizes (small, medium, large) to fit more images
+5. Rotate/tilt photos at different angles for magazine aesthetic
+6. Leave minimal empty space - pack images efficiently
+7. Some slight overlap is OK for depth, but ALL photos must be clearly visible
 
-CREATE THE COLLAGE NOW.`;
+TEXT ELEMENTS TO ADD:
+- "2025" prominently displayed
+- "VISION BOARD" title
+- Bold text labels: ${keywords.map(k => `"${k.toUpperCase()}"`).join(", ")}
+- Affirmations: "FINANCIAL FREEDOM", "SUCCESS", "positive mindset"
+
+STYLE: Magazine cutout aesthetic, vibrant, energetic, inspiring
+FORMAT: 1344x768 landscape
+
+CREATE A DENSELY PACKED COLLAGE WHERE ALL ${imageDataParts.length - 1} IMAGES ARE CLEARLY VISIBLE.`;
 
     const finalResponse = await genai.models.generateContent({
       model: "gemini-2.5-flash-image",
