@@ -55,9 +55,9 @@ export default function PolaroidScatteredTemplate({
   };
 
   return (
-    <div className="relative w-full h-[768px] bg-gradient-to-br from-slate-100 via-stone-50 to-neutral-100 overflow-hidden">
+    <div className="relative w-full h-[768px] bg-gradient-to-br from-amber-50 via-rose-50 to-purple-50 overflow-hidden">
       {/* Subtle background texture */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.9),transparent_70%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.7),transparent_70%)]"></div>
 
       {/* Center text card - compact design without keywords */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-8 py-6 rounded-sm shadow-2xl transform -rotate-2 z-30 border-4 border-white">
@@ -110,27 +110,31 @@ export default function PolaroidScatteredTemplate({
         );
       })}
 
-      {/* Quote boxes positioned between the 3 sections */}
+      {/* Enhanced quote boxes with better styling */}
       {selectedQuotes[0] && (
-        <div className="absolute top-[23%] left-[21%] bg-white/98 backdrop-blur-sm px-5 py-4 shadow-2xl transform rotate-2 z-25 max-w-[160px] border-2 border-white">
+        <div className="absolute top-[23%] left-[21%] bg-gradient-to-br from-white to-purple-50 backdrop-blur-md px-6 py-4 shadow-2xl transform rotate-2 z-25 max-w-[180px] border border-purple-200 rounded-lg">
+          <div className="absolute -top-2 -left-2 w-4 h-4 bg-purple-400 rounded-full"></div>
           <p className="text-sm font-serif italic text-gray-900 leading-relaxed text-center">{selectedQuotes[0]}</p>
         </div>
       )}
 
       {selectedQuotes[1] && (
-        <div className="absolute top-[23%] right-[8%] bg-rose-50/98 backdrop-blur-sm px-5 py-4 shadow-2xl transform -rotate-3 z-25 max-w-[160px] border-2 border-white">
-          <p className="text-sm font-light text-gray-800 leading-relaxed text-center tracking-wide">{selectedQuotes[1]}</p>
+        <div className="absolute top-[23%] right-[8%] bg-gradient-to-br from-rose-50 to-white backdrop-blur-md px-6 py-4 shadow-2xl transform -rotate-3 z-25 max-w-[180px] border border-rose-200 rounded-lg">
+          <div className="absolute -top-2 -right-2 w-4 h-4 bg-rose-400 rounded-full"></div>
+          <p className="text-sm font-medium text-gray-800 leading-relaxed text-center tracking-wide">{selectedQuotes[1]}</p>
         </div>
       )}
 
       {selectedQuotes[2] && (
-        <div className="absolute bottom-[23%] left-[21%] bg-amber-50/98 backdrop-blur-sm px-5 py-3 shadow-2xl transform rotate-3 z-25 max-w-[150px] border-2 border-white">
-          <p className="text-sm font-medium text-gray-800 leading-tight text-center">{selectedQuotes[2]}</p>
+        <div className="absolute bottom-[23%] left-[21%] bg-gradient-to-br from-amber-50 to-white backdrop-blur-md px-6 py-4 shadow-2xl transform rotate-3 z-25 max-w-[170px] border border-amber-200 rounded-lg">
+          <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-amber-400 rounded-full"></div>
+          <p className="text-sm font-semibold text-gray-800 leading-tight text-center">{selectedQuotes[2]}</p>
         </div>
       )}
 
       {selectedQuotes[3] && (
-        <div className="absolute bottom-[23%] left-[40%] bg-stone-50/98 backdrop-blur-sm px-5 py-3 shadow-2xl transform -rotate-4 z-25 max-w-[150px] border-2 border-white">
+        <div className="absolute bottom-[23%] left-[40%] bg-gradient-to-br from-white to-blue-50 backdrop-blur-md px-6 py-4 shadow-2xl transform -rotate-4 z-25 max-w-[170px] border border-blue-200 rounded-lg">
+          <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-400 rounded-full"></div>
           <p className="text-sm font-serif italic text-gray-900 leading-relaxed text-center">{selectedQuotes[3]}</p>
         </div>
       )}

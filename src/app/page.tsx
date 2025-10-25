@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import html2canvas from "html2canvas";
 import VisionBoardCanvas from "@/components/VisionBoardCanvas";
 import {
   MagazineCollageTemplate,
@@ -10,6 +11,7 @@ import {
   TornPaperAffirmationsTemplate,
   TemplateType,
 } from "@/components/templates";
+import { Progress } from "@/components/ui/progress";
 
 interface GeneratedImage {
   url: string;
@@ -69,6 +71,7 @@ export default function Home() {
   const [selectedStyle, setSelectedStyle] = useState<"bold" | "polaroid" | "torn" | "random">("random");
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | "ai" | "random">("ai");
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const [step, setStep] = useState<"input" | "upload" | "preview">("input");
   const [collageReady, setCollageReady] = useState(false);
@@ -167,6 +170,7 @@ export default function Home() {
 
   const proceedToCollage = async () => {
     setLoading(true);
+    setProgress(0);
     setStep("preview");
 
     try {
@@ -181,6 +185,8 @@ export default function Home() {
       console.log("User uploads:", uploadContext);
       console.log("Generation mode:", generationMode);
 
+      setProgress(10); // Starting generation
+
       if (generationMode === "openai") {
         // NEW: DALL-E 3 + Gemini Imagen workflow (individual images for HTML collage)
         console.log("🎨 Generating individual images with DALL-E 3 + Gemini Imagen...");
@@ -188,6 +194,10 @@ export default function Home() {
         // Extract keywords from goals (split by comma or use as-is)
         const extractedKeywords = goals.split(",").map((k) => k.trim()).filter((k) => k.length > 0);
         setKeywords(extractedKeywords);
+
+        setProgress(20); // Keywords extracted
+
+        setProgress(30); // Starting API call
 
         const response = await fetch("/api/generate-with-openai", {
           method: "POST",
@@ -201,6 +211,8 @@ export default function Home() {
           }),
         });
 
+        setProgress(70); // API call completed
+
         if (!response.ok) {
           const errorData = await response.json();
           console.error("Image generation error:", errorData);
@@ -208,6 +220,7 @@ export default function Home() {
         }
 
         const data = await response.json();
+        setProgress(90); // Processing results
         console.log(`✓ Generated ${data.metadata?.total_images_used || 0} total images`);
         console.log(`   - Scenario images (user in dream life): ${data.metadata?.scenario_images || 0}`);
         console.log(`   - DALL-E 3 lifestyle images: ${data.metadata?.dalle_count || 0}`);
@@ -223,6 +236,7 @@ export default function Home() {
           console.log(`✓ Final collage created by Gemini matching sample1.png!`);
           setImages([{ url: data.final_vision_board, keyword: "Vision Board 2025" }]);
         }
+        setProgress(100); // Complete
         setCollageReady(true);
       } else if (generationMode === "component") {
         // Component-based generation
@@ -448,21 +462,51 @@ export default function Home() {
     if (!collageReady || images.length === 0) return;
 
     try {
-      // Download the final collage image from Runway AI
-      const imageUrl = images[0].url;
+      if (useHtmlTemplate) {
+        // For HTML templates, capture the entire board as canvas
+        const boardElement = document.querySelector('.vision-board-template') as HTMLElement;
+        if (!boardElement) {
+          setError("Could not find board to download");
+          return;
+        }
 
-      // Fetch the image and convert to blob
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
+        // Hide the download button temporarily
+        const downloadBtn = document.querySelector('.download-button') as HTMLElement;
+        if (downloadBtn) downloadBtn.style.display = 'none';
 
-      // Create download link
-      const link = document.createElement("a");
-      link.download = "my-vision-board-2025.png";
-      link.href = URL.createObjectURL(blob);
-      link.click();
+        // Capture the board
+        const canvas = await html2canvas(boardElement, {
+          scale: 2, // Higher quality
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: null,
+        });
 
-      // Clean up
-      URL.revokeObjectURL(link.href);
+        // Show the button again
+        if (downloadBtn) downloadBtn.style.display = 'flex';
+
+        // Convert canvas to blob and download
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const link = document.createElement("a");
+            link.download = "my-vision-board-2025.png";
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+          }
+        });
+      } else {
+        // For AI-generated collage, download the image directly
+        const imageUrl = images[0].url;
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+
+        const link = document.createElement("a");
+        link.download = "my-vision-board-2025.png";
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+      }
     } catch {
       setError("Failed to download board");
     }
@@ -750,40 +794,42 @@ export default function Home() {
                 {useHtmlTemplate ? (
                   // Render HTML template with individual images
                   <>
-                    {selectedTemplate === "magazine" && (
-                      <MagazineCollageTemplate
-                        images={images.map((img) => img.url)}
-                        keywords={keywords}
-                      />
-                    )}
-                    {selectedTemplate === "grid" && (
-                      <CleanGridTemplate
-                        images={images.map((img) => img.url)}
-                        keywords={keywords}
-                      />
-                    )}
-                    {selectedTemplate === "neutral" && (
-                      <NeutralBeigeTemplate
-                        images={images.map((img) => img.url)}
-                        keywords={keywords}
-                      />
-                    )}
-                    {selectedTemplate === "polaroid" && (
-                      <PolaroidScatteredTemplate
-                        images={images.map((img) => img.url)}
-                        keywords={keywords}
-                      />
-                    )}
-                    {selectedTemplate === "torn" && (
-                      <TornPaperAffirmationsTemplate
-                        images={images.map((img) => img.url)}
-                        keywords={keywords}
-                      />
-                    )}
+                    <div className="vision-board-template">
+                      {selectedTemplate === "magazine" && (
+                        <MagazineCollageTemplate
+                          images={images.map((img) => img.url)}
+                          keywords={keywords}
+                        />
+                      )}
+                      {selectedTemplate === "grid" && (
+                        <CleanGridTemplate
+                          images={images.map((img) => img.url)}
+                          keywords={keywords}
+                        />
+                      )}
+                      {selectedTemplate === "neutral" && (
+                        <NeutralBeigeTemplate
+                          images={images.map((img) => img.url)}
+                          keywords={keywords}
+                        />
+                      )}
+                      {selectedTemplate === "polaroid" && (
+                        <PolaroidScatteredTemplate
+                          images={images.map((img) => img.url)}
+                          keywords={keywords}
+                        />
+                      )}
+                      {selectedTemplate === "torn" && (
+                        <TornPaperAffirmationsTemplate
+                          images={images.map((img) => img.url)}
+                          keywords={keywords}
+                        />
+                      )}
+                    </div>
                     {/* Download button for HTML templates - repositioned to bottom-right */}
                     <button
                       onClick={handleDownload}
-                      className="absolute bottom-6 right-6 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 z-50 flex items-center gap-2"
+                      className="download-button absolute bottom-6 right-6 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 z-50 flex items-center gap-2"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -813,16 +859,23 @@ export default function Home() {
               </div>
             )}
 
-            {/* Loading state with enhanced spinner animation */}
+            {/* Loading state with progress bar */}
             {!collageReady && (
               <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
                 <div className="space-y-6">
-                  {/* Animated spinner */}
-                  <div className="flex justify-center">
-                    <div className="relative w-24 h-24">
-                      <div className="absolute inset-0 border-8 border-purple-200 rounded-full"></div>
-                      <div className="absolute inset-0 border-8 border-transparent border-t-purple-600 rounded-full animate-spin"></div>
-                      <div className="absolute inset-2 border-8 border-transparent border-t-pink-600 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+                  {/* Progress bar */}
+                  <div className="space-y-3">
+                    <p className="text-purple-600 font-bold text-xl flex items-center justify-center gap-2">
+                      <svg className="w-6 h-6 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                      </svg>
+                      Creating your personalized vision board...
+                    </p>
+
+                    {/* Progress Bar Component */}
+                    <div className="w-full max-w-xl mx-auto">
+                      <Progress value={progress} className="h-3" />
+                      <p className="text-sm text-purple-600 font-medium mt-2">{progress}%</p>
                     </div>
                   </div>
 
@@ -832,12 +885,6 @@ export default function Home() {
                   </div>
 
                   <div className="space-y-3">
-                    <p className="text-purple-600 font-bold text-xl flex items-center justify-center gap-2">
-                      <svg className="w-6 h-6 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
-                      </svg>
-                      Creating your personalized vision board...
-                    </p>
                     <div className="space-y-2">
                       <p className="text-purple-500 text-sm">🎨 Step 1/3: Using Gemini AI to edit YOUR images into dream scenarios</p>
                       <p className="text-purple-500 text-sm">✨ Step 2/3: Generating lifestyle images with DALL-E 3</p>
