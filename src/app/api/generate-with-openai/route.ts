@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
                 { text: prompt }
               ]
             }],
-            config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
+            config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
           });
 
           const candidate = response.candidates?.[0];
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
       const selfieBase64 = categorizedUploads.selfie.split(",")[1];
       const houseBase64 = categorizedUploads.dreamHouse.split(",")[1];
       const comboPrompts = [
-        "Show this person standing proudly in front of this house, looking successful. The person is clearly visible as the homeowner. Beautiful landscaping, golden hour lighting."
+        "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person standing in front of this house. Only change the background/setting, NOT the person. Preserve their race, gender, age, and all facial characteristics exactly as shown."
       ];
       for (const prompt of comboPrompts) {
         console.log(`  [Combo ${scenarioCount + 1}] User WITH house`);
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
               { inlineData: { data: houseBase64, mimeType: "image/jpeg" } },
               { text: prompt }
             ]}],
-            config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
+            config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
           });
           const candidate = response.candidates?.[0];
           if (candidate?.content?.parts) {
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
       const selfieBase64 = categorizedUploads.selfie.split(",")[1];
       const carBase64 = categorizedUploads.dreamCar.split(",")[1];
       const comboPrompts = [
-        "Show this person with this car, looking confident and successful. Keep the car's brand and model clearly recognizable. Professional automotive lifestyle photography."
+        "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person with this car. Keep the car's brand and model clearly recognizable. Only change the setting, NOT the person's appearance. Preserve their race, gender, age, and all facial characteristics exactly as shown."
       ];
       for (const prompt of comboPrompts) {
         console.log(`  [Combo ${scenarioCount + 1}] User WITH car`);
@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
               { inlineData: { data: carBase64, mimeType: "image/jpeg" } },
               { text: prompt }
             ]}],
-            config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
+            config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
           });
           const candidate = response.candidates?.[0];
           if (candidate?.content?.parts) {
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
       const selfieBase64 = categorizedUploads.selfie.split(",")[1];
       const destinationBase64 = categorizedUploads.destination.split(",")[1];
       const comboPrompts = [
-        "Show this person at this exact destination, looking happy and successful. Keep the destination's landmarks and scenery clearly recognizable. Professional travel photography."
+        "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person at this destination. Keep the destination's landmarks clearly recognizable. Only change the background/setting, NOT the person's appearance. Preserve their race, gender, age, and all facial characteristics exactly as shown."
       ];
       for (const prompt of comboPrompts) {
         console.log(`  [Combo ${scenarioCount + 1}] User AT destination`);
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
               { inlineData: { data: destinationBase64, mimeType: "image/jpeg" } },
               { text: prompt }
             ]}],
-            config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
+            config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
           });
           const candidate = response.candidates?.[0];
           if (candidate?.content?.parts) {
@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
     if (hasSelfie && !hasDreamHouse && !hasDreamCar && !hasDestination) {
       const selfieBase64 = categorizedUploads.selfie.split(",")[1];
       const selfieVariations = [
-        "Show this person in a professional successful setting, looking confident. Minimal editing, keep their face recognizable."
+        "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person in a professional setting. Only change the background/clothes, NOT the person's face or identity. Preserve their race, gender, age, and all facial characteristics exactly as shown."
       ];
       await generateVariations(selfieBase64, "Selfie Solo", selfieVariations);
     }
