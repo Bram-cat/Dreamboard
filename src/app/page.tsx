@@ -462,52 +462,40 @@ export default function Home() {
     if (!collageReady || images.length === 0) return;
 
     try {
-      if (useHtmlTemplate) {
-        // For HTML templates, capture the entire board as canvas
-        const boardElement = document.querySelector('.vision-board-template') as HTMLElement;
-        if (!boardElement) {
-          setError("Could not find board to download");
-          return;
-        }
-
-        // Hide the download button temporarily
-        const downloadBtn = document.querySelector('.download-button') as HTMLElement;
-        if (downloadBtn) downloadBtn.style.display = 'none';
-
-        // Capture the board
-        const canvas = await html2canvas(boardElement, {
-          scale: 2, // Higher quality
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: null,
-        });
-
-        // Show the button again
-        if (downloadBtn) downloadBtn.style.display = 'flex';
-
-        // Convert canvas to blob and download
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const link = document.createElement("a");
-            link.download = "my-vision-board-2025.png";
-            link.href = URL.createObjectURL(blob);
-            link.click();
-            URL.revokeObjectURL(link.href);
-          }
-        });
-      } else {
-        // For AI-generated collage, download the image directly
-        const imageUrl = images[0].url;
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-
-        const link = document.createElement("a");
-        link.download = "my-vision-board-2025.png";
-        link.href = URL.createObjectURL(blob);
-        link.click();
-        URL.revokeObjectURL(link.href);
+      // Use html2canvas for ALL templates to capture the entire board
+      const boardElement = document.querySelector('.vision-board-template') as HTMLElement;
+      if (!boardElement) {
+        setError("Could not find board to download");
+        return;
       }
-    } catch {
+
+      // Hide the download button temporarily
+      const downloadBtn = document.querySelector('.download-button') as HTMLElement;
+      if (downloadBtn) downloadBtn.style.display = 'none';
+
+      // Capture the board with html2canvas
+      const canvas = await html2canvas(boardElement, {
+        scale: 2, // Higher quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+      });
+
+      // Show the button again
+      if (downloadBtn) downloadBtn.style.display = 'flex';
+
+      // Convert canvas to blob and download
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const link = document.createElement("a");
+          link.download = "my-vision-board-2025.png";
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          URL.revokeObjectURL(link.href);
+        }
+      });
+    } catch (error) {
+      console.error("Download error:", error);
       setError("Failed to download board");
     }
   };
@@ -840,14 +828,16 @@ export default function Home() {
                 ) : (
                   // Render AI-generated Gemini collage
                   <>
-                    <img
-                      src={images[0].url}
-                      alt="Your Vision Board 2025"
-                      className="w-full h-auto rounded-lg shadow-2xl"
-                    />
+                    <div className="vision-board-template">
+                      <img
+                        src={images[0].url}
+                        alt="Your Vision Board 2025"
+                        className="w-full h-auto rounded-lg shadow-2xl"
+                      />
+                    </div>
                     <button
                       onClick={handleDownload}
-                      className="absolute bottom-6 right-6 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 flex items-center gap-2"
+                      className="download-button absolute bottom-6 right-6 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 flex items-center gap-2"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

@@ -418,16 +418,26 @@ CREATE A DENSELY PACKED COLLAGE WHERE ALL ${imageDataParts.length - 1} IMAGES AR
     console.log("✅ Final collage created successfully!");
 
     // Prepare individual images for HTML templates if needed
+    // PRIORITY ORDER: User variations first, then DALL-E lifestyle images
     const individualImages = useHtmlTemplate
       ? [...allGeneratedImages, ...dalleImages].map(
           (base64) => `data:image/png;base64,${base64}`
         )
       : [];
 
+    // Also include original user uploads in the response for templates that want to use them
+    const userUploads = {
+      selfie: categorizedUploads?.selfie || null,
+      dreamHouse: categorizedUploads?.dreamHouse || null,
+      dreamCar: categorizedUploads?.dreamCar || null,
+      destination: categorizedUploads?.destination || null,
+    };
+
     return NextResponse.json({
       status: "success",
       final_vision_board: finalVisionBoard,
       individual_images: useHtmlTemplate ? individualImages : undefined,
+      user_uploads: userUploads,
       metadata: {
         scenario_images: scenarioCount,
         dalle_count: dalleImages.length,
