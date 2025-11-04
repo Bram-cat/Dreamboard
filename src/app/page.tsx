@@ -4,11 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import html2canvas from "html2canvas";
 import VisionBoardCanvas from "@/components/VisionBoardCanvas";
 import {
-  MagazineCollageTemplate,
   CleanGridTemplate,
-  NeutralBeigeTemplate,
   PolaroidScatteredTemplate,
-  TornPaperAffirmationsTemplate,
   TemplateType,
 } from "@/components/templates";
 import { Progress } from "@/components/ui/progress";
@@ -676,45 +673,6 @@ export default function Home() {
                 </button>
 
                 <button
-                  onClick={() => { setSelectedTemplate("magazine"); setUseHtmlTemplate(true); }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedTemplate === "magazine"
-                      ? "border-purple-600 bg-purple-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-purple-400"
-                  }`}
-                >
-                  <div className="text-2xl mb-2">📰</div>
-                  <div className="font-bold text-sm">Magazine Collage</div>
-                  <div className="text-xs text-gray-600">Bold scattered photos</div>
-                </button>
-
-                <button
-                  onClick={() => { setSelectedTemplate("grid"); setUseHtmlTemplate(true); }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedTemplate === "grid"
-                      ? "border-pink-600 bg-pink-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-pink-400"
-                  }`}
-                >
-                  <div className="text-2xl mb-2">📊</div>
-                  <div className="font-bold text-sm">Clean Grid</div>
-                  <div className="text-xs text-gray-600">Organized 3x3 layout</div>
-                </button>
-
-                <button
-                  onClick={() => { setSelectedTemplate("neutral"); setUseHtmlTemplate(true); }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedTemplate === "neutral"
-                      ? "border-amber-600 bg-amber-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-amber-400"
-                  }`}
-                >
-                  <div className="text-2xl mb-2">🤎</div>
-                  <div className="font-bold text-sm">Neutral Beige</div>
-                  <div className="text-xs text-gray-600">Soft earthy tones</div>
-                </button>
-
-                <button
                   onClick={() => { setSelectedTemplate("polaroid"); setUseHtmlTemplate(true); }}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     selectedTemplate === "polaroid"
@@ -728,16 +686,16 @@ export default function Home() {
                 </button>
 
                 <button
-                  onClick={() => { setSelectedTemplate("torn"); setUseHtmlTemplate(true); }}
+                  onClick={() => { setSelectedTemplate("grid"); setUseHtmlTemplate(true); }}
                   className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedTemplate === "torn"
-                      ? "border-green-600 bg-green-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-green-400"
+                    selectedTemplate === "grid"
+                      ? "border-pink-600 bg-pink-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-pink-400"
                   }`}
                 >
-                  <div className="text-2xl mb-2">✨</div>
-                  <div className="font-bold text-sm">Torn Paper</div>
-                  <div className="text-xs text-gray-600">Affirmations overlays</div>
+                  <div className="text-2xl mb-2">📊</div>
+                  <div className="font-bold text-sm">Clean Grid</div>
+                  <div className="text-xs text-gray-600">Organized 3x3 layout</div>
                 </button>
               </div>
             </div>
@@ -783,32 +741,14 @@ export default function Home() {
                   // Render HTML template with individual images
                   <>
                     <div className="vision-board-template">
-                      {selectedTemplate === "magazine" && (
-                        <MagazineCollageTemplate
-                          images={images.map((img) => img.url)}
-                          keywords={keywords}
-                        />
-                      )}
                       {selectedTemplate === "grid" && (
                         <CleanGridTemplate
                           images={images.map((img) => img.url)}
                           keywords={keywords}
                         />
                       )}
-                      {selectedTemplate === "neutral" && (
-                        <NeutralBeigeTemplate
-                          images={images.map((img) => img.url)}
-                          keywords={keywords}
-                        />
-                      )}
                       {selectedTemplate === "polaroid" && (
                         <PolaroidScatteredTemplate
-                          images={images.map((img) => img.url)}
-                          keywords={keywords}
-                        />
-                      )}
-                      {selectedTemplate === "torn" && (
-                        <TornPaperAffirmationsTemplate
                           images={images.map((img) => img.url)}
                           keywords={keywords}
                         />

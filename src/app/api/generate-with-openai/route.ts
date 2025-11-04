@@ -47,7 +47,14 @@ export async function POST(request: NextRequest) {
     // ============================================
     console.log("\n🎨 STEP 1/3: Generating 5 images with DALL-E based on keywords...");
 
-    const dallePrompts = keywords.slice(0, 5).map((keyword: string) => {
+    // Ensure we have 5 keywords by adding default lifestyle themes
+    const defaultThemes = ["success", "luxury", "wellness", "adventure", "celebration"];
+    const expandedKeywords = [...keywords];
+    while (expandedKeywords.length < 5) {
+      expandedKeywords.push(defaultThemes[expandedKeywords.length % defaultThemes.length]);
+    }
+
+    const dallePrompts = expandedKeywords.slice(0, 5).map((keyword: string) => {
       // Create contextual prompts based on keywords
       if (keyword.toLowerCase().includes("rich") || keyword.toLowerCase().includes("wealth") || keyword.toLowerCase().includes("money")) {
         return hasSelfie
@@ -78,8 +85,8 @@ export async function POST(request: NextRequest) {
     });
 
     const dalleImages: string[] = [];
-    for (let i = 0; i < Math.min(5, dallePrompts.length); i++) {
-      console.log(`  [${i + 1}/5] Generating DALL-E image for: ${keywords[i]}`);
+    for (let i = 0; i < 5; i++) {
+      console.log(`  [${i + 1}/5] Generating DALL-E image for: ${expandedKeywords[i]}`);
       try {
         const response = await fetch("https://api.openai.com/v1/images/generations", {
           method: "POST",
@@ -160,14 +167,37 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 5. Add original uploads as-is to fill remaining slots
+    // 5. Add keyword-based scenario generation to ALWAYS reach 5 Gemini images
+    // Generate scenarios based on user's keywords using their selfie
     if (combinations.length < 5 && hasSelfie) {
+      // Scenario: User living their "rich" keyword - at luxury restaurant/expensive dinner
+      if (keywords.some((k: string) => k.toLowerCase().includes("rich") || k.toLowerCase().includes("wealth") || k.toLowerCase().includes("money"))) {
+        combinations.push({
+          images: [categorizedUploads.selfie],
+          prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person at an elegant luxury restaurant or expensive dinner setting, looking wealthy and successful. Add subtle luxury elements like champagne or fine dining. Preserve their race, gender, age, and facial features exactly. Only change the background to a luxurious setting."
+        });
+      }
+    }
+
+    if (combinations.length < 5 && hasSelfie) {
+      // Scenario: User living their "travel" keyword - at exotic destination
+      if (keywords.some((k: string) => k.toLowerCase().includes("travel") || k.toLowerCase().includes("destination") || k.toLowerCase().includes("adventure"))) {
+        combinations.push({
+          images: [categorizedUploads.selfie],
+          prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person at a beautiful travel destination - beach, mountains, or exotic location, looking happy and adventurous. Preserve their race, gender, age, and facial features exactly. Only change the background to a travel destination."
+        });
+      }
+    }
+
+    if (combinations.length < 5 && hasSelfie) {
+      // Scenario: User with enhanced professional portrait
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "Enhance this portrait to look more professional and aspirational. Keep the EXACT person unchanged - same face, skin tone, features. Only improve lighting and background."
+        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Create a professional, aspirational portrait with better lighting and elegant background. Preserve their race, gender, age, and facial features exactly. Only improve lighting and background quality."
       });
     }
 
+    // If still not enough, add original uploads enhanced
     if (combinations.length < 5 && hasDreamCar) {
       combinations.push({
         images: [categorizedUploads.dreamCar],
@@ -186,6 +216,14 @@ export async function POST(request: NextRequest) {
       combinations.push({
         images: [categorizedUploads.destination],
         prompt: "Enhance this destination image to look more vibrant and travel-worthy. Keep landmarks recognizable. Only improve colors and atmosphere."
+      });
+    }
+
+    // If STILL not 5 images, generate generic aspirational scenes with user's face
+    while (combinations.length < 5 && hasSelfie) {
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person in a successful, aspirational lifestyle setting - could be office, home, vacation, or celebration. Preserve their race, gender, age, and facial features exactly. Only change the background and setting."
       });
     }
 
