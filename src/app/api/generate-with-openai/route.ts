@@ -71,14 +71,21 @@ export async function POST(request: NextRequest) {
           ? `Happiness aesthetic: sunny morning light streaming through window, fresh flowers, cozy reading nook, peaceful joy. CRITICAL: NO people, NO faces, NO humans.`
           : `Joyful person celebrating life, arms raised in happiness, sunrise or sunset, positive energy, smiling and content`;
       }
-      if (keyword.toLowerCase().includes("fit") || keyword.toLowerCase().includes("health")) {
-        return `Fitness lifestyle: yoga mat in sunlit room, healthy smoothie bowl, workout equipment, wellness aesthetic, active lifestyle`;
+      if (keyword.toLowerCase().includes("fit") || keyword.toLowerCase().includes("health") || keyword.toLowerCase().includes("exercise") || keyword.toLowerCase().includes("gym") || keyword.toLowerCase().includes("wellness")) {
+        return hasSelfie
+          ? `Fitness lifestyle scene: yoga mat in sunlit room, healthy smoothie bowl, workout equipment, gym interior, wellness aesthetic. CRITICAL: NO people, NO faces, NO humans - only fitness equipment and wellness settings.`
+          : `Person exercising at gym, doing yoga, or running, fit and healthy lifestyle, workout aesthetic, active and energetic`;
       }
       if (keyword.toLowerCase().includes("car") && !hasDreamCar) {
         return `Luxury sports car exterior, sleek design, modern automotive photography, dream car aesthetic, high-end vehicle`;
       }
       if (keyword.toLowerCase().includes("house") && !hasDreamHouse) {
         return `Modern luxury home exterior, architectural photography, dream house, beautiful landscaping, contemporary design`;
+      }
+      if (keyword.toLowerCase().includes("food") || keyword.toLowerCase().includes("nutrition") || keyword.toLowerCase().includes("healthy eating")) {
+        return hasSelfie
+          ? `Healthy food aesthetic: fresh smoothie bowl with berries, colorful salad, organic ingredients, nutritious meal prep, wellness food. CRITICAL: NO people, NO faces, NO humans - only food and table settings.`
+          : `Person enjoying healthy meal, fresh smoothie bowl, nutritious food, wellness dining, happy and healthy lifestyle`;
       }
       // Default: lifestyle image based on keyword
       return `Aspirational lifestyle image representing "${keyword}": magazine aesthetic, vibrant, inspiring, high quality. CRITICAL: NO people if possible.`;
@@ -168,15 +175,31 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Add keyword-based scenario generation to ALWAYS reach 5 Gemini images
-    // Generate scenarios based on user's keywords using their selfie
+    // ALWAYS prefer using user's selfie for scenarios
+    // User explicitly requested: exercise, rich, happiness scenarios
+
     if (combinations.length < 5 && hasSelfie) {
-      // Scenario: User living their "rich" keyword - at luxury restaurant/expensive dinner
-      if (keywords.some((k: string) => k.toLowerCase().includes("rich") || k.toLowerCase().includes("wealth") || k.toLowerCase().includes("money"))) {
-        combinations.push({
-          images: [categorizedUploads.selfie],
-          prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person at an elegant luxury restaurant or expensive dinner setting, looking wealthy and successful. Add subtle luxury elements like champagne or fine dining. Preserve their race, gender, age, and facial features exactly. Only change the background to a luxurious setting."
-        });
-      }
+      // PRIORITY 1: User doing EXERCISE/FITNESS (user explicitly requested this)
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person exercising - at gym, doing yoga, running, or working out, looking fit and healthy. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a fitness setting (gym, yoga studio, or outdoor exercise location)."
+      });
+    }
+
+    if (combinations.length < 5 && hasSelfie) {
+      // PRIORITY 2: User showing WEALTH/RICH (user explicitly requested this)
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person at an elegant luxury restaurant or expensive dinner setting, looking wealthy and successful. Add subtle luxury elements like champagne or fine dining. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a luxurious setting."
+      });
+    }
+
+    if (combinations.length < 5 && hasSelfie) {
+      // PRIORITY 3: User showing HAPPINESS (user explicitly requested this)
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person celebrating or in a joyful moment - smiling, happy expression, positive energy. Could be at a celebration, party, or happy life moment. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a joyful/celebratory setting."
+      });
     }
 
     if (combinations.length < 5 && hasSelfie) {
@@ -184,16 +207,16 @@ export async function POST(request: NextRequest) {
       if (keywords.some((k: string) => k.toLowerCase().includes("travel") || k.toLowerCase().includes("destination") || k.toLowerCase().includes("adventure"))) {
         combinations.push({
           images: [categorizedUploads.selfie],
-          prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person at a beautiful travel destination - beach, mountains, or exotic location, looking happy and adventurous. Preserve their race, gender, age, and facial features exactly. Only change the background to a travel destination."
+          prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person at a beautiful travel destination - beach, mountains, or exotic location, looking happy and adventurous. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a travel destination."
         });
       }
     }
 
     if (combinations.length < 5 && hasSelfie) {
-      // Scenario: User with enhanced professional portrait
+      // Scenario: User with GOOD FOOD/HEALTHY LIFESTYLE (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Create a professional, aspirational portrait with better lighting and elegant background. Preserve their race, gender, age, and facial features exactly. Only improve lighting and background quality."
+        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person enjoying healthy food - at a healthy restaurant, with fresh smoothie bowl, or preparing nutritious meal, looking healthy and wellness-focused. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a healthy food/wellness setting."
       });
     }
 

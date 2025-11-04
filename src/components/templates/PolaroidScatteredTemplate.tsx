@@ -11,34 +11,35 @@ export default function PolaroidScatteredTemplate({
   images,
   keywords,
 }: PolaroidScatteredTemplateProps) {
-  // Positions for 10 images - evenly distributed across entire 1344x768 canvas
+  // Positions for 10 images - LARGER sizes to fill canvas, evenly distributed across 1344x768
   // Reference: sample5.jpg shows images in all quadrants
+  // Increased sizes from 150-240px to 280-400px to eliminate empty space
   const polaroidPositions = [
-    // TOP LEFT quadrant (2 images)
-    { top: 20, left: 50, rotate: -8, width: 220, height: 180, zIndex: 12 },
-    { top: 80, left: 280, rotate: 12, width: 200, height: 160, zIndex: 11 },
+    // TOP LEFT quadrant (2 images) - LARGER
+    { top: 10, left: 30, rotate: -8, width: 320, height: 260, zIndex: 12 },
+    { top: 60, left: 350, rotate: 12, width: 300, height: 240, zIndex: 11 },
 
-    // TOP CENTER quadrant (2 images)
-    { top: 10, left: 550, rotate: -5, width: 240, height: 200, zIndex: 13 },
-    { top: 90, left: 780, rotate: 8, width: 190, height: 150, zIndex: 10 },
+    // TOP CENTER quadrant (2 images) - LARGER
+    { top: 5, left: 640, rotate: -5, width: 340, height: 280, zIndex: 13 },
+    { top: 70, left: 950, rotate: 8, width: 290, height: 230, zIndex: 10 },
 
-    // TOP RIGHT quadrant (2 images)
-    { top: 25, left: 1050, rotate: -12, width: 210, height: 170, zIndex: 14 },
+    // TOP RIGHT quadrant (1 image) - LARGER
+    { top: 15, left: 1000, rotate: -10, width: 310, height: 250, zIndex: 14 },
 
-    // MIDDLE LEFT (1 image)
-    { top: 280, left: 30, rotate: 6, width: 230, height: 190, zIndex: 9 },
+    // MIDDLE LEFT (1 image) - LARGER
+    { top: 300, left: 20, rotate: 6, width: 330, height: 270, zIndex: 9 },
 
-    // MIDDLE RIGHT (1 image)
-    { top: 300, left: 1070, rotate: -7, width: 200, height: 160, zIndex: 8 },
+    // MIDDLE RIGHT (1 image) - LARGER
+    { top: 320, left: 1000, rotate: -7, width: 300, height: 240, zIndex: 8 },
 
-    // BOTTOM LEFT quadrant (1 image)
-    { top: 520, left: 80, rotate: -10, width: 220, height: 180, zIndex: 7 },
+    // BOTTOM LEFT quadrant (1 image) - LARGER
+    { top: 480, left: 60, rotate: -10, width: 320, height: 260, zIndex: 7 },
 
-    // BOTTOM CENTER quadrant (1 image)
-    { top: 540, left: 560, rotate: 5, width: 240, height: 200, zIndex: 6 },
+    // BOTTOM CENTER quadrant (1 image) - LARGER
+    { top: 470, left: 520, rotate: 5, width: 340, height: 280, zIndex: 6 },
 
-    // BOTTOM RIGHT quadrant (1 image)
-    { top: 510, left: 950, rotate: -6, width: 210, height: 170, zIndex: 5 },
+    // BOTTOM RIGHT quadrant (1 image) - LARGER
+    { top: 460, left: 850, rotate: -6, width: 310, height: 250, zIndex: 5 },
   ];
 
   // Quotes positioned between images
