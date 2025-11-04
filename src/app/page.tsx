@@ -207,7 +207,7 @@ export default function Home() {
           body: JSON.stringify({
             keywords: extractedKeywords,
             categorizedUploads,
-            useHtmlTemplate,
+            selectedTemplate,
           }),
         });
 
@@ -221,20 +221,20 @@ export default function Home() {
 
         const data = await response.json();
         setProgress(90); // Processing results
-        console.log(`✓ Generated ${data.metadata?.total_images_used || 0} total images`);
-        console.log(`   - Scenario images (user in dream life): ${data.metadata?.scenario_images || 0}`);
-        console.log(`   - DALL-E 3 lifestyle images: ${data.metadata?.dalle_count || 0}`);
+        console.log(`✓ Generated ${data.metadata?.total_images || 0} total images`);
+        console.log(`   - Gemini images: ${data.metadata?.gemini_images || 0}`);
+        console.log(`   - DALL-E images: ${data.metadata?.dalle_images || 0}`);
 
-        // If using HTML template, store individual images, otherwise store final AI collage
-        if (useHtmlTemplate && data.individual_images) {
-          console.log(`✓ Using HTML template: ${selectedTemplate}`);
+        // If AI-generated template, use final collage; otherwise use individual images for HTML templates
+        if (selectedTemplate === "ai") {
+          console.log(`✓ AI-generated collage created!`);
+          setImages([{ url: data.final_vision_board, keyword: "Vision Board 2025" }]);
+        } else {
+          console.log(`✓ Using template: ${selectedTemplate} with ${data.individual_images?.length} images`);
           setImages(data.individual_images.map((url: string, idx: number) => ({
             url,
             keyword: extractedKeywords[idx] || `Vision ${idx + 1}`
           })));
-        } else {
-          console.log(`✓ Final collage created by Gemini matching sample1.png!`);
-          setImages([{ url: data.final_vision_board, keyword: "Vision Board 2025" }]);
         }
         setProgress(100); // Complete
         setCollageReady(true);
@@ -776,10 +776,10 @@ export default function Home() {
               />
             )}
 
-            {/* Display HTML Template or Gemini final collage */}
+            {/* Display HTML Template or AI-generated collage */}
             {collageReady && images.length > 0 && (
               <div className="relative">
-                {useHtmlTemplate ? (
+                {selectedTemplate !== "ai" ? (
                   // Render HTML template with individual images
                   <>
                     <div className="vision-board-template">

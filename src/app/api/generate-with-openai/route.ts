@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
-import fs from "fs/promises";
-import path from "path";
 
 export async function POST(request: NextRequest) {
   try {
-    const { keywords, categorizedUploads, useHtmlTemplate } = await request.json();
+    const { keywords, categorizedUploads, selectedTemplate } = await request.json();
 
     if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
       return NextResponse.json(
@@ -28,8 +26,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Gemini API key not configured" }, { status: 500 });
     }
 
-    console.log("🎨 Starting image generation with user uploads integration...");
+    console.log("🎨 Starting vision board generation...");
     console.log("📝 User keywords:", keywords);
+    console.log("🎭 Selected template:", selectedTemplate);
 
     // Check what user uploaded
     const hasSelfie = !!categorizedUploads?.selfie;
@@ -39,203 +38,48 @@ export async function POST(request: NextRequest) {
 
     console.log("📸 User uploads:", { hasSelfie, hasDreamHouse, hasDreamCar, hasDestination });
 
-    // STEP 1: Expand keywords to 10 total
-    const visionBoardThemes = [
-      "financial freedom and wealth",
-      "luxury lifestyle and success",
-      "dream vacation and travel",
-      "health and fitness goals",
-      "peaceful meditation and wellness",
-      "career achievement and growth",
-      "beautiful home and comfort",
-      "adventure and excitement",
-      "love and relationships",
-      "personal growth and confidence",
-    ];
-
-    const expandedKeywords = [...keywords];
-    while (expandedKeywords.length < 10) {
-      expandedKeywords.push(visionBoardThemes[expandedKeywords.length % visionBoardThemes.length]);
-    }
-
-    // STEP 2: Use ALL user images across 8 frames - generate scenarios for each
-    // Target: 5-6 images from user uploads (originals + scenarios), 2-3 lifestyle images
-    console.log("\n🎨 STEP 1/3: Creating scenarios from user's images to fill all 8 frames...");
     const genai = new GoogleGenAI({ apiKey: geminiApiKey });
-    const allGeneratedImages: string[] = [];
-    let scenarioCount = 0;
+    const allImages: string[] = [];
+    const allQuotes: string[] = [];
 
-    // PRIORITY 1: Add user's ORIGINAL images FIRST (unedited)
-    console.log("📸 Step 1: Adding user's original uploaded images...");
-    if (categorizedUploads?.selfie) {
-      const selfieBase64 = categorizedUploads.selfie.split(",")[1];
-      allGeneratedImages.push(selfieBase64);
-      scenarioCount++;
-      console.log(`  ✓ [Image ${scenarioCount}] Original selfie`);
-    }
-    if (categorizedUploads?.dreamCar) {
-      const carBase64 = categorizedUploads.dreamCar.split(",")[1];
-      allGeneratedImages.push(carBase64);
-      scenarioCount++;
-      console.log(`  ✓ [Image ${scenarioCount}] Original car`);
-    }
-    if (categorizedUploads?.dreamHouse) {
-      const houseBase64 = categorizedUploads.dreamHouse.split(",")[1];
-      allGeneratedImages.push(houseBase64);
-      scenarioCount++;
-      console.log(`  ✓ [Image ${scenarioCount}] Original house`);
-    }
-    if (categorizedUploads?.destination) {
-      const destBase64 = categorizedUploads.destination.split(",")[1];
-      allGeneratedImages.push(destBase64);
-      scenarioCount++;
-      console.log(`  ✓ [Image ${scenarioCount}] Original destination`);
-    }
+    // ============================================
+    // STEP 1: Generate 5 images with DALL-E (OpenAI)
+    // ============================================
+    console.log("\n🎨 STEP 1/3: Generating 5 images with DALL-E based on keywords...");
 
-    console.log(`\n📸 Step 2: Generating scenario variations to reach 6 total images...`);
-
-    // Helper function to generate variations of an image
-    const generateVariations = async (imageBase64: string, imageName: string, variations: string[]) => {
-      for (let i = 0; i < variations.length; i++) {
-        const prompt = variations[i];
-        console.log(`  [${scenarioCount + 1}] Generating: ${imageName} - ${prompt.substring(0, 50)}...`);
-
-        try {
-          const response = await genai.models.generateContent({
-            model: "gemini-2.5-flash-image",
-            contents: [{
-              role: "user",
-              parts: [
-                { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
-                { text: prompt }
-              ]
-            }],
-            config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
-          });
-
-          const candidate = response.candidates?.[0];
-          if (candidate?.content?.parts) {
-            const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-              part.inlineData?.mimeType?.startsWith("image/")
-            );
-            if (imagePart?.inlineData?.data) {
-              allGeneratedImages.push(imagePart.inlineData.data);
-              scenarioCount++;
-              console.log(`  ✓ Created variation ${scenarioCount}`);
-            }
-          }
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error(`  ✗ Error generating variation:`, error);
-        }
+    const dallePrompts = keywords.slice(0, 5).map((keyword: string) => {
+      // Create contextual prompts based on keywords
+      if (keyword.toLowerCase().includes("rich") || keyword.toLowerCase().includes("wealth") || keyword.toLowerCase().includes("money")) {
+        return hasSelfie
+          ? `Lifestyle image showing wealth and success: luxury dinner at 5-star restaurant, champagne, elegant table setting, gold accents, success aesthetic. CRITICAL: NO people, NO faces, NO humans - only objects and settings.`
+          : `Person at elegant luxury dinner, expensive champagne, 5-star restaurant, wealthy lifestyle, success aesthetic, confident and happy expression`;
       }
-    };
-
-    // Generate scenario variations - ONE scenario for user WITH car
-    if (hasSelfie && hasDreamCar) {
-      const selfieBase64 = categorizedUploads.selfie.split(",")[1];
-      const carBase64 = categorizedUploads.dreamCar.split(",")[1];
-      console.log(`  [Image ${scenarioCount + 1}] User WITH car scenario`);
-      try {
-        const response = await genai.models.generateContent({
-          model: "gemini-2.5-flash-image",
-          contents: [{ role: "user", parts: [
-            { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
-            { inlineData: { data: carBase64, mimeType: "image/jpeg" } },
-            { text: "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person next to/with this car, looking successful. Keep the car's brand clearly visible. Only change the setting, NOT the person. Preserve their race, gender, age, and all facial characteristics exactly as shown." }
-          ]}],
-          config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
-        });
-        const candidate = response.candidates?.[0];
-        if (candidate?.content?.parts) {
-          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-            part.inlineData?.mimeType?.startsWith("image/")
-          );
-          if (imagePart?.inlineData?.data) {
-            allGeneratedImages.push(imagePart.inlineData.data);
-            scenarioCount++;
-            console.log(`  ✓ [Image ${scenarioCount}] User WITH car created`);
-          }
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (error) {
-        console.error("  ✗ Error:", error);
+      if (keyword.toLowerCase().includes("travel") || keyword.toLowerCase().includes("destination")) {
+        return hasSelfie
+          ? `Travel lifestyle: airplane window view with sunset, passport with stamps, luxury hotel room view, beach resort aesthetic. CRITICAL: NO people, NO faces, NO humans - only travel elements.`
+          : `Person enjoying exotic travel destination, beach or mountains, adventure aesthetic, happy traveler with backpack`;
       }
-    }
-
-    // Generate scenario variation - ONE scenario for user AT destination
-    if (hasSelfie && hasDestination) {
-      const selfieBase64 = categorizedUploads.selfie.split(",")[1];
-      const destinationBase64 = categorizedUploads.destination.split(",")[1];
-      console.log(`  [Image ${scenarioCount + 1}] User AT destination scenario`);
-      try {
-        const response = await genai.models.generateContent({
-          model: "gemini-2.5-flash-image",
-          contents: [{ role: "user", parts: [
-            { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
-            { inlineData: { data: destinationBase64, mimeType: "image/jpeg" } },
-            { text: "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person at this destination, looking happy. Keep the destination's landmarks clearly recognizable. Only change the background/setting, NOT the person. Preserve their race, gender, age, and all facial characteristics exactly as shown." }
-          ]}],
-          config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
-        });
-        const candidate = response.candidates?.[0];
-        if (candidate?.content?.parts) {
-          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-            part.inlineData?.mimeType?.startsWith("image/")
-          );
-          if (imagePart?.inlineData?.data) {
-            allGeneratedImages.push(imagePart.inlineData.data);
-            scenarioCount++;
-            console.log(`  ✓ [Image ${scenarioCount}] User AT destination created`);
-          }
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (error) {
-        console.error("  ✗ Error:", error);
+      if (keyword.toLowerCase().includes("happy") || keyword.toLowerCase().includes("joy")) {
+        return hasSelfie
+          ? `Happiness aesthetic: sunny morning light streaming through window, fresh flowers, cozy reading nook, peaceful joy. CRITICAL: NO people, NO faces, NO humans.`
+          : `Joyful person celebrating life, arms raised in happiness, sunrise or sunset, positive energy, smiling and content`;
       }
-    }
+      if (keyword.toLowerCase().includes("fit") || keyword.toLowerCase().includes("health")) {
+        return `Fitness lifestyle: yoga mat in sunlit room, healthy smoothie bowl, workout equipment, wellness aesthetic, active lifestyle`;
+      }
+      if (keyword.toLowerCase().includes("car") && !hasDreamCar) {
+        return `Luxury sports car exterior, sleek design, modern automotive photography, dream car aesthetic, high-end vehicle`;
+      }
+      if (keyword.toLowerCase().includes("house") && !hasDreamHouse) {
+        return `Modern luxury home exterior, architectural photography, dream house, beautiful landscaping, contemporary design`;
+      }
+      // Default: lifestyle image based on keyword
+      return `Aspirational lifestyle image representing "${keyword}": magazine aesthetic, vibrant, inspiring, high quality. CRITICAL: NO people if possible.`;
+    });
 
-    console.log(`✅ Total images so far: ${scenarioCount} (user originals + scenarios)`);
-
-    // STEP 2B: Generate ONLY 2 lifestyle images to fill remaining space (8 total frames)
-    // Target: 6 user images + 2 lifestyle = 8 frames total
-    const maxLifestyleImages = Math.max(0, 8 - scenarioCount);
-    const lifestyleImagesToGenerate = Math.min(2, maxLifestyleImages);
-    console.log(`\n🎨 STEP 2/3: Generating ${lifestyleImagesToGenerate} complementary lifestyle images to reach 8 total frames...`);
     const dalleImages: string[] = [];
-
-    // Enhanced feminine aesthetic prompts - more thoughtful and aspirational
-    const feminineAestheticPrompts = [
-      "Luxurious morning coffee ritual: artisan latte with heart design, delicate pink macarons on vintage china, single peony in crystal vase, soft morning sunlight streaming through gauze curtains onto white marble. Dreamy lifestyle magazine aesthetic. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Spa sanctuary moment: lit candles in amber glass, scattered rose petals, natural linen towels perfectly folded, eucalyptus branches, smooth stones, diffuser mist. Serene wellness retreat vibe, soft warm lighting. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Cozy reading corner: oversized knit blanket draped over velvet armchair, stack of beautiful books with gold lettering, steaming tea in elegant porcelain cup, vintage brass reading lamp, succulent on side table. Golden hour glow through lace curtains. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Dream closet organization: luxury handbags displayed on glass shelves, designer heels arranged by color, delicate jewelry in velvet-lined drawers, full-length ornate mirror, chandelier lighting. Fashion blogger aesthetic. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Girl boss workspace: MacBook on white desk, fresh white peonies in vase, rose gold pen set, inspirational quotes in gold frame, planner open with handwritten goals, coffee in chic mug, natural light. Productive elegance. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Dreamy bedroom sanctuary: white linen bedding with layers of plush pillows, fairy lights draped above headboard, potted fiddle leaf fig, soft blush throw blanket, bedside table with crystal lamp and journal. Peaceful morning light. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Celebration table setting: champagne flutes catching golden hour light, elegant white plates with gold rim, fresh flowers centerpiece, taper candles in brass holders, silk napkins. Sophisticated dinner party aesthetic. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Wellness meditation space: yoga mat in sunlit room, selenite crystals arranged intentionally, burning sage bundle in abalone shell, meditation cushion, plants, diffuser, prayer beads. Spiritual self-care sanctuary. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Glamorous vanity station: Hollywood-style mirror with warm bulbs, makeup brushes in rose gold holder, perfume bottles displayed artfully, fresh white flowers, vintage jewelry tray, plush velvet stool. Beauty influencer aesthetic. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Luxury vacation vibes: infinity pool overlooking ocean, designer sunglasses on marble table, tropical cocktail with orchid garnish, white cabana with flowing curtains, palm trees swaying. Paradise travel aesthetic, golden hour. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Fresh flowers in abundance: overflowing floral arrangement with roses, peonies, ranunculus in elegant vase, petals scattered on marble surface, soft window light. Romantic luxury flower shop aesthetic. CRITICAL: NO people, NO faces, NO humans.",
-
-      "Chic Parisian balcony: wrought iron bistro set, croissant and espresso on vintage tray, fresh flowers in window box, Eiffel Tower view in soft focus, morning mist. European elegance. CRITICAL: NO people, NO faces, NO humans.",
-    ];
-
-    for (let i = 0; i < lifestyleImagesToGenerate && i < feminineAestheticPrompts.length; i++) {
-      const imagePrompt = feminineAestheticPrompts[i];
-
-      console.log(`  [${i + 1}/${lifestyleImagesToGenerate}] Generating lifestyle image ${i + 1}`);
-
+    for (let i = 0; i < Math.min(5, dallePrompts.length); i++) {
+      console.log(`  [${i + 1}/5] Generating DALL-E image for: ${keywords[i]}`);
       try {
         const response = await fetch("https://api.openai.com/v1/images/generations", {
           method: "POST",
@@ -245,155 +89,258 @@ export async function POST(request: NextRequest) {
           },
           body: JSON.stringify({
             model: "dall-e-3",
-            prompt: imagePrompt,
+            prompt: dallePrompts[i],
             n: 1,
             size: "1024x1024",
             quality: "standard",
           }),
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          if (data.data?.[0]?.url) {
-            const imageUrl = data.data[0].url;
-            const imageResponse = await fetch(imageUrl);
-            if (imageResponse.ok) {
-              const arrayBuffer = await imageResponse.arrayBuffer();
-              const base64 = Buffer.from(arrayBuffer).toString("base64");
-              dalleImages.push(base64);
-              console.log(`  ✓ Generated ${i + 1}/${maxLifestyleImages}`);
-            }
-          }
+        if (!response.ok) {
+          throw new Error(`DALL-E API error: ${response.statusText}`);
         }
 
-        if (i < maxLifestyleImages - 1) await new Promise(resolve => setTimeout(resolve, 1500));
+        const data = await response.json();
+        const imageUrl = data.data[0].url;
+
+        // Download image and convert to base64
+        const imageResponse = await fetch(imageUrl);
+        const arrayBuffer = await imageResponse.arrayBuffer();
+        const base64 = Buffer.from(arrayBuffer).toString("base64");
+        dalleImages.push(base64);
+        console.log(`  ✓ Generated DALL-E image ${i + 1}`);
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (error) {
-        console.error(`  ✗ Error ${i + 1}:`, error);
+        console.error(`  ✗ Error generating DALL-E image ${i + 1}:`, error);
       }
     }
 
-    console.log(`✅ DALL-E: ${dalleImages.length}/${maxLifestyleImages} lifestyle images`);
+    console.log(`✅ Generated ${dalleImages.length} DALL-E images`);
 
-    // STEP 3: Prepare all images for final collage
-    console.log("\n🎨 STEP 3/3: Creating final collage with Gemini (referencing sample1.png)...");
+    // ============================================
+    // STEP 2: Generate 5 images with Gemini (combining user uploads)
+    // ============================================
+    console.log("\n🎨 STEP 2/3: Generating 5 images with Gemini from user uploads...");
 
-    const imageDataParts: Array<{ inlineData: { data: string; mimeType: string } }> = [];
+    const geminiImages: string[] = [];
 
-    // Add scenario images (user integrated into their dreams)
-    allGeneratedImages.forEach((base64) => {
-      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/png" } });
-    });
-    console.log(`  + ${allGeneratedImages.length} scenario images (user in their dream life)`);
+    // Strategy: Create combinations of user's uploaded images
+    const combinations = [];
 
-    // Add DALL-E lifestyle images (NO people)
-    dalleImages.forEach((base64) => {
-      imageDataParts.push({ inlineData: { data: base64, mimeType: "image/png" } });
-    });
-    console.log(`  + ${dalleImages.length} lifestyle images`);
-
-    console.log(`  Total images for collage: ${imageDataParts.length}`);
-
-    // Load reference sample1.png
-    const samplePath = path.join(process.cwd(), "public", "sample1.png");
-    const sampleBuffer = await fs.readFile(samplePath);
-    const sampleBase64 = sampleBuffer.toString("base64");
-
-    // Add reference image
-    imageDataParts.unshift({
-      inlineData: { data: sampleBase64, mimeType: "image/png" }
-    });
-
-    // Create final collage prompt - PRIORITIZE USER'S ACTUAL IMAGES
-    const finalPrompt = `You are an expert vision board designer. Create a PHYSICAL MAGAZINE-STYLE COLLAGE matching the style of the FIRST reference image.
-
-REFERENCE STYLE (First Image):
-- Physical magazine cutout aesthetic
-- Bold text labels in various fonts (handwritten, magazine clippings, stickers)
-- Photos at angles with MINIMAL overlap
-- Text overlays: "2025", "VISION BOARD", user keywords in BOLD
-- Energetic, inspiring, magazine collage vibe
-
-USER'S VISION BOARD:
-User's Goals/Keywords: ${keywords.join(", ")}
-Total images to use: ${imageDataParts.length - 1} images
-
-CRITICAL REQUIREMENTS:
-1. Use ALL ${imageDataParts.length - 1} images (skip the first reference image)
-2. THE FIRST ${scenarioCount} IMAGES ARE THE USER'S PERSONAL PHOTOS - FEATURE THESE MOST PROMINENTLY
-3. Make user's personal images LARGER and more visible than lifestyle images
-4. EVERY IMAGE MUST BE AT LEAST 80% VISIBLE - minimal overlap
-5. Arrange photos at different angles for magazine aesthetic
-6. Keep user's personal images recognizable and clear
-
-TEXT ELEMENTS - USE USER'S EXACT KEYWORDS:
-- "2025" prominently displayed
-- "VISION BOARD" title at top
-- ONLY use these user keywords as text overlays: ${keywords.map(k => `"${k.toUpperCase()}"`).join(", ")}
-- DO NOT add random words like "MONEY", "SUCCESS", "MANIFEST" unless user specified them
-- Keep text minimal and clean
-
-STYLE: Magazine cutout aesthetic, vibrant, energetic, inspiring
-FORMAT: 1344x768 landscape
-
-CREATE A COLLAGE THAT PROMINENTLY FEATURES THE USER'S PERSONAL IMAGES WITH THEIR EXACT KEYWORDS.`;
-
-    const finalResponse = await genai.models.generateContent({
-      model: "gemini-2.5-flash-image",
-      contents: [{
-        role: "user",
-        parts: [
-          ...imageDataParts,
-          { text: finalPrompt },
-        ],
-      }],
-      config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
-    });
-
-    const finalCandidate = finalResponse.candidates?.[0];
-    if (!finalCandidate?.content?.parts) {
-      throw new Error("No final collage generated");
+    // 1. If has selfie + car: person WITH their car
+    if (hasSelfie && hasDreamCar) {
+      combinations.push({
+        images: [categorizedUploads.selfie, categorizedUploads.dreamCar],
+        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person standing next to this car, looking successful and happy. Keep the car brand clearly visible. Preserve the person's race, gender, age, and facial features exactly. Only change the background setting to something aspirational."
+      });
     }
 
-    const finalImagePart = finalCandidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-      part.inlineData?.mimeType?.startsWith("image/")
-    );
-
-    if (!finalImagePart?.inlineData?.data) {
-      throw new Error("No final image data");
+    // 2. If has selfie + house: person AT their dream house
+    if (hasSelfie && hasDreamHouse) {
+      combinations.push({
+        images: [categorizedUploads.selfie, categorizedUploads.dreamHouse],
+        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person in front of this house, looking proud and successful. Preserve the person's race, gender, age, and facial features exactly. Only change the background/setting to something beautiful."
+      });
     }
 
-    const finalVisionBoard = `data:${finalImagePart.inlineData.mimeType};base64,${finalImagePart.inlineData.data}`;
+    // 3. If has selfie + destination: person AT destination
+    if (hasSelfie && hasDestination) {
+      combinations.push({
+        images: [categorizedUploads.selfie, categorizedUploads.destination],
+        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person at this destination, traveling and enjoying life. Keep destination landmarks recognizable. Preserve the person's race, gender, age, and facial features exactly."
+      });
+    }
 
-    console.log("✅ Final collage created successfully!");
+    // 4. If has car + house: combined property wealth scene
+    if (hasDreamCar && hasDreamHouse) {
+      combinations.push({
+        images: [categorizedUploads.dreamCar, categorizedUploads.dreamHouse],
+        prompt: "Create a beautiful scene showing this car parked in front of this house. Keep both the car brand and house architecture clearly recognizable. Make it look aspirational and wealthy."
+      });
+    }
 
-    // Prepare individual images for HTML templates if needed
-    // PRIORITY ORDER: User variations first, then DALL-E lifestyle images
-    const individualImages = useHtmlTemplate
-      ? [...allGeneratedImages, ...dalleImages].map(
-          (base64) => `data:image/png;base64,${base64}`
-        )
-      : [];
+    // 5. Add original uploads as-is to fill remaining slots
+    if (combinations.length < 5 && hasSelfie) {
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "Enhance this portrait to look more professional and aspirational. Keep the EXACT person unchanged - same face, skin tone, features. Only improve lighting and background."
+      });
+    }
 
-    // Also include original user uploads in the response for templates that want to use them
-    const userUploads = {
-      selfie: categorizedUploads?.selfie || null,
-      dreamHouse: categorizedUploads?.dreamHouse || null,
-      dreamCar: categorizedUploads?.dreamCar || null,
-      destination: categorizedUploads?.destination || null,
-    };
+    if (combinations.length < 5 && hasDreamCar) {
+      combinations.push({
+        images: [categorizedUploads.dreamCar],
+        prompt: "Enhance this car image to look more luxurious and aspirational. Keep the car brand and model exactly the same. Only improve the setting and lighting."
+      });
+    }
 
-    return NextResponse.json({
-      status: "success",
-      final_vision_board: finalVisionBoard,
-      individual_images: useHtmlTemplate ? individualImages : undefined,
-      user_uploads: userUploads,
-      metadata: {
-        scenario_images: scenarioCount,
-        dalle_count: dalleImages.length,
-        total_images_used: imageDataParts.length - 1, // Minus reference
-        has_user_scenarios: scenarioCount > 0,
-      },
-    });
+    if (combinations.length < 5 && hasDreamHouse) {
+      combinations.push({
+        images: [categorizedUploads.dreamHouse],
+        prompt: "Enhance this house image to look more beautiful and aspirational. Keep the house architecture exactly the same. Only improve the landscaping and lighting."
+      });
+    }
+
+    if (combinations.length < 5 && hasDestination) {
+      combinations.push({
+        images: [categorizedUploads.destination],
+        prompt: "Enhance this destination image to look more vibrant and travel-worthy. Keep landmarks recognizable. Only improve colors and atmosphere."
+      });
+    }
+
+    // Generate Gemini images from combinations
+    for (let i = 0; i < Math.min(5, combinations.length); i++) {
+      console.log(`  [${i + 1}/5] Generating Gemini combination ${i + 1}`);
+      try {
+        const combo = combinations[i];
+        const imageParts = combo.images.map((dataUrl: string) => ({
+          inlineData: {
+            data: dataUrl.split(",")[1],
+            mimeType: "image/jpeg"
+          }
+        }));
+
+        const response = await genai.models.generateContent({
+          model: "gemini-2.5-flash-image",
+          contents: [{
+            role: "user",
+            parts: [
+              ...imageParts,
+              { text: combo.prompt }
+            ]
+          }],
+          config: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
+        });
+
+        const candidate = response.candidates?.[0];
+        if (candidate?.content?.parts) {
+          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+            part.inlineData?.mimeType?.startsWith("image/")
+          );
+          if (imagePart?.inlineData?.data) {
+            geminiImages.push(imagePart.inlineData.data);
+            console.log(`  ✓ Generated Gemini image ${i + 1}`);
+          }
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error(`  ✗ Error generating Gemini image ${i + 1}:`, error);
+      }
+    }
+
+    console.log(`✅ Generated ${geminiImages.length} Gemini images`);
+
+    // ============================================
+    // STEP 3: Generate inspirational quotes
+    // ============================================
+    console.log("\n💬 STEP 3/3: Generating inspirational quotes...");
+
+    // Generate 3-5 quotes based on keywords
+    const quoteKeywords = keywords.slice(0, 3);
+    for (const keyword of quoteKeywords) {
+      const quote = `"${keyword.toUpperCase()}"`;
+      allQuotes.push(quote);
+    }
+    allQuotes.push('"2025"');
+    allQuotes.push('"VISION BOARD"');
+
+    console.log(`✅ Generated ${allQuotes.length} text elements`);
+
+    // ============================================
+    // STEP 4: Combine all images
+    // ============================================
+    const allGeneratedImages = [...geminiImages, ...dalleImages];
+    console.log(`\n📊 Total images generated: ${allGeneratedImages.length} (${geminiImages.length} Gemini + ${dalleImages.length} DALL-E)`);
+
+    // Return based on template type
+    if (selectedTemplate === "ai") {
+      // AI-generated collage using Gemini
+      console.log("\n🎨 Creating AI-generated collage with Gemini...");
+
+      const imageDataParts = allGeneratedImages.map(base64 => ({
+        inlineData: { data: base64, mimeType: "image/png" }
+      }));
+
+      const collagePrompt = `Create a beautiful 2025 VISION BOARD collage in a scattered magazine style.
+
+STYLE: Polaroid photo frames (white borders) scattered at angles, overlapping slightly, on a light cream/beige background.
+
+IMAGES: You have ${allGeneratedImages.length} images to arrange.
+- First ${geminiImages.length} images are personal/aspirational (FEATURE THESE PROMINENTLY - make them LARGER)
+- Remaining ${dalleImages.length} images are lifestyle accents (these can be smaller)
+
+LAYOUT:
+- Arrange all ${allGeneratedImages.length} images across a 1344x768 landscape canvas
+- Each image in a white polaroid frame (thick white borders)
+- Rotate frames at different angles (5-20 degrees)
+- Overlap slightly for collage depth
+- Ensure 80%+ of each image is visible
+- Personal images should be larger and more prominent
+
+TEXT OVERLAYS (magazine cutout style):
+${allQuotes.map(q => `- ${q}`).join("\n")}
+
+Create a vibrant, inspiring vision board now.`;
+
+      const finalResponse = await genai.models.generateContent({
+        model: "gemini-2.5-flash-image",
+        contents: [{
+          role: "user",
+          parts: [
+            ...imageDataParts,
+            { text: collagePrompt }
+          ]
+        }],
+        config: { temperature: 0.8, topP: 0.9, topK: 40, maxOutputTokens: 8192 },
+      });
+
+      const finalCandidate = finalResponse.candidates?.[0];
+      if (!finalCandidate?.content?.parts) {
+        throw new Error("No final collage generated");
+      }
+
+      const finalImagePart = finalCandidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+        part.inlineData?.mimeType?.startsWith("image/")
+      );
+
+      if (!finalImagePart?.inlineData?.data) {
+        throw new Error("No final image data");
+      }
+
+      const finalVisionBoard = `data:${finalImagePart.inlineData.mimeType};base64,${finalImagePart.inlineData.data}`;
+
+      console.log("✅ AI-generated collage created successfully!");
+
+      return NextResponse.json({
+        status: "success",
+        template: "ai",
+        final_vision_board: finalVisionBoard,
+        metadata: {
+          total_images: allGeneratedImages.length,
+          gemini_images: geminiImages.length,
+          dalle_images: dalleImages.length,
+        },
+      });
+    } else {
+      // Return individual images for HTML templates (polaroid or grid)
+      console.log(`\n🎨 Returning ${allGeneratedImages.length} individual images for template: ${selectedTemplate}`);
+
+      const individualImages = allGeneratedImages.map(base64 => `data:image/png;base64,${base64}`);
+
+      return NextResponse.json({
+        status: "success",
+        template: selectedTemplate,
+        individual_images: individualImages,
+        quotes: allQuotes,
+        metadata: {
+          total_images: allGeneratedImages.length,
+          gemini_images: geminiImages.length,
+          dalle_images: dalleImages.length,
+        },
+      });
+    }
 
   } catch (error: unknown) {
     console.error("❌ Error:", error);
