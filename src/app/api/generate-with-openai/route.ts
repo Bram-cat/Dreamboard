@@ -58,38 +58,41 @@ export async function POST(request: NextRequest) {
       expandedKeywords.push(visionBoardThemes[expandedKeywords.length % visionBoardThemes.length]);
     }
 
-    // STEP 2: Collect user's ORIGINAL images first, then generate minimal variations
-    console.log("\n🎨 STEP 1/3: Using user's original images + creating minimal variations...");
+    // STEP 2: Use ALL user images across 8 frames - generate scenarios for each
+    // Target: 5-6 images from user uploads (originals + scenarios), 2-3 lifestyle images
+    console.log("\n🎨 STEP 1/3: Creating scenarios from user's images to fill all 8 frames...");
     const genai = new GoogleGenAI({ apiKey: geminiApiKey });
     const allGeneratedImages: string[] = [];
     let scenarioCount = 0;
 
-    // PRIORITY: Add user's ORIGINAL images FIRST (unedited)
-    console.log("📸 Adding user's original uploaded images...");
+    // PRIORITY 1: Add user's ORIGINAL images FIRST (unedited)
+    console.log("📸 Step 1: Adding user's original uploaded images...");
     if (categorizedUploads?.selfie) {
       const selfieBase64 = categorizedUploads.selfie.split(",")[1];
       allGeneratedImages.push(selfieBase64);
       scenarioCount++;
-      console.log(`  ✓ Added original selfie`);
-    }
-    if (categorizedUploads?.dreamHouse) {
-      const houseBase64 = categorizedUploads.dreamHouse.split(",")[1];
-      allGeneratedImages.push(houseBase64);
-      scenarioCount++;
-      console.log(`  ✓ Added original house`);
+      console.log(`  ✓ [Image ${scenarioCount}] Original selfie`);
     }
     if (categorizedUploads?.dreamCar) {
       const carBase64 = categorizedUploads.dreamCar.split(",")[1];
       allGeneratedImages.push(carBase64);
       scenarioCount++;
-      console.log(`  ✓ Added original car`);
+      console.log(`  ✓ [Image ${scenarioCount}] Original car`);
+    }
+    if (categorizedUploads?.dreamHouse) {
+      const houseBase64 = categorizedUploads.dreamHouse.split(",")[1];
+      allGeneratedImages.push(houseBase64);
+      scenarioCount++;
+      console.log(`  ✓ [Image ${scenarioCount}] Original house`);
     }
     if (categorizedUploads?.destination) {
       const destBase64 = categorizedUploads.destination.split(",")[1];
       allGeneratedImages.push(destBase64);
       scenarioCount++;
-      console.log(`  ✓ Added original destination`);
+      console.log(`  ✓ [Image ${scenarioCount}] Original destination`);
     }
+
+    console.log(`\n📸 Step 2: Generating scenario variations to reach 6 total images...`);
 
     // Helper function to generate variations of an image
     const generateVariations = async (imageBase64: string, imageName: string, variations: string[]) => {
@@ -128,132 +131,77 @@ export async function POST(request: NextRequest) {
       }
     };
 
-    // Generate MINIMAL user WITH their items (combo shots) - only 1 per combo
-    if (hasSelfie && hasDreamHouse) {
-      const selfieBase64 = categorizedUploads.selfie.split(",")[1];
-      const houseBase64 = categorizedUploads.dreamHouse.split(",")[1];
-      const comboPrompts = [
-        "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person standing in front of this house. Only change the background/setting, NOT the person. Preserve their race, gender, age, and all facial characteristics exactly as shown."
-      ];
-      for (const prompt of comboPrompts) {
-        console.log(`  [Combo ${scenarioCount + 1}] User WITH house`);
-        try {
-          const response = await genai.models.generateContent({
-            model: "gemini-2.5-flash-image",
-            contents: [{ role: "user", parts: [
-              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
-              { inlineData: { data: houseBase64, mimeType: "image/jpeg" } },
-              { text: prompt }
-            ]}],
-            config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
-          });
-          const candidate = response.candidates?.[0];
-          if (candidate?.content?.parts) {
-            const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-              part.inlineData?.mimeType?.startsWith("image/")
-            );
-            if (imagePart?.inlineData?.data) {
-              allGeneratedImages.push(imagePart.inlineData.data);
-              scenarioCount++;
-              console.log(`  ✓ Created combo ${scenarioCount}`);
-            }
-          }
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error("  ✗ Error:", error);
-        }
-      }
-    }
-
+    // Generate scenario variations - ONE scenario for user WITH car
     if (hasSelfie && hasDreamCar) {
       const selfieBase64 = categorizedUploads.selfie.split(",")[1];
       const carBase64 = categorizedUploads.dreamCar.split(",")[1];
-      const comboPrompts = [
-        "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person with this car. Keep the car's brand and model clearly recognizable. Only change the setting, NOT the person's appearance. Preserve their race, gender, age, and all facial characteristics exactly as shown."
-      ];
-      for (const prompt of comboPrompts) {
-        console.log(`  [Combo ${scenarioCount + 1}] User WITH car`);
-        try {
-          const response = await genai.models.generateContent({
-            model: "gemini-2.5-flash-image",
-            contents: [{ role: "user", parts: [
-              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
-              { inlineData: { data: carBase64, mimeType: "image/jpeg" } },
-              { text: prompt }
-            ]}],
-            config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
-          });
-          const candidate = response.candidates?.[0];
-          if (candidate?.content?.parts) {
-            const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-              part.inlineData?.mimeType?.startsWith("image/")
-            );
-            if (imagePart?.inlineData?.data) {
-              allGeneratedImages.push(imagePart.inlineData.data);
-              scenarioCount++;
-              console.log(`  ✓ Created combo ${scenarioCount}`);
-            }
+      console.log(`  [Image ${scenarioCount + 1}] User WITH car scenario`);
+      try {
+        const response = await genai.models.generateContent({
+          model: "gemini-2.5-flash-image",
+          contents: [{ role: "user", parts: [
+            { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
+            { inlineData: { data: carBase64, mimeType: "image/jpeg" } },
+            { text: "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person next to/with this car, looking successful. Keep the car's brand clearly visible. Only change the setting, NOT the person. Preserve their race, gender, age, and all facial characteristics exactly as shown." }
+          ]}],
+          config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
+        });
+        const candidate = response.candidates?.[0];
+        if (candidate?.content?.parts) {
+          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+            part.inlineData?.mimeType?.startsWith("image/")
+          );
+          if (imagePart?.inlineData?.data) {
+            allGeneratedImages.push(imagePart.inlineData.data);
+            scenarioCount++;
+            console.log(`  ✓ [Image ${scenarioCount}] User WITH car created`);
           }
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error("  ✗ Error:", error);
         }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error("  ✗ Error:", error);
       }
     }
 
+    // Generate scenario variation - ONE scenario for user AT destination
     if (hasSelfie && hasDestination) {
       const selfieBase64 = categorizedUploads.selfie.split(",")[1];
       const destinationBase64 = categorizedUploads.destination.split(",")[1];
-      const comboPrompts = [
-        "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person at this destination. Keep the destination's landmarks clearly recognizable. Only change the background/setting, NOT the person's appearance. Preserve their race, gender, age, and all facial characteristics exactly as shown."
-      ];
-      for (const prompt of comboPrompts) {
-        console.log(`  [Combo ${scenarioCount + 1}] User AT destination`);
-        try {
-          const response = await genai.models.generateContent({
-            model: "gemini-2.5-flash-image",
-            contents: [{ role: "user", parts: [
-              { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
-              { inlineData: { data: destinationBase64, mimeType: "image/jpeg" } },
-              { text: prompt }
-            ]}],
-            config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
-          });
-          const candidate = response.candidates?.[0];
-          if (candidate?.content?.parts) {
-            const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-              part.inlineData?.mimeType?.startsWith("image/")
-            );
-            if (imagePart?.inlineData?.data) {
-              allGeneratedImages.push(imagePart.inlineData.data);
-              scenarioCount++;
-              console.log(`  ✓ Created combo ${scenarioCount}`);
-            }
+      console.log(`  [Image ${scenarioCount + 1}] User AT destination scenario`);
+      try {
+        const response = await genai.models.generateContent({
+          model: "gemini-2.5-flash-image",
+          contents: [{ role: "user", parts: [
+            { inlineData: { data: selfieBase64, mimeType: "image/jpeg" } },
+            { inlineData: { data: destinationBase64, mimeType: "image/jpeg" } },
+            { text: "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person at this destination, looking happy. Keep the destination's landmarks clearly recognizable. Only change the background/setting, NOT the person. Preserve their race, gender, age, and all facial characteristics exactly as shown." }
+          ]}],
+          config: { temperature: 0.4, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
+        });
+        const candidate = response.candidates?.[0];
+        if (candidate?.content?.parts) {
+          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+            part.inlineData?.mimeType?.startsWith("image/")
+          );
+          if (imagePart?.inlineData?.data) {
+            allGeneratedImages.push(imagePart.inlineData.data);
+            scenarioCount++;
+            console.log(`  ✓ [Image ${scenarioCount}] User AT destination created`);
           }
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error("  ✗ Error:", error);
         }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error("  ✗ Error:", error);
       }
     }
 
-    // Generate MINIMAL solo selfie variations - only if we don't have combo shots
-    if (hasSelfie && !hasDreamHouse && !hasDreamCar && !hasDestination) {
-      const selfieBase64 = categorizedUploads.selfie.split(",")[1];
-      const selfieVariations = [
-        "CRITICAL: Keep this EXACT person's face, skin tone, facial features, and identity completely unchanged. Show this person in a professional setting. Only change the background/clothes, NOT the person's face or identity. Preserve their race, gender, age, and all facial characteristics exactly as shown."
-      ];
-      await generateVariations(selfieBase64, "Selfie Solo", selfieVariations);
-    }
-
-    // Skip standalone item variations - we already have originals and combo shots
-
     console.log(`✅ Total images so far: ${scenarioCount} (user originals + scenarios)`);
 
-    // STEP 2B: Generate FEWER lifestyle images - prioritize user content
-    // Only generate 3-5 complementary lifestyle images MAX
-    const maxLifestyleImages = Math.min(5, Math.max(0, 10 - scenarioCount));
-    console.log(`\n🎨 STEP 2/3: Generating ${maxLifestyleImages} complementary lifestyle images...`);
+    // STEP 2B: Generate ONLY 2 lifestyle images to fill remaining space (8 total frames)
+    // Target: 6 user images + 2 lifestyle = 8 frames total
+    const maxLifestyleImages = Math.max(0, 8 - scenarioCount);
+    const lifestyleImagesToGenerate = Math.min(2, maxLifestyleImages);
+    console.log(`\n🎨 STEP 2/3: Generating ${lifestyleImagesToGenerate} complementary lifestyle images to reach 8 total frames...`);
     const dalleImages: string[] = [];
 
     // Enhanced feminine aesthetic prompts - more thoughtful and aspirational
@@ -283,10 +231,10 @@ export async function POST(request: NextRequest) {
       "Chic Parisian balcony: wrought iron bistro set, croissant and espresso on vintage tray, fresh flowers in window box, Eiffel Tower view in soft focus, morning mist. European elegance. CRITICAL: NO people, NO faces, NO humans.",
     ];
 
-    for (let i = 0; i < maxLifestyleImages && i < feminineAestheticPrompts.length; i++) {
+    for (let i = 0; i < lifestyleImagesToGenerate && i < feminineAestheticPrompts.length; i++) {
       const imagePrompt = feminineAestheticPrompts[i];
 
-      console.log(`  [${i + 1}/${maxLifestyleImages}] Generating lifestyle image ${i + 1}`);
+      console.log(`  [${i + 1}/${lifestyleImagesToGenerate}] Generating lifestyle image ${i + 1}`);
 
       try {
         const response = await fetch("https://api.openai.com/v1/images/generations", {
