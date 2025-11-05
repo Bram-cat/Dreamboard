@@ -55,9 +55,20 @@ export async function POST(request: NextRequest) {
       expandedKeywords.push(defaultThemes[expandedKeywords.length % defaultThemes.length]);
     }
 
-    // ALWAYS add 2 common lifestyle themes (fitness + wealth) regardless of user input
+    // ALWAYS add common lifestyle themes + generate house/car/destination if user didn't upload
     expandedKeywords.push("fitness");
     expandedKeywords.push("wealth");
+
+    // CRITICAL: If user didn't upload dream house/car/destination, add them to DALL-E generation
+    if (!hasDreamHouse) {
+      expandedKeywords.push("dream house");
+    }
+    if (!hasDreamCar) {
+      expandedKeywords.push("dream car");
+    }
+    if (!hasDestination) {
+      expandedKeywords.push("travel destination");
+    }
 
     const dallePrompts = expandedKeywords.slice(0, 7).map((keyword: string) => {
       // Create contextual prompts based on keywords
@@ -67,9 +78,7 @@ export async function POST(request: NextRequest) {
           : `Person at elegant luxury dinner, expensive champagne, 5-star restaurant, wealthy lifestyle, success aesthetic, confident and happy expression`;
       }
       if (keyword.toLowerCase().includes("travel") || keyword.toLowerCase().includes("destination")) {
-        return hasSelfie
-          ? `Travel lifestyle: airplane window view with sunset, passport with stamps, luxury hotel room view, beach resort aesthetic. CRITICAL: NO people, NO faces, NO humans - only travel elements.`
-          : `Person enjoying exotic travel destination, beach or mountains, adventure aesthetic, happy traveler with backpack`;
+        return `Exotic travel destination: pristine tropical beach with turquoise water, palm trees, luxury resort, paradise aesthetic, travel photography`;
       }
       if (keyword.toLowerCase().includes("happy") || keyword.toLowerCase().includes("joy")) {
         return hasSelfie
@@ -81,11 +90,11 @@ export async function POST(request: NextRequest) {
           ? `Fitness lifestyle scene: yoga mat in sunlit room, healthy smoothie bowl, workout equipment, gym interior, wellness aesthetic. CRITICAL: NO people, NO faces, NO humans - only fitness equipment and wellness settings.`
           : `Person exercising at gym, doing yoga, or running, fit and healthy lifestyle, workout aesthetic, active and energetic`;
       }
-      if (keyword.toLowerCase().includes("car") && !hasDreamCar) {
-        return `Luxury sports car exterior, sleek design, modern automotive photography, dream car aesthetic, high-end vehicle`;
+      if (keyword.toLowerCase().includes("car") || keyword.toLowerCase().includes("dream car")) {
+        return `Luxury sports car: high-end exotic supercar, sleek red Ferrari or Lamborghini, polished exterior, modern automotive photography, dream car aesthetic, wealthy lifestyle`;
       }
-      if (keyword.toLowerCase().includes("house") && !hasDreamHouse) {
-        return `Modern luxury home exterior, architectural photography, dream house, beautiful landscaping, contemporary design`;
+      if (keyword.toLowerCase().includes("house") || keyword.toLowerCase().includes("dream house")) {
+        return `Luxury modern home: stunning contemporary mansion exterior, beautiful architectural design, pool, manicured landscaping, palm trees, dream house aesthetic, wealthy lifestyle`;
       }
       if (keyword.toLowerCase().includes("food") || keyword.toLowerCase().includes("nutrition") || keyword.toLowerCase().includes("healthy eating")) {
         return hasSelfie
