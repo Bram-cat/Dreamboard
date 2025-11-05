@@ -11,35 +11,25 @@ export default function PolaroidScatteredTemplate({
   images,
   keywords,
 }: PolaroidScatteredTemplateProps) {
-  // Positions for 10 images - LARGER sizes to fill canvas, evenly distributed across 1344x768
-  // Reference: sample5.jpg shows images in all quadrants
-  // Increased sizes from 150-240px to 280-400px to eliminate empty space
+  // Positions for 10 images - NO OVERLAPPING, proper spacing like sample5.jpg
+  // Reference: sample5.jpg shows clean layout with no overlaps
+  // Canvas: 1344x768, Center card takes middle ~400x300px area
   const polaroidPositions = [
-    // TOP LEFT quadrant (2 images) - LARGER
-    { top: 10, left: 30, rotate: -8, width: 320, height: 260, zIndex: 12 },
-    { top: 60, left: 350, rotate: 12, width: 300, height: 240, zIndex: 11 },
+    // TOP ROW - 4 images across top (avoiding center)
+    { top: 20, left: 40, rotate: -6, width: 240, height: 200, zIndex: 12 },
+    { top: 35, left: 320, rotate: 8, width: 220, height: 180, zIndex: 11 },
+    { top: 25, left: 920, rotate: -5, width: 230, height: 190, zIndex: 13 },
+    { top: 40, left: 1080, rotate: 7, width: 210, height: 170, zIndex: 10 },
 
-    // TOP CENTER quadrant (2 images) - LARGER
-    { top: 5, left: 640, rotate: -5, width: 340, height: 280, zIndex: 13 },
-    { top: 70, left: 950, rotate: 8, width: 290, height: 230, zIndex: 10 },
+    // MIDDLE ROW - 2 images on sides (avoiding center card)
+    { top: 280, left: 30, rotate: 5, width: 250, height: 210, zIndex: 9 },
+    { top: 295, left: 1050, rotate: -8, width: 240, height: 200, zIndex: 8 },
 
-    // TOP RIGHT quadrant (1 image) - LARGER
-    { top: 15, left: 1000, rotate: -10, width: 310, height: 250, zIndex: 14 },
-
-    // MIDDLE LEFT (1 image) - LARGER
-    { top: 300, left: 20, rotate: 6, width: 330, height: 270, zIndex: 9 },
-
-    // MIDDLE RIGHT (1 image) - LARGER
-    { top: 320, left: 1000, rotate: -7, width: 300, height: 240, zIndex: 8 },
-
-    // BOTTOM LEFT quadrant (1 image) - LARGER
-    { top: 480, left: 60, rotate: -10, width: 320, height: 260, zIndex: 7 },
-
-    // BOTTOM CENTER quadrant (1 image) - LARGER
-    { top: 470, left: 520, rotate: 5, width: 340, height: 280, zIndex: 6 },
-
-    // BOTTOM RIGHT quadrant (1 image) - LARGER
-    { top: 460, left: 850, rotate: -6, width: 310, height: 250, zIndex: 5 },
+    // BOTTOM ROW - 4 images across bottom
+    { top: 520, left: 50, rotate: -7, width: 230, height: 190, zIndex: 7 },
+    { top: 535, left: 320, rotate: 6, width: 220, height: 180, zIndex: 6 },
+    { top: 525, left: 800, rotate: -4, width: 240, height: 200, zIndex: 5 },
+    { top: 540, left: 1070, rotate: 8, width: 210, height: 170, zIndex: 4 },
   ];
 
   // Quotes positioned between images
@@ -51,9 +41,8 @@ export default function PolaroidScatteredTemplate({
   ];
 
   return (
-    <div className="relative w-[1344px] h-[768px] bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 overflow-hidden">
-      {/* Subtle texture */}
-      <div className="absolute inset-0 opacity-30 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIwLjUiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')]"></div>
+    <div className="relative w-[1344px] h-[768px] overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
+      {/* Clean white background like sample5.jpg - no gradients to avoid oklch errors */}
 
       {/* CENTER CARD - "2025 Guided Vision Board" */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-12 py-8 rounded-sm shadow-2xl transform -rotate-1 z-30 border-4 border-white">
@@ -113,25 +102,28 @@ export default function PolaroidScatteredTemplate({
       {/* QUOTE BOXES - positioned between images */}
       {quotePositions.slice(0, Math.min(4, keywords.length)).map((quote, idx) => {
         const colors = {
-          purple: { bg: "from-purple-50 to-white", border: "border-purple-300", dot: "bg-purple-400" },
-          rose: { bg: "from-rose-50 to-white", border: "border-rose-300", dot: "bg-rose-400" },
-          amber: { bg: "from-amber-50 to-white", border: "border-amber-300", dot: "bg-amber-400" },
-          blue: { bg: "from-blue-50 to-white", border: "border-blue-300", dot: "bg-blue-400" },
+          purple: { bg: "#f3e8ff", border: "#d8b4fe", dot: "#c084fc" },
+          rose: { bg: "#ffe4e6", border: "#fda4af", dot: "#fb7185" },
+          amber: { bg: "#fef3c7", border: "#fcd34d", dot: "#f59e0b" },
+          blue: { bg: "#dbeafe", border: "#93c5fd", dot: "#60a5fa" },
         };
         const colorScheme = colors[quote.color as keyof typeof colors] || colors.purple;
 
         return (
           <div
             key={`quote-${idx}`}
-            className={`absolute bg-gradient-to-br ${colorScheme.bg} backdrop-blur-sm px-5 py-3 shadow-lg transform z-25 max-w-[160px] border-2 ${colorScheme.border} rounded-lg`}
+            className="absolute px-5 py-3 shadow-lg transform z-25 max-w-[160px] rounded-lg"
             style={{
+              backgroundColor: colorScheme.bg,
+              borderWidth: '2px',
+              borderColor: colorScheme.border,
               top: `${quote.top}px`,
               left: `${quote.left}px`,
               rotate: `${Math.random() > 0.5 ? '' : '-'}${Math.floor(Math.random() * 8 + 2)}deg`,
             }}
           >
-            <div className={`absolute -top-2 -left-2 w-3 h-3 ${colorScheme.dot} rounded-full`}></div>
-            <p className="text-sm font-medium text-gray-800 leading-snug text-center" style={{ fontFamily: 'cursive' }}>
+            <div className="absolute -top-2 -left-2 w-3 h-3 rounded-full" style={{ backgroundColor: colorScheme.dot }}></div>
+            <p className="text-sm font-medium leading-snug text-center" style={{ fontFamily: 'cursive', color: '#1f2937' }}>
               {quote.text}
             </p>
           </div>

@@ -92,8 +92,14 @@ export async function POST(request: NextRequest) {
     });
 
     const dalleImages: string[] = [];
-    for (let i = 0; i < 5; i++) {
-      console.log(`  [${i + 1}/5] Generating DALL-E image for: ${expandedKeywords[i]}`);
+    // ALWAYS generate exactly 5 DALL-E images with retry logic
+    let dalleAttempts = 0;
+    const maxDalleAttempts = 8; // 5 images + 3 retries
+
+    while (dalleImages.length < 5 && dalleAttempts < maxDalleAttempts) {
+      const currentIndex = dalleImages.length;
+      console.log(`  [${currentIndex + 1}/5] Generating DALL-E image for: ${expandedKeywords[currentIndex]}`);
+
       try {
         const response = await fetch("https://api.openai.com/v1/images/generations", {
           method: "POST",
@@ -103,7 +109,7 @@ export async function POST(request: NextRequest) {
           },
           body: JSON.stringify({
             model: "dall-e-3",
-            prompt: dallePrompts[i],
+            prompt: dallePrompts[currentIndex],
             n: 1,
             size: "1024x1024",
             quality: "standard",
@@ -111,7 +117,8 @@ export async function POST(request: NextRequest) {
         });
 
         if (!response.ok) {
-          throw new Error(`DALL-E API error: ${response.statusText}`);
+          const errorText = await response.text();
+          throw new Error(`DALL-E API error: ${response.statusText} - ${errorText}`);
         }
 
         const data = await response.json();
@@ -122,12 +129,15 @@ export async function POST(request: NextRequest) {
         const arrayBuffer = await imageResponse.arrayBuffer();
         const base64 = Buffer.from(arrayBuffer).toString("base64");
         dalleImages.push(base64);
-        console.log(`  ✓ Generated DALL-E image ${i + 1}`);
+        console.log(`  ✓ Generated DALL-E image ${currentIndex + 1}`);
 
         await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (error) {
-        console.error(`  ✗ Error generating DALL-E image ${i + 1}:`, error);
+        console.error(`  ✗ Error generating DALL-E image ${currentIndex + 1}:`, error);
+        console.log(`  🔄 Will retry if needed (attempt ${dalleAttempts + 1}/${maxDalleAttempts})`);
       }
+
+      dalleAttempts++;
     }
 
     console.log(`✅ Generated ${dalleImages.length} DALL-E images`);
