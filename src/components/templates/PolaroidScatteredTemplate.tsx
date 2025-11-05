@@ -96,7 +96,8 @@ export default function PolaroidScatteredTemplate({
               <img
                 src={image}
                 alt={`Vision ${idx + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
+                style={{ objectFit: 'contain' }}
               />
               {/* Overlay keyword directly ON image like sample.png */}
               {pos.keyword && (
