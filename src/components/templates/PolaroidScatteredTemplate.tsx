@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
 interface PolaroidScatteredTemplateProps {
   images: string[]; // 14 images (7 DALL-E + 7 Gemini)
@@ -11,6 +11,8 @@ export default function PolaroidScatteredTemplate({
   images,
   keywords,
 }: PolaroidScatteredTemplateProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   // Positions for 14 images - Magazine collage style like sample.png
   // Reference: sample.png shows tight collage with images filling entire canvas
   // Canvas: 1344x768, Center card takes middle area
@@ -51,11 +53,251 @@ export default function PolaroidScatteredTemplate({
     { top: 480, left: 700, text: keywords[3] || "I create my own reality", color: "blue" },
   ];
 
-  return (
-    <div className="relative w-[1344px] h-[768px] overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
-      {/* Clean white background like sample5.jpg - no gradients to avoid oklch errors */}
+  // Canvas rendering for download
+  useEffect(() => {
+    const renderToCanvas = async () => {
+      if (!canvasRef.current || images.length === 0) return;
 
-      {/* CENTER CARD - "2025 Guided Vision Board" */}
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Set canvas size
+      canvas.width = 1344;
+      canvas.height = 768;
+
+      // Draw white background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 1344, 768);
+
+      // Load and draw all images
+      const loadImage = (src: string): Promise<HTMLImageElement> => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+        });
+      };
+
+      // Draw all polaroid images
+      for (let idx = 0; idx < Math.min(14, images.length); idx++) {
+        const pos = polaroidPositions[idx];
+        if (!pos) continue;
+
+        try {
+          const img = await loadImage(images[idx]);
+
+          ctx.save();
+          ctx.translate(pos.left + pos.width / 2, pos.top + pos.height / 2);
+          ctx.rotate((pos.rotate * Math.PI) / 180);
+          ctx.translate(-(pos.width / 2), -(pos.height / 2));
+
+          // Draw polaroid frame (white background)
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+          ctx.shadowBlur = 15;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 4;
+          ctx.fillRect(0, 0, pos.width, pos.height);
+          ctx.shadowColor = 'transparent';
+
+          // Draw photo area
+          const photoHeight = pos.height * 0.85 - 24;
+          const padding = 12;
+          ctx.fillStyle = '#f3f4f6';
+          ctx.fillRect(padding, padding, pos.width - padding * 2, photoHeight);
+
+          // Draw image (contain fit)
+          const imgRatio = img.width / img.height;
+          const boxRatio = (pos.width - padding * 2) / photoHeight;
+          let drawWidth, drawHeight, drawX, drawY;
+
+          if (imgRatio > boxRatio) {
+            drawWidth = pos.width - padding * 2;
+            drawHeight = drawWidth / imgRatio;
+            drawX = padding;
+            drawY = padding + (photoHeight - drawHeight) / 2;
+          } else {
+            drawHeight = photoHeight;
+            drawWidth = drawHeight * imgRatio;
+            drawX = padding + ((pos.width - padding * 2) - drawWidth) / 2;
+            drawY = padding;
+          }
+
+          ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+
+          // Draw keyword overlay if exists
+          if (pos.keyword) {
+            const keywordY = padding + photoHeight - 30;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(padding + 8, keywordY, pos.width - padding * 2 - 16, 24);
+            ctx.fillStyle = '#1f2937';
+            ctx.font = '14px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(pos.keyword, pos.width / 2, keywordY + 16);
+          }
+
+          ctx.restore();
+        } catch (error) {
+          console.error(`Failed to load image ${idx}:`, error);
+        }
+      }
+
+      // Draw center card
+      ctx.save();
+      ctx.translate(672, 384);
+      ctx.rotate(-0.017); // -1 degree
+      ctx.translate(-150, -100);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 30;
+      ctx.fillRect(0, 0, 300, 200);
+      ctx.shadowColor = 'transparent';
+
+      // Draw center card border
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(0, 0, 300, 200);
+
+      // Draw center card text
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '10px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('800+', 150, 40);
+
+      ctx.font = 'bold 12px Arial';
+      ctx.fillStyle = '#4b5563';
+      ctx.fillText('elements', 150, 55);
+
+      ctx.font = 'italic 48px Georgia';
+      ctx.fillStyle = '#1f2937';
+      ctx.fillText('2025', 150, 105);
+
+      ctx.font = '48px serif';
+      ctx.fillText('Guided', 150, 145);
+      ctx.fillText('Vision board', 150, 175);
+
+      ctx.font = '14px cursive';
+      ctx.fillStyle = '#4b5563';
+      ctx.fillText('affirmations included ♡', 150, 195);
+
+      ctx.restore();
+
+      // Draw quote boxes
+      const colors = {
+        purple: { bg: "#f3e8ff", border: "#d8b4fe", dot: "#c084fc" },
+        rose: { bg: "#ffe4e6", border: "#fda4af", dot: "#fb7185" },
+        amber: { bg: "#fef3c7", border: "#fcd34d", dot: "#f59e0b" },
+        blue: { bg: "#dbeafe", border: "#93c5fd", dot: "#60a5fa" },
+      };
+
+      quotePositions.slice(0, Math.min(4, keywords.length)).forEach((quote) => {
+        const colorScheme = colors[quote.color as keyof typeof colors] || colors.purple;
+        const rotation = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 8) + 2);
+
+        ctx.save();
+        ctx.translate(quote.left + 80, quote.top + 20);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.translate(-80, -20);
+
+        // Draw quote box
+        ctx.fillStyle = colorScheme.bg;
+        ctx.strokeStyle = colorScheme.border;
+        ctx.lineWidth = 2;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+        ctx.shadowBlur = 10;
+        roundRect(ctx, 0, 0, 160, 40, 8);
+        ctx.fill();
+        ctx.stroke();
+        ctx.shadowColor = 'transparent';
+
+        // Draw dot
+        ctx.fillStyle = colorScheme.dot;
+        ctx.beginPath();
+        ctx.arc(-8, -8, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw text
+        ctx.fillStyle = '#1f2937';
+        ctx.font = '14px cursive';
+        ctx.textAlign = 'center';
+        ctx.fillText(quote.text, 80, 25);
+
+        ctx.restore();
+      });
+
+      // Draw decorative emojis
+      ctx.font = '32px Arial';
+      ctx.fillText('✨', 520, 170);
+      ctx.font = '24px Arial';
+      ctx.fillText('⭐', 1064, 450);
+      ctx.fillText('🌸', 380, 648);
+      ctx.font = '18px Arial';
+      ctx.fillText('💫', 1224, 290);
+    };
+
+    renderToCanvas();
+  }, [images, keywords]);
+
+  // Helper function for rounded rectangles
+  const roundRect = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) => {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+  };
+
+  // Download function
+  const handleDownload = () => {
+    if (!canvasRef.current) return;
+
+    try {
+      const dataUrl = canvasRef.current.toDataURL('image/png', 1.0);
+      const link = document.createElement('a');
+      link.download = 'vision-board-2025.png';
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Download failed. Please try again.');
+    }
+  };
+
+  // Make download function available globally
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).downloadVisionBoard = handleDownload;
+    return () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).downloadVisionBoard;
+    };
+  }, [handleDownload]);
+
+  return (
+    <>
+      {/* Hidden Canvas for download */}
+      <canvas
+        ref={canvasRef}
+        width={1344}
+        height={768}
+        style={{ display: 'none' }}
+      />
+
+      {/* Visible Vision Board */}
+      <div ref={containerRef} className="relative w-[1344px] h-[768px] overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
+        {/* Clean white background like sample5.jpg - no gradients to avoid oklch errors */}
+
+        {/* CENTER CARD - "2025 Guided Vision Board" */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-12 py-8 rounded-sm shadow-2xl transform -rotate-1 z-30 border-4 border-white">
         <div className="text-center space-y-2">
           <p className="text-xs font-medium text-gray-500 uppercase tracking-widest">800+</p>
@@ -179,5 +421,6 @@ export default function PolaroidScatteredTemplate({
       <div className="absolute bottom-[120px] left-[380px] text-3xl z-4 opacity-60">🌸</div>
       <div className="absolute top-[260px] right-[120px] text-2xl z-4 opacity-70">💫</div>
     </div>
+    </>
   );
 }
