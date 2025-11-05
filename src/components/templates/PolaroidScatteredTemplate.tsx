@@ -14,32 +14,30 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // REDESIGNED: Clean grid layout matching image.png reference
-  // Large tiles (300-350px), minimal spacing, beige aesthetic
+  // Clean grid layout - Scaled for 1920x1080 (16:9 aspect ratio)
+  // Large tiles with proper spacing for widescreen display
   const gridPositions = [
-    // Row 1 - 3 large tiles across top
-    { top: 10, left: 10, width: 310, height: 290, keyword: keywords[0] || "" },
-    { top: 10, left: 340, width: 310, height: 290, keyword: "" },
-    { top: 10, left: 670, width: 310, height: 290, keyword: keywords[1] || "" },
+    // Row 1 - 4 large tiles across top
+    { top: 20, left: 20, width: 440, height: 320, keyword: keywords[0] || "" },
+    { top: 20, left: 480, width: 440, height: 320, keyword: "" },
+    { top: 20, left: 940, width: 440, height: 320, keyword: keywords[1] || "" },
+    { top: 20, left: 1400, width: 500, height: 320, keyword: "" },
 
-    // Row 2 - 2 tiles + CENTER CARD + 1 tile
-    { top: 320, left: 10, width: 230, height: 290, keyword: "" },
-    // CENTER CARD: 260-490 (230px wide) x 320-610 (290px tall)
-    { top: 320, left: 750, width: 230, height: 290, keyword: keywords[2] || "" },
+    // Row 2 - 3 tiles + CENTER CARD
+    { top: 360, left: 20, width: 350, height: 340, keyword: "" },
+    // CENTER CARD: 390-1010 (620px wide) x 360-700 (340px tall)
+    { top: 360, left: 1030, width: 870, height: 340, keyword: keywords[2] || "" },
 
-    // Row 3 - 3 large tiles across bottom
-    { top: 630, left: 10, width: 310, height: 290, keyword: keywords[3] || "" },
-    { top: 630, left: 340, width: 310, height: 290, keyword: "" },
-    { top: 630, left: 670, width: 310, height: 290, keyword: keywords[4] || "" },
+    // Row 3 - 4 large tiles across bottom
+    { top: 720, left: 20, width: 440, height: 340, keyword: keywords[3] || "" },
+    { top: 720, left: 480, width: 440, height: 340, keyword: "" },
+    { top: 720, left: 940, width: 440, height: 340, keyword: keywords[4] || "" },
+    { top: 720, left: 1400, width: 500, height: 340, keyword: "" },
 
-    // Right column - 3 tiles stacked
-    { top: 10, left: 1000, width: 324, height: 200, keyword: "" },
-    { top: 230, left: 1000, width: 324, height: 200, keyword: "" },
-    { top: 450, left: 1000, width: 324, height: 200, keyword: "" },
-
-    // Bottom right - 2 smaller tiles
-    { top: 670, left: 1000, width: 158, height: 250, keyword: "" },
-    { top: 670, left: 1172, width: 152, height: 250, keyword: "" },
+    // Additional tiles for variety
+    { top: 360, left: 1030, width: 425, height: 340, keyword: "" },
+    { top: 360, left: 1475, width: 425, height: 340, keyword: "" },
+    { top: 20, left: 1400, width: 245, height: 155, keyword: "" },
   ];
 
   // Canvas rendering for download
@@ -51,13 +49,13 @@ export default function PolaroidScatteredTemplate({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Set canvas size
-      canvas.width = 1344;
-      canvas.height = 940;
+      // Set canvas size - Standard 16:9 aspect ratio for better display
+      canvas.width = 1920;
+      canvas.height = 1080;
 
-      // Draw beige background matching image.png
+      // Draw beige background
       ctx.fillStyle = '#f5f1ed';
-      ctx.fillRect(0, 0, 1344, 940);
+      ctx.fillRect(0, 0, 1920, 1080);
 
       // Load and draw images
       const loadImage = (src: string): Promise<HTMLImageElement> => {
@@ -123,11 +121,11 @@ export default function PolaroidScatteredTemplate({
         }
       }
 
-      // Draw center card (beige with white text)
-      const centerX = 260;
-      const centerY = 320;
-      const centerW = 470;
-      const centerH = 290;
+      // Draw center card (beige with white text) - positioned for 1920x1080
+      const centerX = 390;
+      const centerY = 360;
+      const centerW = 620;
+      const centerH = 340;
 
       ctx.save();
       ctx.fillStyle = '#d6c1b1'; // Beige matching image.png
@@ -189,31 +187,42 @@ export default function PolaroidScatteredTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={1344}
-        height={940}
+        width={1920}
+        height={1080}
         style={{ display: 'none' }}
       />
 
-      {/* Visible Vision Board */}
+      {/* Visible Vision Board - Scales to fit screen */}
       <div
         ref={containerRef}
-        className="relative w-[1344px] h-[940px] mx-auto overflow-hidden"
-        style={{ backgroundColor: '#f5f1ed' }}
+        className="relative w-full mx-auto overflow-hidden"
+        style={{
+          backgroundColor: '#f5f1ed',
+          aspectRatio: '16 / 9',
+          maxWidth: '1920px',
+          maxHeight: '1080px'
+        }}
       >
         {/* Grid Images - 13 tiles */}
         {images.slice(0, 13).map((image, idx) => {
           const pos = gridPositions[idx];
           if (!pos) return null;
 
+          // Convert pixels to percentages for responsive scaling
+          const topPercent = (pos.top / 1080) * 100;
+          const leftPercent = (pos.left / 1920) * 100;
+          const widthPercent = (pos.width / 1920) * 100;
+          const heightPercent = (pos.height / 1080) * 100;
+
           return (
             <div
               key={idx}
               className="absolute overflow-hidden"
               style={{
-                top: `${pos.top}px`,
-                left: `${pos.left}px`,
-                width: `${pos.width}px`,
-                height: `${pos.height}px`,
+                top: `${topPercent}%`,
+                left: `${leftPercent}%`,
+                width: `${widthPercent}%`,
+                height: `${heightPercent}%`,
               }}
             >
               {/* Image with cover fit */}
@@ -249,14 +258,14 @@ export default function PolaroidScatteredTemplate({
           );
         })}
 
-        {/* Center Card (beige with white text) - matching image.png */}
+        {/* Center Card (beige with white text) */}
         <div
           className="absolute flex flex-col items-center justify-center"
           style={{
-            top: '320px',
-            left: '260px',
-            width: '470px',
-            height: '290px',
+            top: '33.33%',
+            left: '20.31%',
+            width: '32.29%',
+            height: '31.48%',
             backgroundColor: '#d6c1b1',
           }}
         >
