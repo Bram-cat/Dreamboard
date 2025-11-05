@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
 interface CleanGridTemplateProps {
-  images: string[]; // 12-15 images
+  images: string[]; // 14 images (7 DALL-E + 7 Gemini)
   keywords: string[];
 }
 
@@ -11,122 +11,296 @@ export default function CleanGridTemplate({
   images,
   keywords,
 }: CleanGridTemplateProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Clean grid positions - MINIMAL DESIGN, NO ROTATION
+  // 3x5 grid layout with center card
+  const gridPositions = [
+    // Row 1 (3 images)
+    { top: 20, left: 20, width: 400, height: 220, keyword: keywords[0] },
+    { top: 20, left: 472, width: 400, height: 220, keyword: "" },
+    { top: 20, left: 924, width: 400, height: 220, keyword: keywords[1] },
+
+    // Row 2 (3 images with center card)
+    { top: 260, left: 20, width: 250, height: 220, keyword: "" },
+    // CENTER CARD HERE (292x240)
+    { top: 260, left: 1074, width: 250, height: 220, keyword: keywords[2] },
+
+    // Row 3 (3 images)
+    { top: 500, left: 20, width: 400, height: 220, keyword: "" },
+    { top: 500, left: 472, width: 400, height: 220, keyword: keywords[3] },
+    { top: 500, left: 924, width: 400, height: 220, keyword: "" },
+
+    // Additional images for 14 total
+    { top: 20, left: 20, width: 195, height: 140, keyword: "" },
+    { top: 20, left: 227, width: 195, height: 140, keyword: "" },
+    { top: 20, left: 1129, width: 195, height: 140, keyword: "" },
+    { top: 500, left: 20, width: 195, height: 140, keyword: "" },
+    { top: 500, left: 227, width: 195, height: 140, keyword: "" },
+    { top: 500, left: 1129, width: 195, height: 140, keyword: keywords[4] },
+  ];
+
+  // Canvas rendering for download
+  useEffect(() => {
+    const renderToCanvas = async () => {
+      if (!canvasRef.current || images.length === 0) return;
+
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Set canvas size
+      canvas.width = 1344;
+      canvas.height = 768;
+
+      // Draw gradient background (soft, professional)
+      const gradient = ctx.createLinearGradient(0, 0, 1344, 768);
+      gradient.addColorStop(0, '#f8fafc');
+      gradient.addColorStop(0.5, '#f1f5f9');
+      gradient.addColorStop(1, '#e2e8f0');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 1344, 768);
+
+      // Load and draw images
+      const loadImage = (src: string): Promise<HTMLImageElement> => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+        });
+      };
+
+      // Draw all grid images
+      for (let idx = 0; idx < Math.min(14, images.length); idx++) {
+        const pos = gridPositions[idx];
+        if (!pos) continue;
+
+        try {
+          const img = await loadImage(images[idx]);
+
+          ctx.save();
+
+          // Draw white card with subtle shadow
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+          ctx.shadowBlur = 20;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 2;
+
+          // Rounded corners
+          const radius = 12;
+          ctx.beginPath();
+          ctx.moveTo(pos.left + radius, pos.top);
+          ctx.lineTo(pos.left + pos.width - radius, pos.top);
+          ctx.quadraticCurveTo(pos.left + pos.width, pos.top, pos.left + pos.width, pos.top + radius);
+          ctx.lineTo(pos.left + pos.width, pos.top + pos.height - radius);
+          ctx.quadraticCurveTo(pos.left + pos.width, pos.top + pos.height, pos.left + pos.width - radius, pos.top + pos.height);
+          ctx.lineTo(pos.left + radius, pos.top + pos.height);
+          ctx.quadraticCurveTo(pos.left, pos.top + pos.height, pos.left, pos.top + pos.height - radius);
+          ctx.lineTo(pos.left, pos.top + radius);
+          ctx.quadraticCurveTo(pos.left, pos.top, pos.left + radius, pos.top);
+          ctx.closePath();
+          ctx.fill();
+          ctx.shadowColor = 'transparent';
+
+          // Clip for rounded corners
+          ctx.clip();
+
+          // Draw image (cover fit for clean grid)
+          const imgRatio = img.width / img.height;
+          const boxRatio = pos.width / pos.height;
+          let drawWidth, drawHeight, drawX, drawY;
+
+          if (imgRatio > boxRatio) {
+            drawHeight = pos.height;
+            drawWidth = drawHeight * imgRatio;
+            drawX = pos.left - (drawWidth - pos.width) / 2;
+            drawY = pos.top;
+          } else {
+            drawWidth = pos.width;
+            drawHeight = drawWidth / imgRatio;
+            drawX = pos.left;
+            drawY = pos.top - (drawHeight - pos.height) / 2;
+          }
+
+          ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+
+          // Draw keyword label at bottom if exists
+          if (pos.keyword) {
+            const labelHeight = 40;
+            const labelY = pos.top + pos.height - labelHeight;
+
+            // Semi-transparent gradient overlay
+            const labelGradient = ctx.createLinearGradient(0, labelY, 0, pos.top + pos.height);
+            labelGradient.addColorStop(0, 'rgba(0, 0, 0, 0.5)');
+            labelGradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
+            ctx.fillStyle = labelGradient;
+            ctx.fillRect(pos.left, labelY, pos.width, labelHeight);
+
+            // Keyword text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 16px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(pos.keyword.toUpperCase(), pos.left + pos.width / 2, labelY + 25);
+          }
+
+          ctx.restore();
+        } catch (error) {
+          console.error(`Failed to load image ${idx}:`, error);
+        }
+      }
+
+      // Draw center card
+      const centerX = 292;
+      const centerY = 270;
+      const centerW = 760;
+      const centerH = 220;
+
+      ctx.save();
+      ctx.fillStyle = '#6366f1'; // Indigo
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+      ctx.shadowBlur = 30;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 4;
+
+      // Rounded rectangle
+      const radius = 16;
+      ctx.beginPath();
+      ctx.moveTo(centerX + radius, centerY);
+      ctx.lineTo(centerX + centerW - radius, centerY);
+      ctx.quadraticCurveTo(centerX + centerW, centerY, centerX + centerW, centerY + radius);
+      ctx.lineTo(centerX + centerW, centerY + centerH - radius);
+      ctx.quadraticCurveTo(centerX + centerW, centerY + centerH, centerX + centerW - radius, centerY + centerH);
+      ctx.lineTo(centerX + radius, centerY + centerH);
+      ctx.quadraticCurveTo(centerX, centerY + centerH, centerX, centerY + centerH - radius);
+      ctx.lineTo(centerX, centerY + radius);
+      ctx.quadraticCurveTo(centerX, centerY, centerX + radius, centerY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Center text
+      ctx.shadowColor = 'transparent';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 56px Inter, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('2025', centerX + centerW / 2, centerY + 90);
+
+      ctx.font = '24px Inter, system-ui, sans-serif';
+      ctx.fillText('YOUR VISION BOARD', centerX + centerW / 2, centerY + 130);
+
+      ctx.font = 'italic 16px Inter, system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.fillText('Created with DreamBoard', centerX + centerW / 2, centerY + 165);
+
+      ctx.restore();
+    };
+
+    renderToCanvas();
+  }, [images, keywords]);
+
+  // Download function
+  const handleDownload = () => {
+    if (!canvasRef.current) return;
+
+    try {
+      const dataUrl = canvasRef.current.toDataURL('image/png', 1.0);
+      const link = document.createElement('a');
+      link.download = 'vision-board-clean-grid-2025.png';
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Download failed. Please try again.');
+    }
+  };
+
+  // Expose download function globally
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).downloadVisionBoard = handleDownload;
+    return () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).downloadVisionBoard;
+    };
+  }, []);
+
   return (
-    <div className="relative w-full h-[768px] bg-gradient-to-br from-stone-50 to-neutral-100 overflow-hidden">
-      {/* Tight 4x4 grid layout with no gaps */}
-      <div className="grid grid-cols-4 grid-rows-4 gap-0 w-full h-full">
-        {/* Row 1 */}
-        <div className="relative overflow-hidden border border-white">
-          {images[0] && <img src={images[0]} alt="Vision 1" className="w-full h-full object-cover" />}
-          <div className="absolute top-2 left-2 bg-white/95 px-2 py-1 rounded-sm shadow">
-            <p className="text-[10px] font-bold text-gray-800 uppercase tracking-wide">{keywords[0] || "GOALS"}</p>
-          </div>
-        </div>
+    <>
+      {/* Hidden Canvas for download */}
+      <canvas
+        ref={canvasRef}
+        width={1344}
+        height={768}
+        style={{ display: 'none' }}
+      />
 
-        <div className="relative overflow-hidden border border-white">
-          {images[1] && <img src={images[1]} alt="Vision 2" className="w-full h-full object-cover" />}
-          <div className="absolute bottom-2 right-2 bg-pink-400/90 px-2 py-1 rounded-sm shadow">
-            <p className="text-[9px] font-bold text-white uppercase">{keywords[1] || "LOVE"}</p>
-          </div>
-        </div>
+      {/* Visible Vision Board */}
+      <div
+        ref={containerRef}
+        className="relative w-[1344px] h-[768px] mx-auto bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 overflow-hidden"
+      >
+        {/* Grid Images */}
+        {images.slice(0, 14).map((image, idx) => {
+          const pos = gridPositions[idx];
+          if (!pos) return null;
 
-        <div className="relative overflow-hidden border border-white">
-          {images[2] && <img src={images[2]} alt="Vision 3" className="w-full h-full object-cover" />}
-        </div>
+          return (
+            <div
+              key={idx}
+              className="absolute bg-white shadow-lg"
+              style={{
+                top: `${pos.top}px`,
+                left: `${pos.left}px`,
+                width: `${pos.width}px`,
+                height: `${pos.height}px`,
+                borderRadius: '12px',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Image */}
+              <img
+                src={image}
+                alt={`Vision ${idx + 1}`}
+                className="w-full h-full object-cover"
+                style={{ objectFit: 'cover' }}
+              />
 
-        <div className="relative overflow-hidden border border-white">
-          {images[3] && <img src={images[3]} alt="Vision 4" className="w-full h-full object-cover" />}
-          <div className="absolute top-2 right-2 bg-purple-500/90 px-2 py-1 rounded-sm shadow">
-            <p className="text-[9px] font-bold text-white">{keywords[2] || "DREAMS"}</p>
-          </div>
-        </div>
-
-        {/* Row 2 */}
-        <div className="relative overflow-hidden border border-white">
-          {images[4] && <img src={images[4]} alt="Vision 5" className="w-full h-full object-cover" />}
-        </div>
-
-        <div className="relative overflow-hidden border border-white">
-          {images[5] && <img src={images[5]} alt="Vision 6" className="w-full h-full object-cover" />}
-          <div className="absolute bottom-2 left-2 bg-black/80 px-2 py-1 rounded-sm shadow">
-            <p className="text-[9px] font-bold text-white uppercase tracking-wide">{keywords[3] || "GROW"}</p>
-          </div>
-        </div>
-
-        {/* Center text panel - spans 2 cells */}
-        <div className="relative col-span-2 row-span-2 flex items-center justify-center bg-gradient-to-br from-rose-50 via-white to-amber-50 border-2 border-white">
-          <div className="text-center space-y-2 px-4">
-            <div className="mb-2">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">My</p>
-              <h1 className="text-6xl font-serif font-light text-gray-800 italic leading-tight">Vision</h1>
-              <h2 className="text-7xl font-serif font-black text-gray-900 leading-tight">Board</h2>
+              {/* Keyword label */}
+              {pos.keyword && (
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-10 flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7))',
+                  }}
+                >
+                  <span className="text-white font-bold text-sm uppercase">
+                    {pos.keyword}
+                  </span>
+                </div>
+              )}
             </div>
-            <div className="pt-2 border-t border-gray-200">
-              <p className="text-4xl font-bold text-gray-900">2025</p>
-              <p className="text-xs text-gray-600 italic mt-1">Make it happen</p>
-            </div>
-          </div>
-        </div>
+          );
+        })}
 
-        {/* Row 3 */}
-        <div className="relative overflow-hidden border border-white">
-          {images[6] && <img src={images[6]} alt="Vision 7" className="w-full h-full object-cover" />}
-          <div className="absolute top-2 left-2 bg-yellow-300/95 px-2 py-1 rounded-sm shadow">
-            <p className="text-[9px] font-black text-gray-900">{keywords[4] || "SHINE"}</p>
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden border border-white">
-          {images[7] && <img src={images[7]} alt="Vision 8" className="w-full h-full object-cover" />}
-        </div>
-
-        {/* Row 4 */}
-        <div className="relative overflow-hidden border border-white">
-          {images[8] && <img src={images[8]} alt="Vision 9" className="w-full h-full object-cover" />}
-        </div>
-
-        <div className="relative overflow-hidden border border-white">
-          {images[9] && <img src={images[9]} alt="Vision 10" className="w-full h-full object-cover" />}
-          <div className="absolute bottom-2 right-2 bg-green-400/90 px-2 py-1 rounded-full shadow">
-            <p className="text-[8px] font-bold text-white uppercase">YES</p>
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden border border-white">
-          {images[10] && <img src={images[10]} alt="Vision 11" className="w-full h-full object-cover" />}
-        </div>
-
-        <div className="relative overflow-hidden border border-white">
-          {images[11] && <img src={images[11]} alt="Vision 12" className="w-full h-full object-cover" />}
-          <div className="absolute top-2 left-2 bg-white/95 px-2 py-1 rounded-sm shadow">
-            <p className="text-[9px] font-bold text-gray-800">{keywords[5] || "BELIEVE"}</p>
-          </div>
+        {/* Center Card */}
+        <div
+          className="absolute bg-indigo-500 shadow-2xl flex flex-col items-center justify-center"
+          style={{
+            top: '270px',
+            left: '292px',
+            width: '760px',
+            height: '220px',
+            borderRadius: '16px',
+          }}
+        >
+          <div className="text-white text-6xl font-bold mb-2">2025</div>
+          <div className="text-white text-2xl tracking-wider">YOUR VISION BOARD</div>
+          <div className="text-white/80 text-sm italic mt-3">Created with DreamBoard</div>
         </div>
       </div>
-
-      {/* Overlay images for 13-15 to add visual interest */}
-      {images[12] && (
-        <div className="absolute top-[30%] left-[5%] w-28 h-28 border-3 border-white shadow-2xl transform -rotate-12 z-10">
-          <img src={images[12]} alt="Vision 13" className="w-full h-full object-cover" />
-        </div>
-      )}
-
-      {images[13] && (
-        <div className="absolute top-[15%] right-[8%] w-32 h-32 border-3 border-white shadow-2xl transform rotate-15 z-10">
-          <img src={images[13]} alt="Vision 14" className="w-full h-full object-cover" />
-        </div>
-      )}
-
-      {images[14] && (
-        <div className="absolute bottom-[10%] left-[12%] w-30 h-30 border-3 border-white shadow-2xl transform rotate-8 z-10">
-          <img src={images[14]} alt="Vision 15" className="w-full h-full object-cover" />
-        </div>
-      )}
-
-      {/* Decorative text badges */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-400 to-purple-500 px-4 py-1 rounded-full shadow-lg z-10">
-        <p className="text-sm font-black text-white uppercase tracking-wide">Manifest Your Dreams</p>
-      </div>
-    </div>
+    </>
   );
 }

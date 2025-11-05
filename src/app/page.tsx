@@ -6,6 +6,8 @@ import VisionBoardCanvas from "@/components/VisionBoardCanvas";
 import {
   CleanGridTemplate,
   PolaroidScatteredTemplate,
+  MagazineCollageTemplate,
+  MinimalScrapbookTemplate,
   TemplateType,
 } from "@/components/templates";
 import { Progress } from "@/components/ui/progress";
@@ -658,7 +660,8 @@ export default function Home() {
             {/* Template Selection */}
             <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 mb-6">
               <h3 className="font-bold text-gray-800 mb-3 text-center">Choose Your Vision Board Template</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <p className="text-xs text-gray-600 mb-4 text-center">Professional Canva-inspired frame styles</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 <button
                   onClick={() => { setSelectedTemplate("ai"); setUseHtmlTemplate(false); }}
                   className={`p-4 rounded-lg border-2 transition-all ${
@@ -681,21 +684,47 @@ export default function Home() {
                   }`}
                 >
                   <div className="text-2xl mb-2">📸</div>
-                  <div className="font-bold text-sm">Polaroid Scattered</div>
-                  <div className="text-xs text-gray-600">Vintage photo style</div>
+                  <div className="font-bold text-sm">Polaroid</div>
+                  <div className="text-xs text-gray-600">Vintage scattered style</div>
                 </button>
 
                 <button
                   onClick={() => { setSelectedTemplate("grid"); setUseHtmlTemplate(true); }}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     selectedTemplate === "grid"
-                      ? "border-pink-600 bg-pink-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-pink-400"
+                      ? "border-indigo-600 bg-indigo-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-indigo-400"
                   }`}
                 >
                   <div className="text-2xl mb-2">📊</div>
                   <div className="font-bold text-sm">Clean Grid</div>
-                  <div className="text-xs text-gray-600">Organized 3x3 layout</div>
+                  <div className="text-xs text-gray-600">Modern minimal design</div>
+                </button>
+
+                <button
+                  onClick={() => { setSelectedTemplate("magazine"); setUseHtmlTemplate(true); }}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedTemplate === "magazine"
+                      ? "border-pink-600 bg-pink-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-pink-400"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">📰</div>
+                  <div className="font-bold text-sm">Magazine</div>
+                  <div className="text-xs text-gray-600">Dynamic collage</div>
+                </button>
+
+                <button
+                  onClick={() => { setSelectedTemplate("scrapbook"); setUseHtmlTemplate(true); }}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedTemplate === "scrapbook"
+                      ? "border-amber-600 bg-amber-100 shadow-lg"
+                      : "border-gray-300 bg-white hover:border-amber-400"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">✂️</div>
+                  <div className="font-bold text-sm">Scrapbook</div>
+                  <div className="text-xs text-gray-600">Handmade pastel</div>
                 </button>
               </div>
             </div>
@@ -749,6 +778,18 @@ export default function Home() {
                       )}
                       {selectedTemplate === "polaroid" && (
                         <PolaroidScatteredTemplate
+                          images={images.map((img) => img.url)}
+                          keywords={keywords}
+                        />
+                      )}
+                      {selectedTemplate === "magazine" && (
+                        <MagazineCollageTemplate
+                          images={images.map((img) => img.url)}
+                          keywords={keywords}
+                        />
+                      )}
+                      {selectedTemplate === "scrapbook" && (
+                        <MinimalScrapbookTemplate
                           images={images.map((img) => img.url)}
                           keywords={keywords}
                         />
