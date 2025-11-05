@@ -168,11 +168,13 @@ export async function POST(request: NextRequest) {
     // Strategy: Create combinations of user's uploaded images
     const combinations = [];
 
+    // PRIORITY COMBINATIONS: User with their uploads (selfie+car, selfie+house, car+house+destination)
+
     // 1. If has selfie + car: person WITH their car
     if (hasSelfie && hasDreamCar) {
       combinations.push({
         images: [categorizedUploads.selfie, categorizedUploads.dreamCar],
-        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person standing next to this car, looking successful and happy. Keep the car brand clearly visible. Preserve the person's race, gender, age, and facial features exactly. Only change the background setting to something aspirational."
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical to the first image. DO NOT change their ethnicity, age, or any facial characteristic. Show this EXACT person standing proudly next to this EXACT car. Keep the car brand and model clearly visible. Make the scene aspirational with beautiful lighting and setting, but the person and car must be recognizable."
       });
     }
 
@@ -180,7 +182,7 @@ export async function POST(request: NextRequest) {
     if (hasSelfie && hasDreamHouse) {
       combinations.push({
         images: [categorizedUploads.selfie, categorizedUploads.dreamHouse],
-        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person in front of this house, looking proud and successful. Preserve the person's race, gender, age, and facial features exactly. Only change the background/setting to something beautiful."
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical to the first image. DO NOT change their ethnicity, age, or any facial characteristic. Show this EXACT person in front of this EXACT house, looking proud and successful. Keep the house architecture recognizable. Only enhance the lighting and atmosphere."
       });
     }
 
@@ -188,15 +190,23 @@ export async function POST(request: NextRequest) {
     if (hasSelfie && hasDestination) {
       combinations.push({
         images: [categorizedUploads.selfie, categorizedUploads.destination],
-        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person at this destination, traveling and enjoying life. Keep destination landmarks recognizable. Preserve the person's race, gender, age, and facial features exactly."
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical to the first image. DO NOT change their ethnicity, age, or any facial characteristic. Show this EXACT person at this EXACT destination, traveling and enjoying life. Keep destination landmarks recognizable. Make it aspirational but preserve their identity 100%."
       });
     }
 
-    // 4. If has car + house: combined property wealth scene
+    // 4. If has car + house + destination: triple combination wealth scene
+    if (hasDreamCar && hasDreamHouse && hasDestination) {
+      combinations.push({
+        images: [categorizedUploads.dreamCar, categorizedUploads.dreamHouse, categorizedUploads.destination],
+        prompt: "Create a beautiful composite scene blending these three elements: this car, this house, and this destination. Make it look like a luxury lifestyle collage - car parked at a beautiful property with destination vibes in the background. Keep all elements recognizable and aspirational."
+      });
+    }
+
+    // 5. If has car + house: combined property wealth scene
     if (hasDreamCar && hasDreamHouse) {
       combinations.push({
         images: [categorizedUploads.dreamCar, categorizedUploads.dreamHouse],
-        prompt: "Create a beautiful scene showing this car parked in front of this house. Keep both the car brand and house architecture clearly recognizable. Make it look aspirational and wealthy."
+        prompt: "Create a beautiful scene showing this EXACT car parked in front of this EXACT house. Keep both the car brand/model and house architecture clearly recognizable. Add beautiful lighting, landscaping, and atmosphere to make it look aspirational and wealthy."
       });
     }
 
@@ -208,7 +218,7 @@ export async function POST(request: NextRequest) {
       // PRIORITY 1: User doing EXERCISE/FITNESS (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person exercising - at gym, doing yoga, running, or working out, looking fit and healthy. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a fitness setting (gym, yoga studio, or outdoor exercise location)."
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person exercising at a gym, doing yoga, running, or working out, looking fit and healthy. Their face must be clearly visible and match the input image exactly. Only change the clothing to workout attire and background to a fitness setting."
       });
     }
 
@@ -216,7 +226,7 @@ export async function POST(request: NextRequest) {
       // PRIORITY 2: User showing WEALTH/RICH (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person at an elegant luxury restaurant or expensive dinner setting, looking wealthy and successful. Add subtle luxury elements like champagne or fine dining. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a luxurious setting."
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person at an elegant luxury restaurant dining, champagne glass, fine dining, looking wealthy and successful. Their face must be clearly visible and match the input image exactly. Only change the clothing to elegant attire and background to luxury dining."
       });
     }
 
@@ -224,7 +234,7 @@ export async function POST(request: NextRequest) {
       // PRIORITY 3: User showing HAPPINESS (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person celebrating or in a joyful moment - smiling, happy expression, positive energy. Could be at a celebration, party, or happy life moment. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a joyful/celebratory setting."
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person celebrating with joyful expression, smiling, positive energy, happy moment. Their face must be clearly visible and match the input image exactly. Only change the background to a celebratory/joyful setting."
       });
     }
 
@@ -232,25 +242,31 @@ export async function POST(request: NextRequest) {
       // PRIORITY 4: User with WELLNESS/MEDITATION (common lifestyle)
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person in a peaceful wellness moment - meditating, doing mindfulness, or in a spa/relaxation setting, looking calm and centered. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a wellness/meditation setting."
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person meditating peacefully, doing yoga, or in a spa/relaxation setting, looking calm and centered. Their face must be clearly visible and match the input image exactly. Only change the background to a wellness setting."
       });
     }
 
     if (combinations.length < 10 && hasSelfie) {
-      // Scenario: User living their "travel" keyword - at exotic destination
-      if (keywords.some((k: string) => k.toLowerCase().includes("travel") || k.toLowerCase().includes("destination") || k.toLowerCase().includes("adventure"))) {
-        combinations.push({
-          images: [categorizedUploads.selfie],
-          prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person at a beautiful travel destination - beach, mountains, or exotic location, looking happy and adventurous. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a travel destination."
-        });
-      }
+      // PRIORITY 5: User with TRAVEL/ADVENTURE
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person at a beautiful exotic travel destination - beach, mountains, or tropical location, looking happy and adventurous. Their face must be clearly visible and match the input image exactly. Only change the background to a travel destination."
+      });
     }
 
     if (combinations.length < 10 && hasSelfie) {
-      // Scenario: User with GOOD FOOD/HEALTHY LIFESTYLE (user explicitly requested this)
+      // PRIORITY 6: User with GOOD FOOD/HEALTHY LIFESTYLE
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity 100% unchanged. Show this person enjoying healthy food - at a healthy restaurant, with fresh smoothie bowl, or preparing nutritious meal, looking healthy and wellness-focused. Preserve their race, gender, age, and ALL facial features exactly. Only change the background to a healthy food/wellness setting."
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person enjoying healthy food - smoothie bowl, fresh salad, or preparing nutritious meal, looking healthy and wellness-focused. Their face must be clearly visible and match the input image exactly. Only change the background to a healthy food setting."
+      });
+    }
+
+    if (combinations.length < 10 && hasSelfie) {
+      // PRIORITY 7: User in PROFESSIONAL/OFFICE SUCCESS setting
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person in a professional office setting, working on laptop, modern workspace, looking successful and confident. Their face must be clearly visible and match the input image exactly. Only change the clothing to business attire and background to modern office."
       });
     }
 
@@ -276,12 +292,20 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // If STILL not 10 images, generate generic aspirational scenes with user's face
-    while (combinations.length < 10 && hasSelfie) {
+    // If STILL not 10 images, add more diverse scenarios with user's face
+    const additionalScenarios = [
+      "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT generate a different person. Show this EXACT person relaxing at home in cozy luxury setting, looking content and successful. Their face must match the input exactly.",
+      "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT generate a different person. Show this EXACT person at a stylish rooftop or penthouse with city view, looking successful. Their face must match the input exactly.",
+      "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT generate a different person. Show this EXACT person shopping in luxury boutique or enjoying high-end lifestyle, looking happy. Their face must match the input exactly."
+    ];
+
+    let scenarioIndex = 0;
+    while (combinations.length < 10 && hasSelfie && scenarioIndex < additionalScenarios.length) {
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person in a successful, aspirational lifestyle setting - could be office, home, vacation, or celebration. Preserve their race, gender, age, and facial features exactly. Only change the background and setting."
+        prompt: additionalScenarios[scenarioIndex]
       });
+      scenarioIndex++;
     }
 
     // Generate Gemini images from combinations (generate ALL combinations up to 10)
@@ -328,20 +352,57 @@ export async function POST(request: NextRequest) {
     console.log(`✅ Generated ${geminiImages.length} Gemini images`);
 
     // ============================================
-    // STEP 3: Generate inspirational quotes
+    // STEP 3: Generate inspirational quotes with AI
     // ============================================
-    console.log("\n💬 STEP 3/3: Generating inspirational quotes...");
+    console.log("\n💬 STEP 3/3: Generating inspirational quotes with AI...");
 
-    // Generate 3-5 quotes based on keywords
-    const quoteKeywords = keywords.slice(0, 3);
-    for (const keyword of quoteKeywords) {
-      const quote = `"${keyword.toUpperCase()}"`;
-      allQuotes.push(quote);
+    try {
+      // Use Gemini to generate real inspirational quotes based on keywords
+      const quotePrompt = `Generate 5 short, powerful, inspirational quotes for a 2025 vision board based on these themes: ${keywords.join(", ")}
+
+Requirements:
+- Each quote must be 3-7 words maximum
+- Must be motivational and aspirational
+- Focus on success, achievement, and dreams
+- Use present tense or future tense
+- Make them emotionally powerful
+
+Examples of good quotes:
+- "Dreams become reality"
+- "Success is my destiny"
+- "Living my best life"
+- "Unstoppable and fearless"
+
+Return ONLY the 5 quotes, one per line, without quotes or numbering.`;
+
+      const quoteResponse = await genai.models.generateContent({
+        model: "gemini-2.0-flash-lite",
+        contents: [{
+          role: "user",
+          parts: [{ text: quotePrompt }]
+        }],
+        config: { temperature: 0.9, topP: 0.95, topK: 40, maxOutputTokens: 200 },
+      });
+
+      const quoteText = quoteResponse.text?.trim() || "";
+      const generatedQuotes = quoteText
+        .split("\n")
+        .filter((q: string) => q.trim().length > 0)
+        .map((q: string) => q.trim().replace(/^["']|["']$/g, "")) // Remove quotes if present
+        .slice(0, 5);
+
+      allQuotes.push(...generatedQuotes);
+      console.log(`✅ Generated ${allQuotes.length} inspirational quotes:`, allQuotes);
+    } catch (error) {
+      console.error("Error generating quotes:", error);
+      // Fallback to keyword-based quotes if AI fails
+      const quoteKeywords = keywords.slice(0, 3);
+      for (const keyword of quoteKeywords) {
+        allQuotes.push(keyword.toUpperCase());
+      }
+      allQuotes.push("2025 VISION");
+      allQuotes.push("DREAM BIG");
     }
-    allQuotes.push('"2025"');
-    allQuotes.push('"VISION BOARD"');
-
-    console.log(`✅ Generated ${allQuotes.length} text elements`);
 
     // ============================================
     // STEP 4: Combine all images
