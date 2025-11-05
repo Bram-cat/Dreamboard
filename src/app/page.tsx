@@ -754,6 +754,31 @@ export default function Home() {
         {/* Step 3: Final Vision Board Collage */}
         {step === "preview" && (
           <div className="space-y-6">
+            {/* Back Button - Top Left */}
+            {collageReady && (
+              <button
+                onClick={() => {
+                  setStep("input");
+                  setImages([]);
+                  setBoardElements([]);
+                  setCategorizedUploads({
+                    selfie: null,
+                    dreamHouse: null,
+                    dreamCar: null,
+                    destination: null
+                  });
+                  setCollageReady(false);
+                  setGoals("");
+                }}
+                className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md border-2 border-gray-200"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Start
+              </button>
+            )}
+
             {/* Display component-based vision board */}
             {collageReady && generationMode === "component" && boardElements.length > 0 && (
               <VisionBoardCanvas

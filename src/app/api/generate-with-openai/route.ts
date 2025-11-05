@@ -358,26 +358,37 @@ export async function POST(request: NextRequest) {
         inlineData: { data: base64, mimeType: "image/png" }
       }));
 
-      const collagePrompt = `Create a beautiful 2025 VISION BOARD collage in a scattered magazine style.
+      const collagePrompt = `CRITICAL: Create a 2025 VISION BOARD collage using ALL ${allGeneratedImages.length} images provided.
 
-STYLE: Polaroid photo frames (white borders) scattered at angles, overlapping slightly, on a light cream/beige background.
+CRITICAL RULES - MUST FOLLOW:
+1. USE EVERY SINGLE IMAGE PROVIDED - All ${allGeneratedImages.length} images MUST appear in the final collage
+2. PRESERVE USER'S IDENTITY - If you see the same person's face in multiple images, that is the USER. Keep their face, skin tone, and features EXACTLY as shown.
+3. The first ${geminiImages.length} images show the USER in their dream scenarios - MAKE THESE THE LARGEST AND MOST PROMINENT
+4. DO NOT generate new people or faces - only use the exact images provided
 
-IMAGES: You have ${allGeneratedImages.length} images to arrange.
-- First ${geminiImages.length} images are personal/aspirational (FEATURE THESE PROMINENTLY - make them LARGER)
-- Remaining ${dalleImages.length} images are lifestyle accents (these can be smaller)
+STYLE: Polaroid photo frames (white borders) scattered at various angles on a light beige background (#f5f1ed).
 
-LAYOUT:
-- Arrange all ${allGeneratedImages.length} images across a 1344x768 landscape canvas
-- Each image in a white polaroid frame (thick white borders)
-- Rotate frames at different angles (5-20 degrees)
-- Overlap slightly for collage depth
-- Ensure 80%+ of each image is visible
-- Personal images should be larger and more prominent
+CANVAS SIZE: 1920x1080 pixels (16:9 landscape)
 
-TEXT OVERLAYS (magazine cutout style):
-${allQuotes.map(q => `- ${q}`).join("\n")}
+LAYOUT FOR ${allGeneratedImages.length} IMAGES:
+- Personal images (first ${geminiImages.length}): LARGE polaroid frames (350-500px), prominent placement
+- Lifestyle images (remaining ${dalleImages.length}): Medium polaroid frames (250-350px), fill gaps
+- Rotate frames between -15° to +15° for natural scattered look
+- Overlap frames slightly (10-20% overlap) for depth
+- Ensure at least 75% of each image is visible
+- Fill the entire canvas - no large empty spaces
 
-Create a vibrant, inspiring vision board now.`;
+POLAROID FRAMES:
+- White borders: 15-20px thickness
+- Small shadow for depth
+- Some frames can be slightly tilted
+
+TEXT: Add bold text overlays for keywords:
+${allQuotes.slice(0, 5).map(q => `- "${q}"`).join("\n")}
+
+CENTER: Large "2025 VISION BOARD" text in elegant font
+
+IMPORTANT: Use EVERY image provided. The user uploaded these specific images - they MUST all appear in the final collage.`;
 
       const finalResponse = await genai.models.generateContent({
         model: "gemini-2.5-flash-image",
