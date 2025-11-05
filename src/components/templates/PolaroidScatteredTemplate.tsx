@@ -3,7 +3,7 @@
 import React from "react";
 
 interface PolaroidScatteredTemplateProps {
-  images: string[]; // 10 images
+  images: string[]; // 14 images (7 DALL-E + 7 Gemini)
   keywords: string[];
 }
 
@@ -11,25 +11,36 @@ export default function PolaroidScatteredTemplate({
   images,
   keywords,
 }: PolaroidScatteredTemplateProps) {
-  // Positions for 10 images - NO OVERLAPPING, proper spacing like sample5.jpg
-  // Reference: sample5.jpg shows clean layout with no overlaps
-  // Canvas: 1344x768, Center card takes middle ~400x300px area
+  // Positions for 14 images - Magazine collage style like sample.png
+  // Reference: sample.png shows tight collage with images filling entire canvas
+  // Canvas: 1344x768, Center card takes middle area
+  // Layout: Images arranged in a collage grid around center card
   const polaroidPositions = [
-    // TOP ROW - 4 images across top (avoiding center)
-    { top: 20, left: 40, rotate: -6, width: 240, height: 200, zIndex: 12 },
-    { top: 35, left: 320, rotate: 8, width: 220, height: 180, zIndex: 11 },
-    { top: 25, left: 920, rotate: -5, width: 230, height: 190, zIndex: 13 },
-    { top: 40, left: 1080, rotate: 7, width: 210, height: 170, zIndex: 10 },
+    // TOP LEFT CORNER (3 images)
+    { top: 5, left: 5, rotate: -4, width: 200, height: 240, zIndex: 12, keyword: keywords[0] },
+    { top: 15, left: 220, rotate: 6, width: 180, height: 210, zIndex: 11, keyword: "" },
+    { top: 5, left: 415, rotate: -3, width: 190, height: 230, zIndex: 10, keyword: keywords[1] },
 
-    // MIDDLE ROW - 2 images on sides (avoiding center card)
-    { top: 280, left: 30, rotate: 5, width: 250, height: 210, zIndex: 9 },
-    { top: 295, left: 1050, rotate: -8, width: 240, height: 200, zIndex: 8 },
+    // TOP RIGHT CORNER (3 images)
+    { top: 10, left: 750, rotate: 4, width: 195, height: 235, zIndex: 13, keyword: "" },
+    { top: 8, left: 960, rotate: -5, width: 185, height: 220, zIndex: 12, keyword: keywords[2] },
+    { top: 15, left: 1160, rotate: 3, width: 175, height: 200, zIndex: 11, keyword: "" },
 
-    // BOTTOM ROW - 4 images across bottom
-    { top: 520, left: 50, rotate: -7, width: 230, height: 190, zIndex: 7 },
-    { top: 535, left: 320, rotate: 6, width: 220, height: 180, zIndex: 6 },
-    { top: 525, left: 800, rotate: -4, width: 240, height: 200, zIndex: 5 },
-    { top: 540, left: 1070, rotate: 8, width: 210, height: 170, zIndex: 4 },
+    // MIDDLE LEFT (2 images)
+    { top: 270, left: 10, rotate: 5, width: 190, height: 230, zIndex: 9, keyword: "" },
+    { top: 280, left: 215, rotate: -4, width: 180, height: 215, zIndex: 8, keyword: keywords[3] },
+
+    // MIDDLE RIGHT (2 images)
+    { top: 275, left: 950, rotate: -6, width: 185, height: 225, zIndex: 10, keyword: "" },
+    { top: 285, left: 1150, rotate: 4, width: 175, height: 210, zIndex: 9, keyword: keywords[4] },
+
+    // BOTTOM LEFT CORNER (2 images)
+    { top: 520, left: 5, rotate: -5, width: 200, height: 240, zIndex: 7, keyword: "" },
+    { top: 530, left: 220, rotate: 7, width: 190, height: 225, zIndex: 6, keyword: "" },
+
+    // BOTTOM RIGHT CORNER (3 images)
+    { top: 525, left: 750, rotate: -4, width: 180, height: 220, zIndex: 8, keyword: "" },
+    { top: 520, left: 945, rotate: 5, width: 195, height: 240, zIndex: 7, keyword: "" },
   ];
 
   // Quotes positioned between images
@@ -59,8 +70,8 @@ export default function PolaroidScatteredTemplate({
         </div>
       </div>
 
-      {/* POLAROID IMAGES - 10 images distributed across entire canvas */}
-      {images.slice(0, 10).map((image, idx) => {
+      {/* POLAROID IMAGES - 14 images in magazine collage style */}
+      {images.slice(0, 14).map((image, idx) => {
         const pos = polaroidPositions[idx];
         if (!pos) return null;
 
@@ -79,7 +90,7 @@ export default function PolaroidScatteredTemplate({
           >
             {/* Photo area - 85% of height */}
             <div
-              className="w-full bg-gray-100 overflow-hidden"
+              className="w-full bg-gray-100 overflow-hidden relative"
               style={{ height: `${pos.height * 0.85 - 24}px` }}
             >
               <img
@@ -87,6 +98,14 @@ export default function PolaroidScatteredTemplate({
                 alt={`Vision ${idx + 1}`}
                 className="w-full h-full object-cover"
               />
+              {/* Overlay keyword directly ON image like sample.png */}
+              {pos.keyword && (
+                <div className="absolute bottom-2 left-2 right-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-md">
+                  <p className="text-sm font-medium text-gray-800 text-center" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    {pos.keyword}
+                  </p>
+                </div>
+              )}
             </div>
             {/* Caption area - 15% of height, empty for clean look */}
             <div
