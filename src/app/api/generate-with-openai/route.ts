@@ -70,7 +70,8 @@ export async function POST(request: NextRequest) {
       expandedKeywords.push("travel destination");
     }
 
-    const dallePrompts = expandedKeywords.slice(0, 7).map((keyword: string) => {
+    // CRITICAL: Generate MORE images to fill the board (at least 13-14 images needed)
+    const dallePrompts = expandedKeywords.slice(0, 10).map((keyword: string) => {
       // Create contextual prompts based on keywords
       if (keyword.toLowerCase().includes("rich") || keyword.toLowerCase().includes("wealth") || keyword.toLowerCase().includes("money")) {
         return hasSelfie
@@ -106,13 +107,13 @@ export async function POST(request: NextRequest) {
     });
 
     const dalleImages: string[] = [];
-    // ALWAYS generate exactly 7 DALL-E images with retry logic
+    // ALWAYS generate at least 10 DALL-E images with retry logic (to fill board properly)
     let dalleAttempts = 0;
-    const maxDalleAttempts = 10; // 7 images + 3 retries
+    const maxDalleAttempts = 15; // 10 images + 5 retries
 
-    while (dalleImages.length < 7 && dalleAttempts < maxDalleAttempts) {
+    while (dalleImages.length < 10 && dalleAttempts < maxDalleAttempts) {
       const currentIndex = dalleImages.length;
-      console.log(`  [${currentIndex + 1}/7] Generating DALL-E image for: ${expandedKeywords[currentIndex]}`);
+      console.log(`  [${currentIndex + 1}/10] Generating DALL-E image for: ${expandedKeywords[currentIndex]}`);
 
       try {
         const response = await fetch("https://api.openai.com/v1/images/generations", {
@@ -157,9 +158,10 @@ export async function POST(request: NextRequest) {
     console.log(`✅ Generated ${dalleImages.length} DALL-E images`);
 
     // ============================================
-    // STEP 2: Generate 7 images with Gemini (combining user uploads + common lifestyle)
+    // STEP 2: Generate MORE images with Gemini (combining user uploads + common lifestyle)
+    // CRITICAL: Generate AT LEAST 7-10 combinations to ensure board is filled
     // ============================================
-    console.log("\n🎨 STEP 2/3: Generating 7 images with Gemini from user uploads...");
+    console.log("\n🎨 STEP 2/3: Generating images with Gemini from user uploads...");
 
     const geminiImages: string[] = [];
 
@@ -198,11 +200,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 5. Add keyword-based scenario generation to ALWAYS reach 7 Gemini images
+    // 5. Add keyword-based scenario generation to reach AT LEAST 10 Gemini images
     // ALWAYS prefer using user's selfie for scenarios
     // User explicitly requested: exercise, rich, happiness, wellness scenarios
 
-    if (combinations.length < 7 && hasSelfie) {
+    if (combinations.length < 10 && hasSelfie) {
       // PRIORITY 1: User doing EXERCISE/FITNESS (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -210,7 +212,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 7 && hasSelfie) {
+    if (combinations.length < 10 && hasSelfie) {
       // PRIORITY 2: User showing WEALTH/RICH (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -218,7 +220,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 7 && hasSelfie) {
+    if (combinations.length < 10 && hasSelfie) {
       // PRIORITY 3: User showing HAPPINESS (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -226,7 +228,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 7 && hasSelfie) {
+    if (combinations.length < 10 && hasSelfie) {
       // PRIORITY 4: User with WELLNESS/MEDITATION (common lifestyle)
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -234,7 +236,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 7 && hasSelfie) {
+    if (combinations.length < 10 && hasSelfie) {
       // Scenario: User living their "travel" keyword - at exotic destination
       if (keywords.some((k: string) => k.toLowerCase().includes("travel") || k.toLowerCase().includes("destination") || k.toLowerCase().includes("adventure"))) {
         combinations.push({
@@ -244,7 +246,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (combinations.length < 7 && hasSelfie) {
+    if (combinations.length < 10 && hasSelfie) {
       // Scenario: User with GOOD FOOD/HEALTHY LIFESTYLE (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -253,38 +255,38 @@ export async function POST(request: NextRequest) {
     }
 
     // If still not enough, add original uploads enhanced
-    if (combinations.length < 7 && hasDreamCar) {
+    if (combinations.length < 10 && hasDreamCar) {
       combinations.push({
         images: [categorizedUploads.dreamCar],
         prompt: "Enhance this car image to look more luxurious and aspirational. Keep the car brand and model exactly the same. Only improve the setting and lighting."
       });
     }
 
-    if (combinations.length < 7 && hasDreamHouse) {
+    if (combinations.length < 10 && hasDreamHouse) {
       combinations.push({
         images: [categorizedUploads.dreamHouse],
         prompt: "Enhance this house image to look more beautiful and aspirational. Keep the house architecture exactly the same. Only improve the landscaping and lighting."
       });
     }
 
-    if (combinations.length < 7 && hasDestination) {
+    if (combinations.length < 10 && hasDestination) {
       combinations.push({
         images: [categorizedUploads.destination],
         prompt: "Enhance this destination image to look more vibrant and travel-worthy. Keep landmarks recognizable. Only improve colors and atmosphere."
       });
     }
 
-    // If STILL not 7 images, generate generic aspirational scenes with user's face
-    while (combinations.length < 7 && hasSelfie) {
+    // If STILL not 10 images, generate generic aspirational scenes with user's face
+    while (combinations.length < 10 && hasSelfie) {
       combinations.push({
         images: [categorizedUploads.selfie],
         prompt: "CRITICAL: Keep this EXACT person's face, skin tone, and identity unchanged. Show this person in a successful, aspirational lifestyle setting - could be office, home, vacation, or celebration. Preserve their race, gender, age, and facial features exactly. Only change the background and setting."
       });
     }
 
-    // Generate Gemini images from combinations
-    for (let i = 0; i < Math.min(7, combinations.length); i++) {
-      console.log(`  [${i + 1}/7] Generating Gemini combination ${i + 1}`);
+    // Generate Gemini images from combinations (generate ALL combinations up to 10)
+    for (let i = 0; i < Math.min(10, combinations.length); i++) {
+      console.log(`  [${i + 1}/${Math.min(10, combinations.length)}] Generating Gemini combination ${i + 1}`);
       try {
         const combo = combinations[i];
         const imageParts = combo.images.map((dataUrl: string) => ({
