@@ -14,39 +14,43 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Clean grid layout - Scaled for 1920x1080 (16:9 aspect ratio)
-  // Large tiles with proper spacing for widescreen display
+  // Balanced grid layout - More square/proportional for 1920x1080
+  // Better spacing and more symmetrical arrangement
   const gridPositions = [
-    // Row 1 - 4 large tiles across top
-    { top: 20, left: 20, width: 440, height: 320 },
-    { top: 20, left: 480, width: 440, height: 320 },
-    { top: 20, left: 940, width: 440, height: 320 },
-    { top: 20, left: 1400, width: 500, height: 320 },
+    // Row 1 - 3 tiles across top (left side)
+    { top: 30, left: 30, width: 380, height: 300 },
+    { top: 30, left: 430, width: 380, height: 300 },
+    { top: 30, left: 830, width: 380, height: 300 },
 
-    // Row 2 - 3 tiles + CENTER CARD
-    { top: 360, left: 20, width: 350, height: 340 },
-    // CENTER CARD: 390-1010 (620px wide) x 360-700 (340px tall)
-    { top: 360, left: 1030, width: 870, height: 340 },
+    // Row 2 - Left side tiles + CENTER CARD space
+    { top: 350, left: 30, width: 380, height: 320 },
+    { top: 350, left: 430, width: 380, height: 320 },
+    // CENTER CARD: 850-1400 x 350-690
 
-    // Row 3 - 4 large tiles across bottom
-    { top: 720, left: 20, width: 440, height: 340 },
-    { top: 720, left: 480, width: 440, height: 340 },
-    { top: 720, left: 940, width: 440, height: 340 },
-    { top: 720, left: 1400, width: 500, height: 340 },
+    // Row 3 - Bottom row (left side)
+    { top: 690, left: 30, width: 380, height: 320 },
+    { top: 690, left: 430, width: 380, height: 320 },
+    { top: 690, left: 830, width: 380, height: 320 },
 
-    // Additional tiles for variety
-    { top: 360, left: 1030, width: 425, height: 340 },
-    { top: 360, left: 1475, width: 425, height: 340 },
-    { top: 20, left: 1400, width: 245, height: 155 },
+    // Right side - Vertical arrangement
+    { top: 30, left: 1230, width: 320, height: 240 },
+    { top: 290, left: 1230, width: 320, height: 240 },
+    { top: 550, left: 1230, width: 320, height: 240 },
+    { top: 810, left: 1230, width: 320, height: 200 },
+
+    // Far right column
+    { top: 30, left: 1570, width: 320, height: 320 },
+    { top: 370, left: 1570, width: 320, height: 320 },
+    { top: 710, left: 1570, width: 320, height: 300 },
   ];
 
-  // Inspirational quote positions in empty spaces
+  // Inspirational quote positions - More visible in empty spaces
   const quotePositions = [
-    { top: 50, left: 1680, maxWidth: 200 },   // Top right
-    { top: 380, left: 1680, maxWidth: 200 },  // Middle right
-    { top: 770, left: 1680, maxWidth: 200 },  // Bottom right
-    { top: 1000, left: 50, maxWidth: 300 },   // Bottom left
-    { top: 1000, left: 950, maxWidth: 300 },  // Bottom center
+    { top: 360, left: 860, maxWidth: 240 },    // Near center card top
+    { top: 600, left: 860, maxWidth: 240 },    // Near center card bottom
+    { top: 1035, left: 50, maxWidth: 350 },    // Bottom left
+    { top: 1035, left: 860, maxWidth: 350 },   // Bottom center
+    { top: 1035, left: 1500, maxWidth: 350 },  // Bottom right
   ];
 
   // Canvas rendering for download
@@ -112,10 +116,10 @@ export default function PolaroidScatteredTemplate({
         }
       }
 
-      // Draw center card (beige with white text) - positioned for 1920x1080
-      const centerX = 390;
-      const centerY = 360;
-      const centerW = 620;
+      // Draw center card (beige with white text) - positioned for balanced layout
+      const centerX = 850;
+      const centerY = 350;
+      const centerW = 550;
       const centerH = 340;
 
       ctx.save();
@@ -143,35 +147,50 @@ export default function PolaroidScatteredTemplate({
 
       ctx.restore();
 
-      // Draw inspirational quotes in empty spaces
+      // Draw inspirational quotes in empty spaces with background
       ctx.save();
-      ctx.fillStyle = '#8b7355'; // Brownish text color
-      ctx.font = 'italic 22px Georgia, serif';
-      ctx.textAlign = 'left';
 
       quotes.slice(0, 5).forEach((quote, idx) => {
         const pos = quotePositions[idx];
         if (!pos) return;
 
-        // Word wrap the quote
+        // Measure quote dimensions for background
+        ctx.font = 'italic bold 26px Georgia, serif';
         const words = quote.split(' ');
+        const lines: string[] = [];
         let line = '';
-        let y = pos.top;
-        const lineHeight = 32;
 
         for (let i = 0; i < words.length; i++) {
           const testLine = line + words[i] + ' ';
           const metrics = ctx.measureText(testLine);
 
           if (metrics.width > pos.maxWidth && i > 0) {
-            ctx.fillText(line, pos.left, y);
+            lines.push(line.trim());
             line = words[i] + ' ';
-            y += lineHeight;
           } else {
             line = testLine;
           }
         }
-        ctx.fillText(line, pos.left, y);
+        if (line.trim()) lines.push(line.trim());
+
+        // Draw semi-transparent background
+        const lineHeight = 38;
+        const padding = 12;
+        const bgHeight = (lines.length * lineHeight) + (padding * 2);
+        const bgWidth = pos.maxWidth + (padding * 2);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.fillRect(pos.left - padding, pos.top - padding - 10, bgWidth, bgHeight);
+
+        // Draw text
+        ctx.fillStyle = '#5a4a3a'; // Darker brown for better visibility
+        ctx.textAlign = 'left';
+        let y = pos.top + 18;
+
+        lines.forEach(textLine => {
+          ctx.fillText(textLine, pos.left, y);
+          y += lineHeight;
+        });
       });
 
       ctx.restore();
@@ -264,14 +283,14 @@ export default function PolaroidScatteredTemplate({
           );
         })}
 
-        {/* Inspirational Quotes in empty spaces */}
+        {/* Inspirational Quotes in empty spaces with background */}
         {quotes.slice(0, 5).map((quote, idx) => {
           const pos = quotePositions[idx];
           if (!pos) return null;
 
           const topPercent = (pos.top / 1080) * 100;
           const leftPercent = (pos.left / 1920) * 100;
-          const widthPercent = (pos.maxWidth / 1920) * 100;
+          const widthPercent = ((pos.maxWidth + 24) / 1920) * 100;
 
           return (
             <div
@@ -281,11 +300,15 @@ export default function PolaroidScatteredTemplate({
                 top: `${topPercent}%`,
                 left: `${leftPercent}%`,
                 width: `${widthPercent}%`,
-                color: '#8b7355',
+                backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                padding: '0.6vw',
+                color: '#5a4a3a',
                 fontFamily: 'Georgia, serif',
                 fontStyle: 'italic',
-                fontSize: '1.2vw',
+                fontWeight: 'bold',
+                fontSize: '1.35vw',
                 lineHeight: '1.5',
+                transform: 'translateY(-1%)',
               }}
             >
               {quote}
@@ -297,9 +320,9 @@ export default function PolaroidScatteredTemplate({
         <div
           className="absolute flex flex-col items-center justify-center"
           style={{
-            top: '33.33%',
-            left: '20.31%',
-            width: '32.29%',
+            top: '32.41%',
+            left: '44.27%',
+            width: '28.65%',
             height: '31.48%',
             backgroundColor: '#d6c1b1',
           }}
