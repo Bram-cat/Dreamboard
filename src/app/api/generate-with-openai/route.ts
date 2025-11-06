@@ -103,7 +103,9 @@ export async function POST(request: NextRequest) {
           : `Person enjoying healthy meal, fresh smoothie bowl, nutritious food, wellness dining, happy and healthy lifestyle`;
       }
       // Default: lifestyle image based on keyword
-      return `Aspirational lifestyle image representing "${keyword}": magazine aesthetic, vibrant, inspiring, high quality. CRITICAL: NO people if possible.`;
+      return hasSelfie
+        ? `Aspirational lifestyle image representing "${keyword}": magazine aesthetic, vibrant, inspiring, high quality setting. CRITICAL: NO people, NO faces, NO humans - only objects and settings.`
+        : `Aspirational person living their best life, representing "${keyword}": magazine aesthetic, vibrant, inspiring lifestyle, confident and successful expression`;
     });
 
     const dalleImages: string[] = [];
