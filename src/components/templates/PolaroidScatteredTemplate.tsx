@@ -14,43 +14,42 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Balanced grid layout - More square/proportional for 1920x1080
-  // Better spacing and more symmetrical arrangement
+  // Scrapbook style polaroid layout - Rotated frames with overlaps
+  // Reference: second image style with angled polaroids
   const gridPositions = [
-    // Row 1 - 3 tiles across top (left side)
-    { top: 30, left: 30, width: 380, height: 300 },
-    { top: 30, left: 430, width: 380, height: 300 },
-    { top: 30, left: 830, width: 380, height: 300 },
+    // Top row - scattered polaroids
+    { top: 20, left: 30, width: 320, height: 280, rotation: -8, label: "" },
+    { top: 50, left: 380, width: 280, height: 240, rotation: 5, label: "" },
+    { top: 30, left: 690, width: 300, height: 260, rotation: -3, label: "Just living my best life" },
+    { top: 60, left: 1020, width: 260, height: 220, rotation: 7, label: "" },
+    { top: 40, left: 1310, width: 300, height: 260, rotation: -5, label: "MY DREAMS" },
+    { top: 70, left: 1640, width: 240, height: 200, rotation: 4, label: "" },
 
-    // Row 2 - Left side tiles + CENTER CARD space
-    { top: 350, left: 30, width: 380, height: 320 },
-    { top: 350, left: 430, width: 380, height: 320 },
-    // CENTER CARD: 850-1400 x 350-690
+    // Middle row - overlapping polaroids
+    { top: 340, left: 50, width: 280, height: 240, rotation: 6, label: "TRAVEL" },
+    { top: 370, left: 360, width: 260, height: 220, rotation: -7, label: "" },
+    { top: 350, left: 1050, width: 280, height: 240, rotation: 5, label: "" },
+    { top: 380, left: 1360, width: 300, height: 260, rotation: -4, label: "" },
 
-    // Row 3 - Bottom row (left side)
-    { top: 690, left: 30, width: 380, height: 320 },
-    { top: 690, left: 430, width: 380, height: 320 },
-    { top: 690, left: 830, width: 380, height: 320 },
-
-    // Right side - Vertical arrangement
-    { top: 30, left: 1230, width: 320, height: 240 },
-    { top: 290, left: 1230, width: 320, height: 240 },
-    { top: 550, left: 1230, width: 320, height: 240 },
-    { top: 810, left: 1230, width: 320, height: 200 },
-
-    // Far right column
-    { top: 30, left: 1570, width: 320, height: 320 },
-    { top: 370, left: 1570, width: 320, height: 320 },
-    { top: 710, left: 1570, width: 320, height: 300 },
+    // Bottom row - final scattered polaroids
+    { top: 640, left: 30, width: 300, height: 260, rotation: -5, label: "Inspiration" },
+    { top: 670, left: 360, width: 280, height: 240, rotation: 3, label: "" },
+    { top: 650, left: 1080, width: 260, height: 220, rotation: -6, label: "" },
+    { top: 680, left: 1370, width: 280, height: 240, rotation: 8, label: "" },
+    { top: 660, left: 1680, width: 240, height: 200, rotation: -4, label: "Happiness" },
   ];
 
-  // Inspirational quote positions - More visible in empty spaces
+  // Handwritten text overlays and decorative elements
+  const textOverlays = [
+    { text: "towards my ultimate freedom", top: 420, left: 680, rotation: -2, fontSize: 32 },
+    { text: "Stop dreaming and start doing", top: 880, left: 1200, rotation: 3, fontSize: 22 },
+  ];
+
+  // Inspirational quote positions - Handwritten style
   const quotePositions = [
-    { top: 360, left: 860, maxWidth: 240 },    // Near center card top
-    { top: 600, left: 860, maxWidth: 240 },    // Near center card bottom
-    { top: 1035, left: 50, maxWidth: 350 },    // Bottom left
-    { top: 1035, left: 860, maxWidth: 350 },   // Bottom center
-    { top: 1035, left: 1500, maxWidth: 350 },  // Bottom right
+    { top: 320, left: 680, maxWidth: 280, rotation: -2 },    // Center area
+    { top: 940, left: 80, maxWidth: 300, rotation: 1 },      // Bottom left
+    { top: 940, left: 1450, maxWidth: 300, rotation: -1 },   // Bottom right
   ];
 
   // Canvas rendering for download
@@ -81,8 +80,8 @@ export default function PolaroidScatteredTemplate({
         });
       };
 
-      // Draw all grid images (13 images, 14th position is center card)
-      for (let idx = 0; idx < Math.min(13, images.length); idx++) {
+      // Draw all polaroid frames with rotation
+      for (let idx = 0; idx < Math.min(15, images.length); idx++) {
         const pos = gridPositions[idx];
         if (!pos) continue;
 
@@ -91,24 +90,54 @@ export default function PolaroidScatteredTemplate({
 
           ctx.save();
 
-          // Draw image with cover fit (fills entire tile)
+          // Translate to polaroid center and rotate
+          const centerX = pos.left + pos.width / 2;
+          const centerY = pos.top + pos.height / 2;
+          ctx.translate(centerX, centerY);
+          ctx.rotate((pos.rotation * Math.PI) / 180);
+
+          // Draw white polaroid frame (larger than image)
+          const frameWidth = pos.width + 40;
+          const frameHeight = pos.height + 60; // Extra space at bottom for label
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+          ctx.shadowBlur = 15;
+          ctx.shadowOffsetX = 5;
+          ctx.shadowOffsetY = 5;
+          ctx.fillRect(-frameWidth / 2, -frameHeight / 2, frameWidth, frameHeight);
+          ctx.shadowColor = 'transparent';
+
+          // Draw image inside polaroid frame
           const imgRatio = img.width / img.height;
           const boxRatio = pos.width / pos.height;
-          let drawWidth, drawHeight, drawX, drawY;
+          let drawWidth, drawHeight;
 
           if (imgRatio > boxRatio) {
             drawHeight = pos.height;
             drawWidth = drawHeight * imgRatio;
-            drawX = pos.left - (drawWidth - pos.width) / 2;
-            drawY = pos.top;
           } else {
             drawWidth = pos.width;
             drawHeight = drawWidth / imgRatio;
-            drawX = pos.left;
-            drawY = pos.top - (drawHeight - pos.height) / 2;
           }
 
-          ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+          // Center image within frame
+          const imgX = -pos.width / 2;
+          const imgY = -frameHeight / 2 + 20; // 20px from top edge
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(imgX, imgY, pos.width, pos.height);
+          ctx.clip();
+          ctx.drawImage(img, imgX - (drawWidth - pos.width) / 2, imgY - (drawHeight - pos.height) / 2, drawWidth, drawHeight);
+          ctx.restore();
+
+          // Draw label if exists (handwritten style)
+          if (pos.label) {
+            ctx.fillStyle = '#2a2a2a';
+            ctx.font = 'italic 22px "Brush Script MT", cursive, Georgia';
+            ctx.textAlign = 'center';
+            ctx.fillText(pos.label, 0, frameHeight / 2 - 15);
+          }
 
           ctx.restore();
         } catch (error) {
@@ -116,46 +145,83 @@ export default function PolaroidScatteredTemplate({
         }
       }
 
-      // Draw center card (beige with white text) - positioned for balanced layout
-      const centerX = 850;
-      const centerY = 350;
-      const centerW = 550;
-      const centerH = 340;
+      // Draw center card (beige with decorative border) - scrapbook style
+      const centerX = 680;
+      const centerY = 320;
+      const centerW = 380;
+      const centerH = 360;
 
       ctx.save();
-      ctx.fillStyle = '#d6c1b1'; // Beige matching image.png
-      ctx.fillRect(centerX, centerY, centerW, centerH);
+      ctx.translate(centerX + centerW / 2, centerY + centerH / 2);
+      ctx.rotate(-2 * Math.PI / 180); // Slight rotation
 
-      // Add decorative plus signs
+      // White background with shadow
       ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetX = 4;
+      ctx.shadowOffsetY = 4;
+      ctx.fillRect(-centerW / 2, -centerH / 2, centerW, centerH);
+      ctx.shadowColor = 'transparent';
+
+      // Purple border
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(-centerW / 2 + 10, -centerH / 2 + 10, centerW - 20, centerH - 20);
+
+      // Decorative stars
+      ctx.fillStyle = '#2a2a2a';
       ctx.font = '32px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('+', centerX + centerW / 2, centerY + 70);
-      ctx.fillText('+', centerX + centerW / 2, centerY + centerH - 50);
+      ctx.fillText('★', -100, -120);
+      ctx.fillText('★', 100, -120);
+      ctx.fillText('★', 0, 140);
 
       // Center text
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 60px Arial, sans-serif';
+      ctx.fillStyle = '#2a2a2a';
+      ctx.font = 'bold 72px Arial, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('2025', centerX + centerW / 2, centerY + centerH / 2 - 30);
+      ctx.fillText('2025', 0, -20);
 
-      ctx.font = 'bold 36px Arial, sans-serif';
-      ctx.fillText('VISION', centerX + centerW / 2, centerY + centerH / 2 + 20);
+      ctx.font = '28px "Brush Script MT", cursive, Georgia';
+      ctx.fillText('VISION BOARD', 0, 30);
 
-      ctx.font = 'bold 36px Arial, sans-serif';
-      ctx.fillText('BOARD', centerX + centerW / 2, centerY + centerH / 2 + 65);
+      // Wavy line decoration
+      ctx.strokeStyle = '#2a2a2a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-100, 80);
+      ctx.quadraticCurveTo(-50, 70, 0, 80);
+      ctx.quadraticCurveTo(50, 90, 100, 80);
+      ctx.stroke();
 
       ctx.restore();
 
-      // Draw inspirational quotes in empty spaces with background
-      ctx.save();
+      // Draw handwritten text overlays
+      textOverlays.forEach(overlay => {
+        ctx.save();
+        ctx.translate(overlay.left, overlay.top);
+        ctx.rotate((overlay.rotation * Math.PI) / 180);
 
-      quotes.slice(0, 5).forEach((quote, idx) => {
+        ctx.fillStyle = '#2a2a2a';
+        ctx.font = `italic ${overlay.fontSize}px "Brush Script MT", cursive, Georgia`;
+        ctx.textAlign = 'center';
+        ctx.fillText(overlay.text, 0, 0);
+
+        ctx.restore();
+      });
+
+      // Draw inspirational quotes - handwritten style with rotation
+      quotes.slice(0, 3).forEach((quote, idx) => {
         const pos = quotePositions[idx];
         if (!pos) return;
 
-        // Measure quote dimensions for background
-        ctx.font = 'italic bold 26px Georgia, serif';
+        ctx.save();
+        ctx.translate(pos.left, pos.top);
+        ctx.rotate((pos.rotation * Math.PI) / 180);
+
+        // Measure quote dimensions
+        ctx.font = 'italic 24px "Brush Script MT", cursive, Georgia';
         const words = quote.split(' ');
         const lines: string[] = [];
         let line = '';
@@ -173,27 +239,19 @@ export default function PolaroidScatteredTemplate({
         }
         if (line.trim()) lines.push(line.trim());
 
-        // Draw semi-transparent background
-        const lineHeight = 38;
-        const padding = 12;
-        const bgHeight = (lines.length * lineHeight) + (padding * 2);
-        const bgWidth = pos.maxWidth + (padding * 2);
-
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-        ctx.fillRect(pos.left - padding, pos.top - padding - 10, bgWidth, bgHeight);
-
-        // Draw text
-        ctx.fillStyle = '#5a4a3a'; // Darker brown for better visibility
+        // Draw text (handwritten style, no background)
+        ctx.fillStyle = '#2a2a2a';
         ctx.textAlign = 'left';
-        let y = pos.top + 18;
+        let y = 0;
+        const lineHeight = 34;
 
         lines.forEach(textLine => {
-          ctx.fillText(textLine, pos.left, y);
+          ctx.fillText(textLine, 0, y);
           y += lineHeight;
         });
-      });
 
-      ctx.restore();
+        ctx.restore();
+      });
     };
 
     renderToCanvas();
@@ -246,69 +304,106 @@ export default function PolaroidScatteredTemplate({
           maxHeight: '1080px'
         }}
       >
-        {/* Grid Images - 13 tiles */}
-        {images.slice(0, 13).map((image, idx) => {
+        {/* Polaroid Frames - Rotated Scrapbook Style */}
+        {images.slice(0, 15).map((image, idx) => {
           const pos = gridPositions[idx];
           if (!pos) return null;
 
-          // Convert pixels to percentages for responsive scaling
           const topPercent = (pos.top / 1080) * 100;
           const leftPercent = (pos.left / 1920) * 100;
-          const widthPercent = (pos.width / 1920) * 100;
-          const heightPercent = (pos.height / 1080) * 100;
+          const widthPercent = ((pos.width + 40) / 1920) * 100;
+          const heightPercent = ((pos.height + 60) / 1080) * 100;
 
           return (
             <div
               key={idx}
-              className="absolute overflow-hidden"
+              className="absolute"
               style={{
                 top: `${topPercent}%`,
                 left: `${leftPercent}%`,
                 width: `${widthPercent}%`,
                 height: `${heightPercent}%`,
+                transform: `rotate(${pos.rotation}deg)`,
+                transformOrigin: 'center center',
               }}
             >
-              {/* Image with cover fit */}
-              <img
-                src={image}
-                alt={`Vision ${idx + 1}`}
-                className="w-full h-full"
+              {/* White Polaroid Frame */}
+              <div
+                className="w-full h-full bg-white relative"
                 style={{
-                  objectFit: 'cover',
-                  width: '100%',
-                  height: '100%'
+                  boxShadow: '5px 5px 15px rgba(0, 0, 0, 0.3)',
+                  padding: '2% 2% 6% 2%', // Extra padding at bottom
                 }}
-              />
+              >
+                {/* Image */}
+                <img
+                  src={image}
+                  alt={`Vision ${idx + 1}`}
+                  className="w-full"
+                  style={{
+                    objectFit: 'cover',
+                    height: '85%',
+                  }}
+                />
+
+                {/* Label */}
+                {pos.label && (
+                  <div
+                    className="absolute bottom-2 w-full text-center"
+                    style={{
+                      fontFamily: '"Brush Script MT", cursive, Georgia',
+                      fontStyle: 'italic',
+                      fontSize: '1.1vw',
+                      color: '#2a2a2a',
+                    }}
+                  >
+                    {pos.label}
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
 
-        {/* Inspirational Quotes in empty spaces with background */}
-        {quotes.slice(0, 5).map((quote, idx) => {
+        {/* Handwritten Text Overlays */}
+        {textOverlays.map((overlay, idx) => (
+          <div
+            key={`overlay-${idx}`}
+            className="absolute"
+            style={{
+              top: `${(overlay.top / 1080) * 100}%`,
+              left: `${(overlay.left / 1920) * 100}%`,
+              transform: `rotate(${overlay.rotation}deg)`,
+              fontFamily: '"Brush Script MT", cursive, Georgia',
+              fontStyle: 'italic',
+              fontSize: `${(overlay.fontSize / 1920) * 100}vw`,
+              color: '#2a2a2a',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {overlay.text}
+          </div>
+        ))}
+
+        {/* Inspirational Quotes - Handwritten Style */}
+        {quotes.slice(0, 3).map((quote, idx) => {
           const pos = quotePositions[idx];
           if (!pos) return null;
-
-          const topPercent = (pos.top / 1080) * 100;
-          const leftPercent = (pos.left / 1920) * 100;
-          const widthPercent = ((pos.maxWidth + 24) / 1920) * 100;
 
           return (
             <div
               key={`quote-${idx}`}
               className="absolute"
               style={{
-                top: `${topPercent}%`,
-                left: `${leftPercent}%`,
-                width: `${widthPercent}%`,
-                backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                padding: '0.6vw',
-                color: '#5a4a3a',
-                fontFamily: 'Georgia, serif',
+                top: `${(pos.top / 1080) * 100}%`,
+                left: `${(pos.left / 1920) * 100}%`,
+                width: `${(pos.maxWidth / 1920) * 100}%`,
+                transform: `rotate(${pos.rotation}deg)`,
+                fontFamily: '"Brush Script MT", cursive, Georgia',
                 fontStyle: 'italic',
-                fontWeight: 'bold',
-                fontSize: '1.35vw',
+                fontSize: '1.25vw',
                 lineHeight: '1.5',
-                transform: 'translateY(-1%)',
+                color: '#2a2a2a',
               }}
             >
               {quote}
@@ -316,22 +411,57 @@ export default function PolaroidScatteredTemplate({
           );
         })}
 
-        {/* Center Card (beige with white text) */}
+        {/* Center Card - Scrapbook Style with Border */}
         <div
-          className="absolute flex flex-col items-center justify-center"
+          className="absolute flex flex-col items-center justify-center bg-white"
           style={{
-            top: '32.41%',
-            left: '44.27%',
-            width: '28.65%',
-            height: '31.48%',
-            backgroundColor: '#d6c1b1',
+            top: '29.63%',
+            left: '35.42%',
+            width: '19.79%',
+            height: '33.33%',
+            transform: 'rotate(-2deg)',
+            boxShadow: '4px 4px 12px rgba(0, 0, 0, 0.25)',
           }}
         >
-          <div className="text-white text-4xl mb-8">+</div>
-          <div className="text-white text-6xl font-bold mb-4">2025</div>
-          <div className="text-white text-4xl font-bold">VISION</div>
-          <div className="text-white text-4xl font-bold mb-8">BOARD</div>
-          <div className="text-white text-4xl">+</div>
+          {/* Purple Border */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              right: '10px',
+              bottom: '10px',
+              border: '6px solid #8b5cf6',
+            }}
+          />
+
+          {/* Decorative Stars */}
+          <div style={{ position: 'absolute', top: '15%', fontSize: '2vw', color: '#2a2a2a' }}>
+            ★ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ★
+          </div>
+
+          {/* Main Text */}
+          <div style={{ fontSize: '3.75vw', fontWeight: 'bold', color: '#2a2a2a', marginBottom: '0.5vw' }}>
+            2025
+          </div>
+          <div style={{
+            fontFamily: '"Brush Script MT", cursive, Georgia',
+            fontStyle: 'italic',
+            fontSize: '1.45vw',
+            color: '#2a2a2a',
+          }}>
+            VISION BOARD
+          </div>
+
+          {/* Bottom Star */}
+          <div style={{ position: 'absolute', bottom: '15%', fontSize: '2vw', color: '#2a2a2a' }}>
+            ★
+          </div>
+
+          {/* Wavy Line */}
+          <svg style={{ position: 'absolute', bottom: '10%', width: '60%' }} height="20">
+            <path d="M0,10 Q25,5 50,10 T100,10" stroke="#2a2a2a" strokeWidth="2" fill="none" />
+          </svg>
         </div>
       </div>
     </>
