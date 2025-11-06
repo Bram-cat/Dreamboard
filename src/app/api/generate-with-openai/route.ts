@@ -464,52 +464,125 @@ Return ONLY the 5 quotes, one per line, without quotes or numbering.`;
       console.log(`📸 Using ${userImageParts.length} user images for one-shot generation`);
 
       // Build magazine-style collage prompt (reference: sample.png)
-      const magazinePrompt = `Create a professional 2025 vision board collage in magazine style with these specifications:
+      const magazinePrompt = hasSelfie
+        ? `CREATE A 2025 VISION BOARD COLLAGE - MAGAZINE STYLE
 
-🎨 CANVAS: 1920x1080 pixels (16:9 landscape format)
+🎨 CANVAS SIZE: 1920x1080 pixels (16:9 landscape)
 
-📐 LAYOUT STYLE: Magazine photo collage (reference: clean grid layout with text overlays)
-- Use clean rectangular photo tiles (NOT polaroid frames)
-- Arrange photos in an asymmetric grid with varying sizes
-- Some tiles large (400-600px), some medium (250-400px), some small (150-250px)
-- Photos should fill their tiles completely (no borders, no frames)
-- Slight gaps between tiles (5-15px) on light beige background (#f5f1ed or #f9f7f4)
+🚨 CRITICAL - PERSON IDENTITY PRESERVATION:
+The FIRST provided image shows a REAL PERSON. This is the user of this vision board.
+- Study their face carefully: facial features, skin tone, hair, eye color, nose shape, facial structure
+- This EXACT person must appear in 4-6 different photo tiles across the board
+- NEVER change their face, ethnicity, age, or core appearance
+- ONLY change: clothing, pose, background setting to match different life goals
 
-🖼️ IMAGES TO USE:
-${userImageParts.length > 0 ? `- Use the ${userImageParts.length} provided user images (selfie/house/car/destination)
-- If person shown: preserve their EXACT face, skin tone, ethnicity in all scenarios
-- Generate additional lifestyle images for these themes: ${keywords.join(", ")}
-- Create 10-15 total photo tiles` : `- Generate lifestyle images for these themes: ${keywords.join(", ")}
-- Create 10-15 photo tiles total`}
+📸 PERSON SCENARIOS (showing the same person from image 1):
+1. EXERCISE/FITNESS: Person working out at gym, doing yoga, or running - active and healthy
+2. WEALTH/SUCCESS: Person in elegant business attire or luxury setting - confident and successful
+3. TRAVEL/ADVENTURE: Person at beautiful destination (use destination image if provided) - exploring and happy
+4. MEDITATION/WELLNESS: Person meditating peacefully or in spa setting - calm and centered
+5. CELEBRATION/JOY: Person celebrating, smiling, arms raised - happy and fulfilled
+6. PROFESSIONAL: Person in modern office or working on laptop - focused and accomplished
 
-📝 TEXT OVERLAYS (place on select tiles like magazine labels):
-- Use 2-3 of these keywords as text labels: ${keywords.slice(0, 3).join(", ")}
-- Style: Simple beige/tan rectangular labels in bottom-right of select tiles
-- Font: Sans-serif, bold, uppercase, white or dark text
-- Examples: "TRAVELLING", "I LOVE WHAT I DO", "MEDITATION", "WEALTH", "FITNESS"
+${hasDreamCar ? '🚗 CAR TILE: Include the provided dream car image as one of the photo tiles' : ''}
+${hasDreamHouse ? '🏠 HOUSE TILE: Include the provided dream house image as one of the photo tiles' : ''}
+${hasDestination ? '🌍 DESTINATION TILE: Include the provided destination image as one of the photo tiles' : ''}
 
-🎯 CENTER FOCAL CARD:
-- Create a clean beige card (400-600px wide) in the center-left or center area
-- Text on card: "Make it Happen" or "Dream Big" (cursive/handwriting font)
-- Below: "Vision Board" (serif font)
-- Below: "2025" (bold numbers)
-- Add small decorative plus signs (+) above and below text
-- Background: Solid beige (#d6c1b1 or #c9b8a6)
+📐 LAYOUT STRUCTURE (Magazine Grid - like sample reference):
+- Total: 12-15 rectangular photo tiles in asymmetric grid
+- Tile sizes: Mix of large (500x350px), medium (350x250px), small (250x200px)
+- Background: Light beige/cream (#f5f1ed)
+- Gaps: 10-20px between tiles
+- NO borders, NO frames - clean magazine style
+
+🎯 CENTER FOCAL CARD (beige card in center-left area):
+- Size: 400-500px wide x 300-350px tall
+- Background: Solid tan/beige (#d6c1b1)
+- Text layout:
+  * Top: Small decorative "+" symbol
+  * "Dream Big" (cursive/script font, 36px)
+  * "Vision Board" (serif font, 28px)
+  * "2025" (bold sans-serif, 72px)
+  * Bottom: Small decorative "+" symbol
+- All text: White color (#ffffff)
+
+📝 TEXT LABELS (on 3-4 photo tiles):
+Add beige rectangular labels in bottom-right corner of select tiles:
+- Keywords: ${keywords.slice(0, 4).join(", ").toUpperCase()}
+- Style: Sans-serif, bold, uppercase, 14-16px
+- Background: rgba(214, 193, 177, 0.85)
+- Examples: "WEALTH", "TRAVELLING", "FITNESS", "MEDITATION"
+
+🎨 VISUAL CONSISTENCY:
+- All photos of the person must show the SAME face/person (consistent identity)
+- Cohesive color palette: beige, tan, warm tones
+- Professional lifestyle photography aesthetic
+- Modern, clean, aspirational magazine layout
+- Natural lighting and realistic scenes
+
+✅ FINAL CHECKLIST:
+- [ ] Same person appears in 4-6 tiles with identical facial features
+- [ ] Person's ethnicity and appearance preserved across all scenarios
+- [ ] Clean rectangular grid (no polaroid frames)
+- [ ] Center beige card with "2025 Vision Board" text
+- [ ] 3-4 keyword labels on tiles
+- [ ] 1920x1080 canvas filled completely
+- [ ] Professional magazine aesthetic`
+        : `CREATE A 2025 VISION BOARD COLLAGE - MAGAZINE STYLE
+
+🎨 CANVAS SIZE: 1920x1080 pixels (16:9 landscape)
+
+📸 GENERATE LIFESTYLE IMAGERY:
+Create 12-15 aspirational lifestyle photos representing these themes:
+${keywords.join(", ")}
+
+Include these categories:
+- Success and wealth imagery
+- Travel and adventure
+- Fitness and wellness
+- Meditation and mindfulness
+- Celebration and joy
+- Professional achievement
+${hasDreamCar ? '- Include the provided dream car image' : '- Luxury dream car'}
+${hasDreamHouse ? '- Include the provided dream house image' : '- Beautiful dream home'}
+${hasDestination ? '- Include the provided travel destination' : '- Exotic travel destination'}
+
+📐 LAYOUT STRUCTURE (Magazine Grid):
+- Total: 12-15 rectangular photo tiles in asymmetric grid
+- Tile sizes: Mix of large (500x350px), medium (350x250px), small (250x200px)
+- Background: Light beige/cream (#f5f1ed)
+- Gaps: 10-20px between tiles
+- NO borders, NO frames - clean magazine style
+
+🎯 CENTER FOCAL CARD (beige card in center-left area):
+- Size: 400-500px wide x 300-350px tall
+- Background: Solid tan/beige (#d6c1b1)
+- Text layout:
+  * Top: Small decorative "+" symbol
+  * "Dream Big" (cursive/script font, 36px)
+  * "Vision Board" (serif font, 28px)
+  * "2025" (bold sans-serif, 72px)
+  * Bottom: Small decorative "+" symbol
+- All text: White color (#ffffff)
+
+📝 TEXT LABELS (on 3-4 photo tiles):
+Add beige rectangular labels in bottom-right corner of select tiles:
+- Keywords: ${keywords.slice(0, 4).join(", ").toUpperCase()}
+- Style: Sans-serif, bold, uppercase, 14-16px
+- Background: rgba(214, 193, 177, 0.85)
 
 🎨 VISUAL STYLE:
-- Magazine aesthetic: clean, modern, aspirational
-- High-quality photo composition
-- Cohesive color palette: beige/tan/neutral tones with lifestyle colors
-- Professional layout like Canva or Pinterest boards
-- Images should look realistic and lifestyle-focused
+- Cohesive color palette: beige, tan, warm tones
+- Professional lifestyle photography aesthetic
+- Modern, clean, aspirational magazine layout
+- Natural lighting and realistic scenes
 
-⚠️ CRITICAL REQUIREMENTS:
-${hasSelfie ? `- The person in the first provided image MUST appear in 3-5 scenarios (exercise, wealth, travel, success, meditation)
-- Keep their EXACT face/ethnicity/skin tone - DO NOT change their appearance
-- Only change clothing/background for different scenarios` : "- Generate diverse lifestyle scenarios"}
-- Create a complete, cohesive vision board in ONE generation
-- DO NOT use polaroid frames - use clean magazine grid style
-- Fill the entire 1920x1080 canvas`;
+✅ FINAL CHECKLIST:
+- [ ] Clean rectangular grid (no polaroid frames)
+- [ ] Center beige card with "2025 Vision Board" text
+- [ ] 3-4 keyword labels on tiles
+- [ ] 1920x1080 canvas filled completely
+- [ ] Professional magazine aesthetic`;
 
       const finalResponse = await genai.models.generateContent({
         model: "gemini-2.5-flash-image",
