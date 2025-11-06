@@ -14,52 +14,50 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Scrapbook style polaroid layout - Full coverage with no empty spaces
-  // Rearranged to fill circled empty areas
+  // Scrapbook style polaroid layout - Proper distribution of 20 images across canvas
   const gridPositions = [
-    // Top row - 6 polaroids across
-    { top: 10, left: 20, width: 260, height: 220, rotation: -8, label: "" },
-    { top: 30, left: 300, width: 280, height: 240, rotation: 5, label: "" },
-    { top: 20, left: 600, width: 280, height: 240, rotation: -3, label: "Just living my best life" },
-    { top: 40, left: 900, width: 240, height: 200, rotation: 6, label: "" },
-    { top: 25, left: 1160, width: 300, height: 260, rotation: -4, label: "MY DREAMS" },
-    { top: 15, left: 1480, width: 280, height: 240, rotation: 3, label: "" },
-    { top: 10, left: 1780, width: 120, height: 100, rotation: 7, label: "" },
+    // Top row - 5 polaroids covering full width
+    { top: 10, left: 20, width: 280, height: 240, rotation: -6, label: "" },
+    { top: 30, left: 340, width: 300, height: 260, rotation: 4, label: "" },
+    { top: 15, left: 680, width: 280, height: 240, rotation: -3, label: "Just living my best life" },
+    { top: 25, left: 1000, width: 320, height: 280, rotation: 5, label: "MY DREAMS" },
+    { top: 20, left: 1360, width: 300, height: 260, rotation: -4, label: "" },
+    { top: 10, left: 1700, width: 180, height: 160, rotation: 7, label: "" },
 
-    // Middle row - Fill left, right sides around center card
-    { top: 280, left: 15, width: 240, height: 200, rotation: 6, label: "TRAVEL" },
-    { top: 300, left: 270, width: 220, height: 180, rotation: -5, label: "" },
-    // CENTER CARD SPACE: 520-960 x 280-640
-    { top: 290, left: 980, width: 260, height: 220, rotation: 4, label: "" },
-    { top: 310, left: 1260, width: 280, height: 240, rotation: -6, label: "" },
-    { top: 300, left: 1560, width: 240, height: 200, rotation: 5, label: "" },
-    { top: 285, left: 1820, width: 80, height: 70, rotation: -8, label: "" },
+    // Middle row - Surrounding center card (left and right sides)
+    { top: 290, left: 15, width: 260, height: 220, rotation: 5, label: "TRAVEL" },
+    { top: 320, left: 300, width: 240, height: 200, rotation: -6, label: "" },
+    // CENTER CARD SPACE: 580-1040 x 280-640
+    { top: 285, left: 1060, width: 280, height: 240, rotation: 3, label: "" },
+    { top: 310, left: 1360, width: 260, height: 220, rotation: -5, label: "" },
+    { top: 300, left: 1640, width: 240, height: 200, rotation: 6, label: "" },
 
-    // Bottom row - Fill all empty spaces
-    { top: 520, left: 20, width: 240, height: 200, rotation: -4, label: "Inspiration" },
-    { top: 550, left: 280, width: 220, height: 180, rotation: 7, label: "" },
-    { top: 540, left: 980, width: 280, height: 240, rotation: -5, label: "" },
-    { top: 560, left: 1280, width: 240, height: 200, rotation: 6, label: "" },
-    { top: 550, left: 1540, width: 260, height: 220, rotation: -3, label: "Happiness" },
-    { top: 530, left: 1820, width: 80, height: 70, rotation: 4, label: "" },
+    // Lower-middle row - Fill gap between center and bottom
+    { top: 540, left: 30, width: 280, height: 240, rotation: -4, label: "Inspiration" },
+    { top: 560, left: 340, width: 240, height: 200, rotation: 5, label: "" },
+    { top: 550, left: 600, width: 260, height: 220, rotation: -3, label: "" },
+    { top: 570, left: 1080, width: 280, height: 240, rotation: 4, label: "" },
+    { top: 555, left: 1380, width: 240, height: 200, rotation: -6, label: "Happiness" },
+    { top: 565, left: 1640, width: 260, height: 220, rotation: 5, label: "" },
 
-    // Bottom-most row - Fill remaining space
-    { top: 780, left: 30, width: 260, height: 220, rotation: 5, label: "" },
-    { top: 800, left: 310, width: 240, height: 200, rotation: -6, label: "" },
+    // Bottom row - Fill remaining space
+    { top: 800, left: 40, width: 300, height: 260, rotation: 6, label: "" },
+    { top: 820, left: 380, width: 280, height: 240, rotation: -5, label: "" },
+    { top: 810, left: 1480, width: 300, height: 250, rotation: 4, label: "" },
   ];
 
   // Handwritten text overlays - Fill empty spaces with quotes
   const textOverlays = [
-    { text: quotes[0] || "towards my ultimate freedom", top: 690, left: 600, rotation: -2, fontSize: 28 },
-    { text: quotes[1] || "Stop dreaming and start doing", top: 850, left: 1200, rotation: 3, fontSize: 24 },
-    { text: quotes[2] || "Driving my dream car now", top: 760, left: 100, rotation: 4, fontSize: 22 },
+    { text: quotes[0] || "towards my ultimate freedom", top: 720, left: 750, rotation: -2, fontSize: 26 },
+    { text: quotes[1] || "Stop dreaming and start doing", top: 920, left: 950, rotation: 3, fontSize: 28 },
+    { text: quotes[2] || "Driving my dream car now", top: 930, left: 180, rotation: -3, fontSize: 24 },
   ];
 
   // Additional decorative quote positions
   const quotePositions = [
-    { top: 500, left: 550, maxWidth: 240, rotation: -2 },    // Left of center card
-    { top: 950, left: 900, maxWidth: 280, rotation: 1 },     // Bottom center
-    { top: 950, left: 1500, maxWidth: 260, rotation: -1 },   // Bottom right
+    { top: 500, left: 1100, maxWidth: 240, rotation: -2 },    // Right of center card
+    { top: 750, left: 900, maxWidth: 280, rotation: 2 },      // Bottom center-left
+    { top: 920, left: 1620, maxWidth: 260, rotation: -1 },    // Bottom right
   ];
 
   // Canvas rendering for download
@@ -91,7 +89,7 @@ export default function PolaroidScatteredTemplate({
       };
 
       // Draw all polaroid frames with rotation
-      for (let idx = 0; idx < Math.min(21, images.length); idx++) {
+      for (let idx = 0; idx < Math.min(20, images.length); idx++) {
         const pos = gridPositions[idx];
         if (!pos) continue;
 
@@ -156,9 +154,9 @@ export default function PolaroidScatteredTemplate({
       }
 
       // Draw center card (beige with decorative border) - scrapbook style
-      const centerX = 680;
-      const centerY = 320;
-      const centerW = 380;
+      const centerX = 580;
+      const centerY = 280;
+      const centerW = 460;
       const centerH = 360;
 
       ctx.save();
@@ -315,7 +313,7 @@ export default function PolaroidScatteredTemplate({
         }}
       >
         {/* Polaroid Frames - Rotated Scrapbook Style */}
-        {images.slice(0, 15).map((image, idx) => {
+        {images.slice(0, 20).map((image, idx) => {
           const pos = gridPositions[idx];
           if (!pos) return null;
 
@@ -425,9 +423,9 @@ export default function PolaroidScatteredTemplate({
         <div
           className="absolute flex flex-col items-center justify-center bg-white"
           style={{
-            top: '29.63%',
-            left: '35.42%',
-            width: '19.79%',
+            top: '25.93%',
+            left: '30.21%',
+            width: '23.96%',
             height: '33.33%',
             transform: 'rotate(-2deg)',
             boxShadow: '4px 4px 12px rgba(0, 0, 0, 0.25)',
