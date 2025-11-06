@@ -414,42 +414,47 @@ Return ONLY the 5 quotes, one per line, without quotes or numbering.`;
     if (selectedTemplate === "ai") {
       // AI-generated collage using Gemini
       console.log("\n🎨 Creating AI-generated collage with Gemini...");
+      console.log(`📸 User has selfie: ${hasSelfie}`);
 
       const imageDataParts = allGeneratedImages.map(base64 => ({
         inlineData: { data: base64, mimeType: "image/png" }
       }));
 
-      const collagePrompt = `CRITICAL: Create a 2025 VISION BOARD collage using ALL ${allGeneratedImages.length} images provided.
+      // Build collage prompt based on whether user uploaded selfie
+      let identityWarning = "";
+      if (hasSelfie) {
+        identityWarning = `
+🚨 USER IDENTITY ALERT: The first ${geminiImages.length} images contain the SAME PERSON (the user). This person's face appears multiple times in different scenarios. When you arrange these images into polaroid frames, you MUST keep their face EXACTLY as shown. DO NOT generate a new person. DO NOT change their appearance. Just crop and arrange the existing images.`;
+      }
 
-CRITICAL RULES - MUST FOLLOW:
-1. USE EVERY SINGLE IMAGE PROVIDED - All ${allGeneratedImages.length} images MUST appear in the final collage
-2. PRESERVE USER'S IDENTITY - If you see the same person's face in multiple images, that is the USER. Keep their face, skin tone, and features EXACTLY as shown.
-3. The first ${geminiImages.length} images show the USER in their dream scenarios - MAKE THESE THE LARGEST AND MOST PROMINENT
-4. DO NOT generate new people or faces - only use the exact images provided
+      const collagePrompt = `CRITICAL COMPOSITING TASK: Arrange ALL ${allGeneratedImages.length} provided images into a 2025 vision board collage.${identityWarning}
 
-STYLE: Polaroid photo frames (white borders) scattered at various angles on a light beige background (#f5f1ed).
+🚨 ABSOLUTE RULES - NO EXCEPTIONS:
+1. DO NOT GENERATE ANY NEW IMAGES OR PEOPLE - You are a compositor, NOT a generator
+2. DO NOT CREATE NEW FACES - Use ONLY the exact images provided
+3. DO NOT MODIFY THE PEOPLE in the images - Just crop, resize, rotate, and position them
+4. COPY-PASTE each provided image into polaroid frames - DO NOT redraw or regenerate them
+5. If you see a person's face in the provided images, that EXACT face must appear in the collage - DO NOT create a different person
 
-CANVAS SIZE: 1920x1080 pixels (16:9 landscape)
+YOUR ONLY JOB: Arrange the ${allGeneratedImages.length} images I'm giving you into polaroid frames on a canvas.
 
-LAYOUT FOR ${allGeneratedImages.length} IMAGES:
-- Personal images (first ${geminiImages.length}): LARGE polaroid frames (350-500px), prominent placement
-- Lifestyle images (remaining ${dalleImages.length}): Medium polaroid frames (250-350px), fill gaps
-- Rotate frames between -15° to +15° for natural scattered look
-- Overlap frames slightly (10-20% overlap) for depth
-- Ensure at least 75% of each image is visible
-- Fill the entire canvas - no large empty spaces
+STYLE: Polaroid photo frames (white borders, 15-20px thickness) scattered at various angles on light beige background (#f5f1ed).
 
-POLAROID FRAMES:
-- White borders: 15-20px thickness
-- Small shadow for depth
-- Some frames can be slightly tilted
+CANVAS: 1920x1080 pixels (16:9 landscape)
 
-TEXT: Add bold text overlays for keywords:
+LAYOUT:
+- First ${geminiImages.length} images: LARGE polaroid frames (350-500px) - these show the user
+- Remaining ${dalleImages.length} images: Medium frames (250-350px) - lifestyle images
+- Rotate frames -15° to +15° for scattered look
+- Slight overlap (10-20%) for depth
+- Fill entire canvas with the provided images
+
+TEXT OVERLAYS (add as decorative labels):
 ${allQuotes.slice(0, 5).map(q => `- "${q}"`).join("\n")}
 
-CENTER: Large "2025 VISION BOARD" text in elegant font
+CENTER TEXT: Large "2025 VISION BOARD" in elegant font
 
-IMPORTANT: Use EVERY image provided. The user uploaded these specific images - they MUST all appear in the final collage.`;
+⚠️ CRITICAL: You are compositing existing images, NOT generating new content. Just arrange the ${allGeneratedImages.length} images I provided into polaroid frames. DO NOT create new people or faces.`;
 
       const finalResponse = await genai.models.generateContent({
         model: "gemini-2.5-flash-image",
