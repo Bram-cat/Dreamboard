@@ -14,50 +14,50 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Scrapbook style polaroid layout - LARGER frames to eliminate all empty space
+  // Scrapbook style polaroid layout - COMPLETE coverage with overlapping frames
   const gridPositions = [
-    // Top row - Bigger frames covering full width
-    { top: 5, left: 10, width: 340, height: 280, rotation: -5, label: "" },
-    { top: 20, left: 380, width: 360, height: 300, rotation: 3, label: "" },
-    { top: 10, left: 770, width: 340, height: 280, rotation: -4, label: "Just living my best life" },
-    { top: 15, left: 1140, width: 340, height: 300, rotation: 4, label: "MY DREAMS" },
-    { top: 8, left: 1510, width: 400, height: 320, rotation: -3, label: "" },
+    // Top row - 5 overlapping frames covering full width
+    { top: 0, left: 5, width: 380, height: 300, rotation: -4, label: "" },
+    { top: 15, left: 395, width: 380, height: 310, rotation: 3, label: "" },
+    { top: 5, left: 785, width: 360, height: 290, rotation: -3, label: "Just living my best life" },
+    { top: 10, left: 1155, width: 380, height: 310, rotation: 4, label: "MY DREAMS" },
+    { top: 0, left: 1545, width: 370, height: 300, rotation: -3, label: "" },
 
-    // Middle-top row - Fill space above center card
-    { top: 300, left: 5, width: 300, height: 260, rotation: 6, label: "TRAVEL" },
-    { top: 320, left: 330, width: 280, height: 240, rotation: -5, label: "" },
+    // Middle row - Frames surrounding center card
+    { top: 310, left: 0, width: 320, height: 280, rotation: 5, label: "TRAVEL" },
+    { top: 330, left: 335, width: 300, height: 260, rotation: -4, label: "" },
     // CENTER CARD SPACE: 580-1040 x 280-640
-    { top: 295, left: 1070, width: 320, height: 280, rotation: 3, label: "" },
-    { top: 310, left: 1420, width: 300, height: 260, rotation: -6, label: "" },
-    { top: 305, left: 1750, width: 160, height: 140, rotation: 5, label: "" },
+    { top: 305, left: 1065, width: 340, height: 300, rotation: 3, label: "" },
+    { top: 320, left: 1420, width: 320, height: 280, rotation: -5, label: "" },
+    { top: 315, left: 1755, width: 160, height: 140, rotation: 4, label: "" },
 
-    // Lower-middle row - Bigger frames to fill gap
-    { top: 580, left: 10, width: 320, height: 280, rotation: -3, label: "Inspiration" },
-    { top: 600, left: 360, width: 300, height: 260, rotation: 5, label: "" },
-    { top: 590, left: 1090, width: 340, height: 300, rotation: -4, label: "" },
-    { top: 605, left: 1460, width: 300, height: 260, rotation: 6, label: "Happiness" },
-    { top: 595, left: 1790, width: 120, height: 100, rotation: -5, label: "" },
+    // Lower row - Fill gap between center and bottom
+    { top: 605, left: 5, width: 340, height: 300, rotation: -3, label: "Inspiration" },
+    { top: 620, left: 360, width: 310, height: 270, rotation: 4, label: "" },
+    { top: 615, left: 685, width: 360, height: 290, rotation: -3, label: "" },
+    { top: 610, left: 1060, width: 360, height: 300, rotation: 3, label: "" },
+    { top: 625, left: 1435, width: 320, height: 280, rotation: -4, label: "Happiness" },
 
-    // Bottom row - Large frames filling all remaining space
-    { top: 875, left: 15, width: 380, height: 190, rotation: 4, label: "" },
-    { top: 895, left: 430, width: 360, height: 170, rotation: -3, label: "" },
-    { top: 885, left: 820, width: 340, height: 180, rotation: 2, label: "" },
-    { top: 890, left: 1190, width: 360, height: 175, rotation: -4, label: "" },
-    { top: 880, left: 1580, width: 330, height: 185, rotation: 3, label: "" },
+    // Bottom row - Wide frames covering entire bottom
+    { top: 920, left: 10, width: 470, height: 155, rotation: 3, label: "" },
+    { top: 935, left: 500, width: 440, height: 140, rotation: -2, label: "" },
+    { top: 930, left: 960, width: 420, height: 145, rotation: 2, label: "" },
+    { top: 925, left: 1400, width: 450, height: 150, rotation: -3, label: "" },
+    { top: 920, left: 1720, width: 195, height: 155, rotation: 4, label: "" },
   ];
 
-  // Handwritten text overlays - Fill empty spaces with quotes
+  // Handwritten text overlays - Fill remaining empty spaces with quotes
   const textOverlays = [
-    { text: quotes[0] || "towards my ultimate freedom", top: 700, left: 780, rotation: -2, fontSize: 30 },
-    { text: quotes[1] || "Stop dreaming and start doing", top: 850, left: 280, rotation: 3, fontSize: 28 },
-    { text: quotes[2] || "Driving my dream car now", top: 560, left: 700, rotation: -3, fontSize: 26 },
+    { text: quotes[0] || "towards my ultimate freedom", top: 575, left: 720, rotation: -2, fontSize: 32 },
+    { text: quotes[1] || "Stop dreaming and start doing", top: 895, left: 240, rotation: 3, fontSize: 30 },
+    { text: quotes[2] || "Driving my dream car now", top: 895, left: 1760, rotation: -3, fontSize: 28 },
   ];
 
   // Additional decorative quote positions
   const quotePositions = [
-    { top: 255, left: 650, maxWidth: 300, rotation: 2 },      // Between top frames
-    { top: 540, left: 1450, maxWidth: 280, rotation: -2 },    // Right side middle
-    { top: 850, left: 1200, maxWidth: 320, rotation: 1 },     // Bottom center-right
+    { top: 320, left: 665, maxWidth: 350, rotation: 2 },      // Center area above card
+    { top: 570, left: 1090, maxWidth: 320, rotation: -1 },    // Center area below card
+    { top: 895, left: 1180, maxWidth: 340, rotation: 1 },     // Bottom center
   ];
 
   // Canvas rendering for download
