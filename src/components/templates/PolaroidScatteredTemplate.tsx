@@ -14,43 +14,36 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Scrapbook style polaroid layout - Natural scattered arrangement like sample images
+  // Scrapbook style polaroid layout - Evenly distributed across entire canvas
   const gridPositions = [
-    // Top-left cluster - 3 frames
-    { top: 0, left: 0, width: 280, height: 240, rotation: -8, label: "" },
-    { top: 40, left: 240, width: 260, height: 220, rotation: 5, label: "" },
-    { top: 15, left: 480, width: 240, height: 200, rotation: -3, label: "" },
+    // Top row - 6 frames spanning full width
+    { top: 5, left: 10, width: 260, height: 220, rotation: -6, label: "" },
+    { top: 25, left: 285, width: 280, height: 240, rotation: 4, label: "" },
+    { top: 10, left: 580, width: 260, height: 220, rotation: -3, label: "Just living my best life" },
+    { top: 20, left: 860, width: 300, height: 260, rotation: 5, label: "" },
+    { top: 5, left: 1180, width: 280, height: 240, rotation: -4, label: "MY DREAMS" },
+    { top: 15, left: 1480, width: 300, height: 260, rotation: 3, label: "" },
+    { top: 20, left: 1800, width: 110, height: 100, rotation: -5, label: "" },
 
-    // Top-center-right cluster - 4 frames around labels
-    { top: 5, left: 750, width: 280, height: 240, rotation: 4, label: "Just living my best life" },
-    { top: 30, left: 1040, width: 260, height: 220, rotation: -6, label: "" },
-    { top: 0, left: 1310, width: 300, height: 260, rotation: 3, label: "MY DREAMS" },
-    { top: 25, left: 1620, width: 280, height: 240, rotation: -4, label: "" },
-
-    // Middle-left cluster - 2 frames
-    { top: 270, left: 0, width: 240, height: 200, rotation: 6, label: "TRAVEL" },
-    { top: 310, left: 260, width: 260, height: 220, rotation: -5, label: "" },
-
+    // Middle row - 5 frames around center card
+    { top: 290, left: 5, width: 260, height: 220, rotation: 6, label: "TRAVEL" },
+    { top: 310, left: 285, width: 240, height: 200, rotation: -4, label: "" },
     // CENTER CARD SPACE: 580-1040 x 280-640
+    { top: 295, left: 1065, width: 280, height: 240, rotation: 4, label: "" },
+    { top: 315, left: 1365, width: 260, height: 220, rotation: -5, label: "" },
+    { top: 300, left: 1645, width: 240, height: 200, rotation: 6, label: "" },
 
-    // Middle-right cluster - 3 frames
-    { top: 285, left: 1080, width: 280, height: 240, rotation: 5, label: "" },
-    { top: 305, left: 1380, width: 260, height: 220, rotation: -4, label: "" },
-    { top: 290, left: 1660, width: 240, height: 200, rotation: 7, label: "" },
+    // Lower-middle row - 5 frames filling middle-bottom gap
+    { top: 575, left: 15, width: 280, height: 240, rotation: -5, label: "Inspiration" },
+    { top: 595, left: 315, width: 260, height: 220, rotation: 4, label: "" },
+    { top: 585, left: 595, width: 240, height: 200, rotation: -3, label: "" },
+    { top: 590, left: 1085, width: 280, height: 240, rotation: 5, label: "" },
+    { top: 580, left: 1385, width: 260, height: 220, rotation: -4, label: "Happiness" },
+    { top: 595, left: 1665, width: 240, height: 200, rotation: 6, label: "" },
 
-    // Lower-left cluster - 3 frames
-    { top: 550, left: 10, width: 260, height: 220, rotation: -4, label: "Inspiration" },
-    { top: 590, left: 280, width: 240, height: 200, rotation: 6, label: "" },
-    { top: 570, left: 540, width: 280, height: 240, rotation: -3, label: "" },
-
-    // Lower-right cluster - 3 frames
-    { top: 565, left: 1100, width: 260, height: 220, rotation: 4, label: "" },
-    { top: 585, left: 1380, width: 280, height: 240, rotation: -5, label: "Happiness" },
-    { top: 575, left: 1680, width: 240, height: 200, rotation: 6, label: "" },
-
-    // Bottom cluster - 2 frames filling gaps
-    { top: 840, left: 120, width: 280, height: 220, rotation: -6, label: "" },
-    { top: 850, left: 1520, width: 260, height: 200, rotation: 5, label: "" },
+    // Bottom row - 2 frames at bottom edges
+    { top: 855, left: 460, width: 280, height: 210, rotation: -4, label: "" },
+    { top: 860, left: 1180, width: 260, height: 205, rotation: 3, label: "" },
   ];
 
   // Handwritten text overlays - Scattered naturally between polaroid clusters
