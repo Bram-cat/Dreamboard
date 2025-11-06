@@ -3,13 +3,13 @@
 import React, { useRef, useEffect } from "react";
 
 interface PolaroidScatteredTemplateProps {
-  images: string[]; // 14 images (7 DALL-E + 7 Gemini)
-  keywords: string[];
+  images: string[]; // 20 images (10 DALL-E + 10 Gemini)
+  quotes: string[];
 }
 
 export default function PolaroidScatteredTemplate({
   images,
-  keywords,
+  quotes,
 }: PolaroidScatteredTemplateProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,26 +18,35 @@ export default function PolaroidScatteredTemplate({
   // Large tiles with proper spacing for widescreen display
   const gridPositions = [
     // Row 1 - 4 large tiles across top
-    { top: 20, left: 20, width: 440, height: 320, keyword: keywords[0] || "" },
-    { top: 20, left: 480, width: 440, height: 320, keyword: "" },
-    { top: 20, left: 940, width: 440, height: 320, keyword: keywords[1] || "" },
-    { top: 20, left: 1400, width: 500, height: 320, keyword: "" },
+    { top: 20, left: 20, width: 440, height: 320 },
+    { top: 20, left: 480, width: 440, height: 320 },
+    { top: 20, left: 940, width: 440, height: 320 },
+    { top: 20, left: 1400, width: 500, height: 320 },
 
     // Row 2 - 3 tiles + CENTER CARD
-    { top: 360, left: 20, width: 350, height: 340, keyword: "" },
+    { top: 360, left: 20, width: 350, height: 340 },
     // CENTER CARD: 390-1010 (620px wide) x 360-700 (340px tall)
-    { top: 360, left: 1030, width: 870, height: 340, keyword: keywords[2] || "" },
+    { top: 360, left: 1030, width: 870, height: 340 },
 
     // Row 3 - 4 large tiles across bottom
-    { top: 720, left: 20, width: 440, height: 340, keyword: keywords[3] || "" },
-    { top: 720, left: 480, width: 440, height: 340, keyword: "" },
-    { top: 720, left: 940, width: 440, height: 340, keyword: keywords[4] || "" },
-    { top: 720, left: 1400, width: 500, height: 340, keyword: "" },
+    { top: 720, left: 20, width: 440, height: 340 },
+    { top: 720, left: 480, width: 440, height: 340 },
+    { top: 720, left: 940, width: 440, height: 340 },
+    { top: 720, left: 1400, width: 500, height: 340 },
 
     // Additional tiles for variety
-    { top: 360, left: 1030, width: 425, height: 340, keyword: "" },
-    { top: 360, left: 1475, width: 425, height: 340, keyword: "" },
-    { top: 20, left: 1400, width: 245, height: 155, keyword: "" },
+    { top: 360, left: 1030, width: 425, height: 340 },
+    { top: 360, left: 1475, width: 425, height: 340 },
+    { top: 20, left: 1400, width: 245, height: 155 },
+  ];
+
+  // Inspirational quote positions in empty spaces
+  const quotePositions = [
+    { top: 50, left: 1680, maxWidth: 200 },   // Top right
+    { top: 380, left: 1680, maxWidth: 200 },  // Middle right
+    { top: 770, left: 1680, maxWidth: 200 },  // Bottom right
+    { top: 1000, left: 50, maxWidth: 300 },   // Bottom left
+    { top: 1000, left: 950, maxWidth: 300 },  // Bottom center
   ];
 
   // Canvas rendering for download
@@ -97,24 +106,6 @@ export default function PolaroidScatteredTemplate({
 
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
 
-          // Draw keyword label overlay (beige box in corner like image.png)
-          if (pos.keyword) {
-            const labelW = 140;
-            const labelH = 50;
-            const labelX = pos.left + pos.width - labelW - 15;
-            const labelY = pos.top + pos.height - labelH - 15;
-
-            // Beige semi-transparent background
-            ctx.fillStyle = 'rgba(214, 193, 177, 0.9)';
-            ctx.fillRect(labelX, labelY, labelW, labelH);
-
-            // Text
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 16px Arial, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(pos.keyword.toUpperCase(), labelX + labelW / 2, labelY + labelH / 2 + 6);
-          }
-
           ctx.restore();
         } catch (error) {
           console.error(`Failed to load image ${idx}:`, error);
@@ -151,10 +142,43 @@ export default function PolaroidScatteredTemplate({
       ctx.fillText('BOARD', centerX + centerW / 2, centerY + centerH / 2 + 65);
 
       ctx.restore();
+
+      // Draw inspirational quotes in empty spaces
+      ctx.save();
+      ctx.fillStyle = '#8b7355'; // Brownish text color
+      ctx.font = 'italic 22px Georgia, serif';
+      ctx.textAlign = 'left';
+
+      quotes.slice(0, 5).forEach((quote, idx) => {
+        const pos = quotePositions[idx];
+        if (!pos) return;
+
+        // Word wrap the quote
+        const words = quote.split(' ');
+        let line = '';
+        let y = pos.top;
+        const lineHeight = 32;
+
+        for (let i = 0; i < words.length; i++) {
+          const testLine = line + words[i] + ' ';
+          const metrics = ctx.measureText(testLine);
+
+          if (metrics.width > pos.maxWidth && i > 0) {
+            ctx.fillText(line, pos.left, y);
+            line = words[i] + ' ';
+            y += lineHeight;
+          } else {
+            line = testLine;
+          }
+        }
+        ctx.fillText(line, pos.left, y);
+      });
+
+      ctx.restore();
     };
 
     renderToCanvas();
-  }, [images, keywords]);
+  }, [images, quotes]);
 
   // Download function
   const handleDownload = () => {
@@ -236,24 +260,35 @@ export default function PolaroidScatteredTemplate({
                   height: '100%'
                 }}
               />
+            </div>
+          );
+        })}
 
-              {/* Keyword label (beige box in corner) */}
-              {pos.keyword && (
-                <div
-                  className="absolute flex items-center justify-center"
-                  style={{
-                    bottom: '15px',
-                    right: '15px',
-                    width: '140px',
-                    height: '50px',
-                    backgroundColor: 'rgba(214, 193, 177, 0.9)',
-                  }}
-                >
-                  <span className="text-white font-bold text-base uppercase tracking-wide">
-                    {pos.keyword}
-                  </span>
-                </div>
-              )}
+        {/* Inspirational Quotes in empty spaces */}
+        {quotes.slice(0, 5).map((quote, idx) => {
+          const pos = quotePositions[idx];
+          if (!pos) return null;
+
+          const topPercent = (pos.top / 1080) * 100;
+          const leftPercent = (pos.left / 1920) * 100;
+          const widthPercent = (pos.maxWidth / 1920) * 100;
+
+          return (
+            <div
+              key={`quote-${idx}`}
+              className="absolute"
+              style={{
+                top: `${topPercent}%`,
+                left: `${leftPercent}%`,
+                width: `${widthPercent}%`,
+                color: '#8b7355',
+                fontFamily: 'Georgia, serif',
+                fontStyle: 'italic',
+                fontSize: '1.2vw',
+                lineHeight: '1.5',
+              }}
+            >
+              {quote}
             </div>
           );
         })}

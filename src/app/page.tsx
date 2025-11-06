@@ -60,6 +60,7 @@ interface CategorizedUploads {
 export default function Home() {
   const [goals, setGoals] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
+  const [quotes, setQuotes] = useState<string[]>([]);
   const [images, setImages] = useState<GeneratedImage[]>([]);
   const [categorizedUploads, setCategorizedUploads] = useState<CategorizedUploads>({
     selfie: null,
@@ -234,6 +235,12 @@ export default function Home() {
             url,
             keyword: extractedKeywords[idx] || `Vision ${idx + 1}`
           })));
+
+          // Store quotes from API response
+          if (data.quotes && Array.isArray(data.quotes)) {
+            console.log(`✓ Received ${data.quotes.length} inspirational quotes`);
+            setQuotes(data.quotes);
+          }
         }
         setProgress(100); // Complete
         setCollageReady(true);
@@ -803,7 +810,7 @@ export default function Home() {
                       {selectedTemplate === "polaroid" && (
                         <PolaroidScatteredTemplate
                           images={images.map((img) => img.url)}
-                          keywords={keywords}
+                          quotes={quotes}
                         />
                       )}
                       {selectedTemplate === "magazine" && (
