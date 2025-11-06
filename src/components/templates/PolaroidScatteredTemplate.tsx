@@ -14,42 +14,52 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Scrapbook style polaroid layout - Rotated frames with overlaps
-  // Reference: second image style with angled polaroids
+  // Scrapbook style polaroid layout - Full coverage with no empty spaces
+  // Rearranged to fill circled empty areas
   const gridPositions = [
-    // Top row - scattered polaroids
-    { top: 20, left: 30, width: 320, height: 280, rotation: -8, label: "" },
-    { top: 50, left: 380, width: 280, height: 240, rotation: 5, label: "" },
-    { top: 30, left: 690, width: 300, height: 260, rotation: -3, label: "Just living my best life" },
-    { top: 60, left: 1020, width: 260, height: 220, rotation: 7, label: "" },
-    { top: 40, left: 1310, width: 300, height: 260, rotation: -5, label: "MY DREAMS" },
-    { top: 70, left: 1640, width: 240, height: 200, rotation: 4, label: "" },
+    // Top row - 6 polaroids across
+    { top: 10, left: 20, width: 260, height: 220, rotation: -8, label: "" },
+    { top: 30, left: 300, width: 280, height: 240, rotation: 5, label: "" },
+    { top: 20, left: 600, width: 280, height: 240, rotation: -3, label: "Just living my best life" },
+    { top: 40, left: 900, width: 240, height: 200, rotation: 6, label: "" },
+    { top: 25, left: 1160, width: 300, height: 260, rotation: -4, label: "MY DREAMS" },
+    { top: 15, left: 1480, width: 280, height: 240, rotation: 3, label: "" },
+    { top: 10, left: 1780, width: 120, height: 100, rotation: 7, label: "" },
 
-    // Middle row - overlapping polaroids
-    { top: 340, left: 50, width: 280, height: 240, rotation: 6, label: "TRAVEL" },
-    { top: 370, left: 360, width: 260, height: 220, rotation: -7, label: "" },
-    { top: 350, left: 1050, width: 280, height: 240, rotation: 5, label: "" },
-    { top: 380, left: 1360, width: 300, height: 260, rotation: -4, label: "" },
+    // Middle row - Fill left, right sides around center card
+    { top: 280, left: 15, width: 240, height: 200, rotation: 6, label: "TRAVEL" },
+    { top: 300, left: 270, width: 220, height: 180, rotation: -5, label: "" },
+    // CENTER CARD SPACE: 520-960 x 280-640
+    { top: 290, left: 980, width: 260, height: 220, rotation: 4, label: "" },
+    { top: 310, left: 1260, width: 280, height: 240, rotation: -6, label: "" },
+    { top: 300, left: 1560, width: 240, height: 200, rotation: 5, label: "" },
+    { top: 285, left: 1820, width: 80, height: 70, rotation: -8, label: "" },
 
-    // Bottom row - final scattered polaroids
-    { top: 640, left: 30, width: 300, height: 260, rotation: -5, label: "Inspiration" },
-    { top: 670, left: 360, width: 280, height: 240, rotation: 3, label: "" },
-    { top: 650, left: 1080, width: 260, height: 220, rotation: -6, label: "" },
-    { top: 680, left: 1370, width: 280, height: 240, rotation: 8, label: "" },
-    { top: 660, left: 1680, width: 240, height: 200, rotation: -4, label: "Happiness" },
+    // Bottom row - Fill all empty spaces
+    { top: 520, left: 20, width: 240, height: 200, rotation: -4, label: "Inspiration" },
+    { top: 550, left: 280, width: 220, height: 180, rotation: 7, label: "" },
+    { top: 540, left: 980, width: 280, height: 240, rotation: -5, label: "" },
+    { top: 560, left: 1280, width: 240, height: 200, rotation: 6, label: "" },
+    { top: 550, left: 1540, width: 260, height: 220, rotation: -3, label: "Happiness" },
+    { top: 530, left: 1820, width: 80, height: 70, rotation: 4, label: "" },
+
+    // Bottom-most row - Fill remaining space
+    { top: 780, left: 30, width: 260, height: 220, rotation: 5, label: "" },
+    { top: 800, left: 310, width: 240, height: 200, rotation: -6, label: "" },
   ];
 
-  // Handwritten text overlays and decorative elements
+  // Handwritten text overlays - Fill empty spaces with quotes
   const textOverlays = [
-    { text: "towards my ultimate freedom", top: 420, left: 680, rotation: -2, fontSize: 32 },
-    { text: "Stop dreaming and start doing", top: 880, left: 1200, rotation: 3, fontSize: 22 },
+    { text: quotes[0] || "towards my ultimate freedom", top: 690, left: 600, rotation: -2, fontSize: 28 },
+    { text: quotes[1] || "Stop dreaming and start doing", top: 850, left: 1200, rotation: 3, fontSize: 24 },
+    { text: quotes[2] || "Driving my dream car now", top: 760, left: 100, rotation: 4, fontSize: 22 },
   ];
 
-  // Inspirational quote positions - Handwritten style
+  // Additional decorative quote positions
   const quotePositions = [
-    { top: 320, left: 680, maxWidth: 280, rotation: -2 },    // Center area
-    { top: 940, left: 80, maxWidth: 300, rotation: 1 },      // Bottom left
-    { top: 940, left: 1450, maxWidth: 300, rotation: -1 },   // Bottom right
+    { top: 500, left: 550, maxWidth: 240, rotation: -2 },    // Left of center card
+    { top: 950, left: 900, maxWidth: 280, rotation: 1 },     // Bottom center
+    { top: 950, left: 1500, maxWidth: 260, rotation: -1 },   // Bottom right
   ];
 
   // Canvas rendering for download
@@ -81,7 +91,7 @@ export default function PolaroidScatteredTemplate({
       };
 
       // Draw all polaroid frames with rotation
-      for (let idx = 0; idx < Math.min(15, images.length); idx++) {
+      for (let idx = 0; idx < Math.min(21, images.length); idx++) {
         const pos = gridPositions[idx];
         if (!pos) continue;
 
