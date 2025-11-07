@@ -136,6 +136,7 @@ export async function POST(request: NextRequest) {
 
           if (!response.ok) {
             const errorText = await response.text();
+            console.error(`  🚨 DALL-E API HTTP ${response.status}: ${errorText}`);
             throw new Error(`DALL-E API error: ${response.statusText} - ${errorText}`);
           }
 
@@ -151,7 +152,12 @@ export async function POST(request: NextRequest) {
 
           await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
-          console.error(`  ✗ Error generating DALL-E image ${currentIndex + 1}:`, error);
+          console.error(`  ✗ DETAILED ERROR for DALL-E image ${currentIndex + 1}:`);
+          console.error(`     Error type: ${error instanceof Error ? error.constructor.name : typeof error}`);
+          console.error(`     Error message: ${error instanceof Error ? error.message : String(error)}`);
+          if (error instanceof Error && error.stack) {
+            console.error(`     Stack trace: ${error.stack.split('\n').slice(0, 3).join('\n')}`);
+          }
           console.log(`  🔄 Will retry if needed (attempt ${dalleAttempts + 1}/${maxDalleAttempts})`);
         }
 
