@@ -14,50 +14,40 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Scrapbook style polaroid layout - Full canvas coverage with even distribution
+  // Scrapbook style polaroid layout - COMPLETE canvas coverage (1920x1080)
   const gridPositions = [
-    // Top row - 5 frames spanning full width
-    { top: 5, left: 10, width: 280, height: 240, rotation: -6, label: "" },
-    { top: 25, left: 310, width: 300, height: 260, rotation: 4, label: "Just living my best life" },
-    { top: 10, left: 640, width: 280, height: 240, rotation: -3, label: "" },
-    { top: 20, left: 950, width: 300, height: 260, rotation: 5, label: "MY DREAMS" },
-    { top: 5, left: 1280, width: 280, height: 240, rotation: -4, label: "" },
-    { top: 15, left: 1590, width: 300, height: 260, rotation: 3, label: "" },
+    // Top row - 7 frames across full width (0-1920)
+    { top: 10, left: 5, width: 240, height: 200, rotation: -5, label: "" },
+    { top: 25, left: 265, width: 260, height: 220, rotation: 4, label: "" },
+    { top: 15, left: 545, width: 240, height: 200, rotation: -3, label: "" },
+    { top: 20, left: 805, width: 260, height: 220, rotation: 5, label: "MY DREAMS" },
+    { top: 10, left: 1085, width: 250, height: 210, rotation: -4, label: "" },
+    { top: 18, left: 1355, width: 260, height: 220, rotation: 3, label: "" },
+    { top: 12, left: 1635, width: 250, height: 210, rotation: -5, label: "" },
 
-    // Middle row - 4 frames around center card (left and right sides)
-    { top: 290, left: 5, width: 280, height: 240, rotation: 6, label: "TRAVEL" },
-    { top: 310, left: 305, width: 260, height: 220, rotation: -4, label: "" },
+    // Middle row - 6 frames around center card
+    { top: 285, left: 5, width: 250, height: 210, rotation: 6, label: "TRAVEL" },
+    { top: 305, left: 275, width: 240, height: 200, rotation: -4, label: "" },
     // CENTER CARD SPACE: 580-1040 x 280-640
-    { top: 295, left: 1065, width: 280, height: 240, rotation: 4, label: "" },
-    { top: 315, left: 1375, width: 280, height: 240, rotation: -5, label: "" },
-    { top: 300, left: 1675, width: 230, height: 190, rotation: 6, label: "" },
+    { top: 295, left: 1060, width: 260, height: 220, rotation: 4, label: "" },
+    { top: 310, left: 1340, width: 250, height: 210, rotation: -5, label: "" },
+    { top: 290, left: 1610, width: 260, height: 220, rotation: 5, label: "" },
 
-    // Lower-middle row - 5 frames spanning full width
-    { top: 675, left: 15, width: 280, height: 240, rotation: -5, label: "Inspiration" },
-    { top: 695, left: 320, width: 260, height: 220, rotation: 4, label: "" },
-    { top: 685, left: 610, width: 260, height: 220, rotation: -3, label: "" },
-    { top: 690, left: 900, width: 280, height: 240, rotation: 5, label: "" },
-    { top: 680, left: 1210, width: 280, height: 240, rotation: -4, label: "Happiness" },
-    { top: 695, left: 1520, width: 260, height: 220, rotation: 6, label: "" },
-
-    // Bottom row - 3 frames at bottom spanning full width
-    { top: 820, left: 140, width: 280, height: 220, rotation: -4, label: "" },
-    { top: 830, left: 810, width: 280, height: 220, rotation: 3, label: "" },
-    { top: 825, left: 1480, width: 280, height: 220, rotation: -3, label: "" },
+    // Lower row - 7 frames spanning full width (CRITICAL: covers bottom area)
+    { top: 675, left: 10, width: 250, height: 210, rotation: -4, label: "" },
+    { top: 690, left: 280, width: 240, height: 200, rotation: 5, label: "" },
+    { top: 680, left: 540, width: 260, height: 220, rotation: -3, label: "" },
+    { top: 685, left: 820, width: 250, height: 210, rotation: 4, label: "" },
+    { top: 675, left: 1090, width: 260, height: 220, rotation: -5, label: "" },
+    { top: 690, left: 1370, width: 250, height: 210, rotation: 3, label: "" },
+    { top: 680, left: 1640, width: 250, height: 210, rotation: -4, label: "" },
   ];
 
-  // Handwritten text overlays - Scattered naturally between frames
-  const textOverlays = [
-    { text: quotes[0] || "towards my ultimate freedom", top: 260, left: 600, rotation: -3, fontSize: 28 },
-    { text: quotes[1] || "Stop dreaming and start doing", top: 630, left: 950, rotation: 2, fontSize: 30 },
-    { text: quotes[2] || "Driving my dream car now", top: 970, left: 520, rotation: -2, fontSize: 26 },
-  ];
-
-  // Additional decorative quote positions - filling empty spaces between frames
+  // Single quote system - NO DUPLICATES (only 3 quotes in empty spaces)
   const quotePositions = [
-    { top: 560, left: 100, maxWidth: 240, rotation: -2 },     // Left side between middle and lower
-    { top: 575, left: 1100, maxWidth: 250, rotation: 3 },     // Right side between middle and lower
-    { top: 980, left: 1200, maxWidth: 280, rotation: 1 },     // Bottom-right area
+    { text: quotes[0] || "Wealth flows to me", top: 250, left: 540, maxWidth: 220, rotation: -2, fontSize: 24 },
+    { text: quotes[1] || "Living my dream", top: 615, left: 1150, maxWidth: 240, rotation: 3, fontSize: 26 },
+    { text: quotes[2] || "Thriving daily", top: 950, left: 350, maxWidth: 200, rotation: -3, fontSize: 22 },
   ];
 
   // Canvas rendering for download
@@ -205,32 +195,15 @@ export default function PolaroidScatteredTemplate({
 
       ctx.restore();
 
-      // Draw handwritten text overlays
-      textOverlays.forEach(overlay => {
-        ctx.save();
-        ctx.translate(overlay.left, overlay.top);
-        ctx.rotate((overlay.rotation * Math.PI) / 180);
-
-        ctx.fillStyle = '#2a2a2a';
-        ctx.font = `italic ${overlay.fontSize}px "Brush Script MT", cursive, Georgia`;
-        ctx.textAlign = 'center';
-        ctx.fillText(overlay.text, 0, 0);
-
-        ctx.restore();
-      });
-
-      // Draw inspirational quotes - handwritten style with rotation
-      quotes.slice(0, 3).forEach((quote, idx) => {
-        const pos = quotePositions[idx];
-        if (!pos) return;
-
+      // Draw inspirational quotes - SINGLE SYSTEM (no duplicates)
+      quotePositions.forEach((pos) => {
         ctx.save();
         ctx.translate(pos.left, pos.top);
         ctx.rotate((pos.rotation * Math.PI) / 180);
 
-        // Measure quote dimensions
-        ctx.font = 'italic 24px "Brush Script MT", cursive, Georgia';
-        const words = quote.split(' ');
+        // Use the text from quotePositions (already has the quote text)
+        ctx.font = `italic ${pos.fontSize}px "Brush Script MT", cursive, Georgia`;
+        const words = pos.text.split(' ');
         const lines: string[] = [];
         let line = '';
 
@@ -251,7 +224,7 @@ export default function PolaroidScatteredTemplate({
         ctx.fillStyle = '#2a2a2a';
         ctx.textAlign = 'left';
         let y = 0;
-        const lineHeight = 34;
+        const lineHeight = pos.fontSize + 8;
 
         lines.forEach(textLine => {
           ctx.fillText(textLine, 0, y);
@@ -374,50 +347,26 @@ export default function PolaroidScatteredTemplate({
         })}
 
         {/* Handwritten Text Overlays */}
-        {textOverlays.map((overlay, idx) => (
+        {/* Inspirational Quotes - SINGLE SYSTEM (no duplicates) */}
+        {quotePositions.map((pos, idx) => (
           <div
-            key={`overlay-${idx}`}
+            key={`quote-${idx}`}
             className="absolute"
             style={{
-              top: `${(overlay.top / 1080) * 100}%`,
-              left: `${(overlay.left / 1920) * 100}%`,
-              transform: `rotate(${overlay.rotation}deg)`,
+              top: `${(pos.top / 1080) * 100}%`,
+              left: `${(pos.left / 1920) * 100}%`,
+              width: `${(pos.maxWidth / 1920) * 100}%`,
+              transform: `rotate(${pos.rotation}deg)`,
               fontFamily: '"Brush Script MT", cursive, Georgia',
               fontStyle: 'italic',
-              fontSize: `${(overlay.fontSize / 1920) * 100}vw`,
+              fontSize: `${(pos.fontSize / 1920) * 100}vw`,
+              lineHeight: '1.5',
               color: '#2a2a2a',
-              whiteSpace: 'nowrap',
             }}
           >
-            {overlay.text}
+            {pos.text}
           </div>
         ))}
-
-        {/* Inspirational Quotes - Handwritten Style */}
-        {quotes.slice(0, 3).map((quote, idx) => {
-          const pos = quotePositions[idx];
-          if (!pos) return null;
-
-          return (
-            <div
-              key={`quote-${idx}`}
-              className="absolute"
-              style={{
-                top: `${(pos.top / 1080) * 100}%`,
-                left: `${(pos.left / 1920) * 100}%`,
-                width: `${(pos.maxWidth / 1920) * 100}%`,
-                transform: `rotate(${pos.rotation}deg)`,
-                fontFamily: '"Brush Script MT", cursive, Georgia',
-                fontStyle: 'italic',
-                fontSize: '1.25vw',
-                lineHeight: '1.5',
-                color: '#2a2a2a',
-              }}
-            >
-              {quote}
-            </div>
-          );
-        })}
 
         {/* Center Card - Scrapbook Style with Border */}
         <div
