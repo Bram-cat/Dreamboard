@@ -14,50 +14,50 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Scrapbook style polaroid layout - Evenly distributed across entire canvas
+  // Scrapbook style polaroid layout - Full canvas coverage with even distribution
   const gridPositions = [
-    // Top row - 6 frames spanning full width
-    { top: 5, left: 10, width: 260, height: 220, rotation: -6, label: "" },
-    { top: 25, left: 285, width: 280, height: 240, rotation: 4, label: "" },
-    { top: 10, left: 580, width: 260, height: 220, rotation: -3, label: "Just living my best life" },
-    { top: 20, left: 860, width: 300, height: 260, rotation: 5, label: "" },
-    { top: 5, left: 1180, width: 280, height: 240, rotation: -4, label: "MY DREAMS" },
-    { top: 15, left: 1480, width: 300, height: 260, rotation: 3, label: "" },
-    { top: 20, left: 1800, width: 110, height: 100, rotation: -5, label: "" },
+    // Top row - 5 frames spanning full width
+    { top: 5, left: 10, width: 280, height: 240, rotation: -6, label: "" },
+    { top: 25, left: 310, width: 300, height: 260, rotation: 4, label: "Just living my best life" },
+    { top: 10, left: 640, width: 280, height: 240, rotation: -3, label: "" },
+    { top: 20, left: 950, width: 300, height: 260, rotation: 5, label: "MY DREAMS" },
+    { top: 5, left: 1280, width: 280, height: 240, rotation: -4, label: "" },
+    { top: 15, left: 1590, width: 300, height: 260, rotation: 3, label: "" },
 
-    // Middle row - 5 frames around center card
-    { top: 290, left: 5, width: 260, height: 220, rotation: 6, label: "TRAVEL" },
-    { top: 310, left: 285, width: 240, height: 200, rotation: -4, label: "" },
+    // Middle row - 4 frames around center card (left and right sides)
+    { top: 290, left: 5, width: 280, height: 240, rotation: 6, label: "TRAVEL" },
+    { top: 310, left: 305, width: 260, height: 220, rotation: -4, label: "" },
     // CENTER CARD SPACE: 580-1040 x 280-640
     { top: 295, left: 1065, width: 280, height: 240, rotation: 4, label: "" },
-    { top: 315, left: 1365, width: 260, height: 220, rotation: -5, label: "" },
-    { top: 300, left: 1645, width: 240, height: 200, rotation: 6, label: "" },
+    { top: 315, left: 1375, width: 280, height: 240, rotation: -5, label: "" },
+    { top: 300, left: 1675, width: 230, height: 190, rotation: 6, label: "" },
 
-    // Lower-middle row - 5 frames filling middle-bottom gap
-    { top: 575, left: 15, width: 280, height: 240, rotation: -5, label: "Inspiration" },
-    { top: 595, left: 315, width: 260, height: 220, rotation: 4, label: "" },
-    { top: 585, left: 595, width: 240, height: 200, rotation: -3, label: "" },
-    { top: 590, left: 1085, width: 280, height: 240, rotation: 5, label: "" },
-    { top: 580, left: 1385, width: 260, height: 220, rotation: -4, label: "Happiness" },
-    { top: 595, left: 1665, width: 240, height: 200, rotation: 6, label: "" },
+    // Lower-middle row - 5 frames spanning full width
+    { top: 675, left: 15, width: 280, height: 240, rotation: -5, label: "Inspiration" },
+    { top: 695, left: 320, width: 260, height: 220, rotation: 4, label: "" },
+    { top: 685, left: 610, width: 260, height: 220, rotation: -3, label: "" },
+    { top: 690, left: 900, width: 280, height: 240, rotation: 5, label: "" },
+    { top: 680, left: 1210, width: 280, height: 240, rotation: -4, label: "Happiness" },
+    { top: 695, left: 1520, width: 260, height: 220, rotation: 6, label: "" },
 
-    // Bottom row - 2 frames at bottom edges
-    { top: 855, left: 460, width: 280, height: 210, rotation: -4, label: "" },
-    { top: 860, left: 1180, width: 260, height: 205, rotation: 3, label: "" },
+    // Bottom row - 3 frames at bottom spanning full width
+    { top: 820, left: 140, width: 280, height: 220, rotation: -4, label: "" },
+    { top: 830, left: 810, width: 280, height: 220, rotation: 3, label: "" },
+    { top: 825, left: 1480, width: 280, height: 220, rotation: -3, label: "" },
   ];
 
-  // Handwritten text overlays - Scattered naturally between polaroid clusters
+  // Handwritten text overlays - Scattered naturally between frames
   const textOverlays = [
-    { text: quotes[0] || "towards my ultimate freedom", top: 260, left: 550, rotation: -3, fontSize: 28 },
-    { text: quotes[1] || "Stop dreaming and start doing", top: 530, left: 850, rotation: 2, fontSize: 30 },
-    { text: quotes[2] || "Driving my dream car now", top: 820, left: 420, rotation: -2, fontSize: 26 },
+    { text: quotes[0] || "towards my ultimate freedom", top: 260, left: 600, rotation: -3, fontSize: 28 },
+    { text: quotes[1] || "Stop dreaming and start doing", top: 630, left: 950, rotation: 2, fontSize: 30 },
+    { text: quotes[2] || "Driving my dream car now", top: 970, left: 520, rotation: -2, fontSize: 26 },
   ];
 
-  // Additional decorative quote positions - filling empty spaces naturally
+  // Additional decorative quote positions - filling empty spaces between frames
   const quotePositions = [
-    { top: 255, left: 1050, maxWidth: 240, rotation: 3 },     // Top-right between frames
-    { top: 520, left: 280, maxWidth: 220, rotation: -2 },     // Left side middle
-    { top: 820, left: 800, maxWidth: 280, rotation: 1 },      // Bottom center-left
+    { top: 560, left: 100, maxWidth: 240, rotation: -2 },     // Left side between middle and lower
+    { top: 575, left: 1100, maxWidth: 250, rotation: 3 },     // Right side between middle and lower
+    { top: 980, left: 1200, maxWidth: 280, rotation: 1 },     // Bottom-right area
   ];
 
   // Canvas rendering for download
