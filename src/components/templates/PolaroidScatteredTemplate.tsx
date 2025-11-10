@@ -14,39 +14,33 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Polaroid scrapbook layout - Natural scattered style with complete coverage
+  // Polaroid scrapbook layout - ONLY frames, NO text/quotes
   const gridPositions = [
-    // Top row - 6 larger frames spanning full width
-    { top: 5, left: 5, width: 280, height: 240, rotation: -6, label: "" },
-    { top: 20, left: 310, width: 300, height: 260, rotation: 4, label: "" },
-    { top: 10, left: 635, width: 280, height: 240, rotation: -3, label: "" },
-    { top: 15, left: 940, width: 300, height: 260, rotation: 5, label: "" },
-    { top: 8, left: 1265, width: 300, height: 260, rotation: -4, label: "" },
-    { top: 18, left: 1590, width: 300, height: 260, rotation: 3, label: "" },
+    // Top row - 7 properly sized frames spanning full width
+    { top: 8, left: 8, width: 240, height: 200, rotation: -5, label: "" },
+    { top: 18, left: 268, width: 260, height: 220, rotation: 4, label: "" },
+    { top: 12, left: 548, width: 240, height: 200, rotation: -3, label: "" },
+    { top: 15, left: 808, width: 260, height: 220, rotation: 5, label: "" },
+    { top: 10, left: 1088, width: 250, height: 210, rotation: -4, label: "" },
+    { top: 16, left: 1358, width: 260, height: 220, rotation: 3, label: "" },
+    { top: 12, left: 1638, width: 250, height: 210, rotation: -5, label: "" },
 
     // Middle row - 5 frames around center card
-    { top: 285, left: 5, width: 280, height: 240, rotation: 6, label: "" },
-    { top: 305, left: 300, width: 260, height: 220, rotation: -4, label: "" },
+    { top: 285, left: 8, width: 250, height: 210, rotation: 6, label: "" },
+    { top: 305, left: 278, width: 240, height: 200, rotation: -4, label: "" },
     // CENTER CARD SPACE: 580-1040 x 280-640
-    { top: 295, left: 1060, width: 280, height: 240, rotation: 4, label: "" },
-    { top: 310, left: 1360, width: 280, height: 240, rotation: -5, label: "" },
-    { top: 290, left: 1660, width: 250, height: 210, rotation: 5, label: "" },
+    { top: 295, left: 1060, width: 260, height: 220, rotation: 4, label: "" },
+    { top: 310, left: 1340, width: 250, height: 210, rotation: -5, label: "" },
+    { top: 295, left: 1610, width: 260, height: 220, rotation: 5, label: "" },
 
-    // Bottom row - 9 frames covering entire bottom including RIGHT SIDE
-    { top: 665, left: 5, width: 280, height: 240, rotation: -5, label: "" },
-    { top: 680, left: 300, width: 260, height: 220, rotation: 4, label: "" },
-    { top: 670, left: 580, width: 280, height: 240, rotation: -3, label: "" },
-    { top: 675, left: 880, width: 260, height: 220, rotation: 5, label: "" },
-    { top: 665, left: 1160, width: 280, height: 240, rotation: -4, label: "" },
-    { top: 680, left: 1460, width: 280, height: 240, rotation: 3, label: "" },
-    { top: 670, left: 1760, width: 140, height: 120, rotation: -5, label: "" },
-  ];
-
-  // Handwritten quotes in empty spaces ONLY (no overlapping with frames)
-  const quotePositions = [
-    { text: quotes[0] || "Wealth flows to me", top: 255, left: 570, maxWidth: 200, rotation: -2, fontSize: 22 },
-    { text: quotes[1] || "Living my dream life", top: 600, left: 100, maxWidth: 220, rotation: 3, fontSize: 24 },
-    { text: quotes[2] || "Adventures begin now", top: 615, left: 1100, maxWidth: 240, rotation: -3, fontSize: 23 },
+    // Bottom row - 8 frames covering entire bottom
+    { top: 670, left: 8, width: 250, height: 210, rotation: -4, label: "" },
+    { top: 685, left: 278, width: 240, height: 200, rotation: 5, label: "" },
+    { top: 675, left: 538, width: 260, height: 220, rotation: -3, label: "" },
+    { top: 680, left: 818, width: 250, height: 210, rotation: 4, label: "" },
+    { top: 670, left: 1088, width: 260, height: 220, rotation: -5, label: "" },
+    { top: 685, left: 1368, width: 250, height: 210, rotation: 3, label: "" },
+    { top: 675, left: 1638, width: 250, height: 210, rotation: -4, label: "" },
   ];
 
   // Canvas rendering for download
@@ -194,48 +188,11 @@ export default function PolaroidScatteredTemplate({
 
       ctx.restore();
 
-      // Draw inspirational quotes - SINGLE SYSTEM (no duplicates)
-      quotePositions.forEach((pos) => {
-        ctx.save();
-        ctx.translate(pos.left, pos.top);
-        ctx.rotate((pos.rotation * Math.PI) / 180);
-
-        // Use the text from quotePositions (already has the quote text)
-        ctx.font = `italic ${pos.fontSize}px "Brush Script MT", cursive, Georgia`;
-        const words = pos.text.split(' ');
-        const lines: string[] = [];
-        let line = '';
-
-        for (let i = 0; i < words.length; i++) {
-          const testLine = line + words[i] + ' ';
-          const metrics = ctx.measureText(testLine);
-
-          if (metrics.width > pos.maxWidth && i > 0) {
-            lines.push(line.trim());
-            line = words[i] + ' ';
-          } else {
-            line = testLine;
-          }
-        }
-        if (line.trim()) lines.push(line.trim());
-
-        // Draw text (handwritten style, no background)
-        ctx.fillStyle = '#2a2a2a';
-        ctx.textAlign = 'left';
-        let y = 0;
-        const lineHeight = pos.fontSize + 8;
-
-        lines.forEach(textLine => {
-          ctx.fillText(textLine, 0, y);
-          y += lineHeight;
-        });
-
-        ctx.restore();
-      });
+      // NO QUOTES - Focus on frame arrangement only
     };
 
     renderToCanvas();
-  }, [images, quotes]);
+  }, [images]);
 
   // Download function
   const handleDownload = () => {
@@ -345,27 +302,7 @@ export default function PolaroidScatteredTemplate({
           );
         })}
 
-        {/* Handwritten Text Overlays */}
-        {/* Inspirational Quotes - SINGLE SYSTEM (no duplicates) */}
-        {quotePositions.map((pos, idx) => (
-          <div
-            key={`quote-${idx}`}
-            className="absolute"
-            style={{
-              top: `${(pos.top / 1080) * 100}%`,
-              left: `${(pos.left / 1920) * 100}%`,
-              width: `${(pos.maxWidth / 1920) * 100}%`,
-              transform: `rotate(${pos.rotation}deg)`,
-              fontFamily: '"Brush Script MT", cursive, Georgia',
-              fontStyle: 'italic',
-              fontSize: `${(pos.fontSize / 1920) * 100}vw`,
-              lineHeight: '1.5',
-              color: '#2a2a2a',
-            }}
-          >
-            {pos.text}
-          </div>
-        ))}
+        {/* NO QUOTES - Focus on frame arrangement only */}
 
         {/* Center Card - Scrapbook Style with Border */}
         <div
