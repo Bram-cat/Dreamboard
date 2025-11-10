@@ -14,33 +14,27 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Polaroid scrapbook layout - ONLY frames, NO text/quotes
+  // Polaroid scrapbook layout - Reduced to 12 frames to avoid clutter
   const gridPositions = [
-    // Top row - 7 properly sized frames spanning full width
-    { top: 8, left: 8, width: 240, height: 200, rotation: -5, label: "" },
-    { top: 18, left: 268, width: 260, height: 220, rotation: 4, label: "" },
-    { top: 12, left: 548, width: 240, height: 200, rotation: -3, label: "" },
-    { top: 15, left: 808, width: 260, height: 220, rotation: 5, label: "" },
-    { top: 10, left: 1088, width: 250, height: 210, rotation: -4, label: "" },
-    { top: 16, left: 1358, width: 260, height: 220, rotation: 3, label: "" },
-    { top: 12, left: 1638, width: 250, height: 210, rotation: -5, label: "" },
+    // Top row - 5 frames spanning full width
+    { top: 10, left: 10, width: 280, height: 240, rotation: -5, label: "" },
+    { top: 20, left: 320, width: 300, height: 260, rotation: 4, label: "" },
+    { top: 15, left: 650, width: 280, height: 240, rotation: -3, label: "" },
+    { top: 10, left: 1260, width: 300, height: 260, rotation: 4, label: "" },
+    { top: 18, left: 1590, width: 300, height: 260, rotation: -5, label: "" },
 
-    // Middle row - 5 frames around center card
-    { top: 285, left: 8, width: 250, height: 210, rotation: 6, label: "" },
-    { top: 305, left: 278, width: 240, height: 200, rotation: -4, label: "" },
-    // CENTER CARD SPACE: 580-1040 x 280-640
-    { top: 295, left: 1060, width: 260, height: 220, rotation: 4, label: "" },
-    { top: 310, left: 1340, width: 250, height: 210, rotation: -5, label: "" },
-    { top: 295, left: 1610, width: 260, height: 220, rotation: 5, label: "" },
+    // Middle row - 3 frames (left and right of center card)
+    { top: 290, left: 10, width: 280, height: 240, rotation: 6, label: "" },
+    { top: 310, left: 310, width: 260, height: 220, rotation: -4, label: "" },
+    // CENTER CARD SPACE: 660-1260 x 280-640 (properly centered)
+    { top: 295, left: 1280, width: 280, height: 240, rotation: 4, label: "" },
+    { top: 305, left: 1590, width: 280, height: 240, rotation: -5, label: "" },
 
-    // Bottom row - 8 frames covering entire bottom
-    { top: 670, left: 8, width: 250, height: 210, rotation: -4, label: "" },
-    { top: 685, left: 278, width: 240, height: 200, rotation: 5, label: "" },
-    { top: 675, left: 538, width: 260, height: 220, rotation: -3, label: "" },
-    { top: 680, left: 818, width: 250, height: 210, rotation: 4, label: "" },
-    { top: 670, left: 1088, width: 260, height: 220, rotation: -5, label: "" },
-    { top: 685, left: 1368, width: 250, height: 210, rotation: 3, label: "" },
-    { top: 675, left: 1638, width: 250, height: 210, rotation: -4, label: "" },
+    // Bottom row - 4 frames covering bottom width
+    { top: 675, left: 10, width: 280, height: 240, rotation: -4, label: "" },
+    { top: 690, left: 630, width: 280, height: 240, rotation: 5, label: "" },
+    { top: 680, left: 1270, width: 280, height: 240, rotation: -3, label: "" },
+    { top: 685, left: 1590, width: 280, height: 240, rotation: 4, label: "" },
   ];
 
   // Canvas rendering for download
@@ -71,8 +65,8 @@ export default function PolaroidScatteredTemplate({
         });
       };
 
-      // Draw all polaroid frames with rotation
-      for (let idx = 0; idx < Math.min(20, images.length); idx++) {
+      // Draw all polaroid frames with rotation (max 13 frames)
+      for (let idx = 0; idx < Math.min(13, images.length); idx++) {
         const pos = gridPositions[idx];
         if (!pos) continue;
 
@@ -136,11 +130,11 @@ export default function PolaroidScatteredTemplate({
         }
       }
 
-      // Draw center card (beige with decorative border) - scrapbook style
-      const centerX = 580;
-      const centerY = 280;
-      const centerW = 460;
-      const centerH = 360;
+      // Draw center card (properly centered) - scrapbook style
+      const centerW = 500;
+      const centerH = 380;
+      const centerX = (1920 - centerW) / 2; // 710px - horizontally centered
+      const centerY = (1080 - centerH) / 2; // 350px - vertically centered
 
       ctx.save();
       ctx.translate(centerX + centerW / 2, centerY + centerH / 2);
@@ -242,7 +236,7 @@ export default function PolaroidScatteredTemplate({
         }}
       >
         {/* Polaroid Frames - Rotated Scrapbook Style */}
-        {images.slice(0, 20).map((image, idx) => {
+        {images.slice(0, 13).map((image, idx) => {
           const pos = gridPositions[idx];
           if (!pos) return null;
 
@@ -304,15 +298,15 @@ export default function PolaroidScatteredTemplate({
 
         {/* NO QUOTES - Focus on frame arrangement only */}
 
-        {/* Center Card - Scrapbook Style with Border */}
+        {/* Center Card - Properly Centered */}
         <div
           className="absolute flex flex-col items-center justify-center bg-white"
           style={{
-            top: '25.93%',
-            left: '30.21%',
-            width: '23.96%',
-            height: '33.33%',
-            transform: 'rotate(-2deg)',
+            top: '50%',
+            left: '50%',
+            width: '26%',
+            height: '35%',
+            transform: 'translate(-50%, -50%) rotate(-2deg)',
             boxShadow: '4px 4px 12px rgba(0, 0, 0, 0.25)',
           }}
         >
