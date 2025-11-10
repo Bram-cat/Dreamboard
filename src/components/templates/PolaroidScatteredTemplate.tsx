@@ -154,31 +154,34 @@ export default function PolaroidScatteredTemplate({
       ctx.lineWidth = 6;
       ctx.strokeRect(-centerW / 2 + 10, -centerH / 2 + 10, centerW - 20, centerH - 20);
 
-      // Decorative stars
+      // Decorative stars - top
       ctx.fillStyle = '#2a2a2a';
-      ctx.font = '32px Arial';
+      ctx.font = '30px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('★', -100, -120);
-      ctx.fillText('★', 100, -120);
-      ctx.fillText('★', 0, 140);
+      ctx.fillText('★', -80, -140);
+      ctx.fillText('★', 80, -140);
 
-      // Center text
+      // Center text - properly spaced
       ctx.fillStyle = '#2a2a2a';
-      ctx.font = 'bold 72px Arial, sans-serif';
+      ctx.font = 'bold 68px Arial, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('2025', 0, -20);
+      ctx.fillText('2025', 0, -40);
 
-      ctx.font = '28px "Brush Script MT", cursive, Georgia';
-      ctx.fillText('VISION BOARD', 0, 30);
+      ctx.font = 'italic 26px "Brush Script MT", cursive, Georgia';
+      ctx.fillText('VISION BOARD', 0, 10);
 
-      // Wavy line decoration
+      // Wavy line decoration - below text
       ctx.strokeStyle = '#2a2a2a';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(-100, 80);
-      ctx.quadraticCurveTo(-50, 70, 0, 80);
-      ctx.quadraticCurveTo(50, 90, 100, 80);
+      ctx.moveTo(-90, 55);
+      ctx.quadraticCurveTo(-45, 48, 0, 55);
+      ctx.quadraticCurveTo(45, 62, 90, 55);
       ctx.stroke();
+
+      // Bottom star
+      ctx.font = '30px Arial';
+      ctx.fillText('★', 0, 130);
 
       ctx.restore();
 
@@ -323,31 +326,62 @@ export default function PolaroidScatteredTemplate({
           />
 
           {/* Decorative Stars */}
-          <div style={{ position: 'absolute', top: '15%', fontSize: '2vw', color: '#2a2a2a' }}>
-            ★ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ★
+          <div style={{
+            position: 'absolute',
+            top: '12%',
+            fontSize: '1.8vw',
+            color: '#2a2a2a',
+            display: 'flex',
+            gap: '4vw'
+          }}>
+            <span>★</span>
+            <span>★</span>
           </div>
 
-          {/* Main Text */}
-          <div style={{ fontSize: '3.75vw', fontWeight: 'bold', color: '#2a2a2a', marginBottom: '0.5vw' }}>
-            2025
-          </div>
+          {/* Main Text Container */}
           <div style={{
-            fontFamily: '"Brush Script MT", cursive, Georgia',
-            fontStyle: 'italic',
-            fontSize: '1.45vw',
-            color: '#2a2a2a',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.3vw',
+            marginTop: '-1vw'
           }}>
-            VISION BOARD
+            <div style={{
+              fontSize: '3.5vw',
+              fontWeight: 'bold',
+              color: '#2a2a2a',
+              lineHeight: '1'
+            }}>
+              2025
+            </div>
+            <div style={{
+              fontFamily: '"Brush Script MT", cursive, Georgia',
+              fontStyle: 'italic',
+              fontSize: '1.3vw',
+              color: '#2a2a2a',
+              marginTop: '0.5vw'
+            }}>
+              VISION BOARD
+            </div>
           </div>
 
           {/* Bottom Star */}
-          <div style={{ position: 'absolute', bottom: '15%', fontSize: '2vw', color: '#2a2a2a' }}>
+          <div style={{
+            position: 'absolute',
+            bottom: '12%',
+            fontSize: '1.8vw',
+            color: '#2a2a2a'
+          }}>
             ★
           </div>
 
           {/* Wavy Line */}
-          <svg style={{ position: 'absolute', bottom: '10%', width: '60%' }} height="20">
-            <path d="M0,10 Q25,5 50,10 T100,10" stroke="#2a2a2a" strokeWidth="2" fill="none" />
+          <svg style={{
+            position: 'absolute',
+            bottom: '20%',
+            width: '50%'
+          }} height="15" viewBox="0 0 100 10">
+            <path d="M0,5 Q25,0 50,5 T100,5" stroke="#2a2a2a" strokeWidth="1.5" fill="none" />
           </svg>
         </div>
       </div>
