@@ -14,40 +14,39 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Scrapbook style polaroid layout - COMPLETE canvas coverage (1920x1080)
+  // Polaroid scrapbook layout - Natural scattered style with complete coverage
   const gridPositions = [
-    // Top row - 7 frames across full width (0-1920)
-    { top: 10, left: 5, width: 240, height: 200, rotation: -5, label: "" },
-    { top: 25, left: 265, width: 260, height: 220, rotation: 4, label: "" },
-    { top: 15, left: 545, width: 240, height: 200, rotation: -3, label: "" },
-    { top: 20, left: 805, width: 260, height: 220, rotation: 5, label: "MY DREAMS" },
-    { top: 10, left: 1085, width: 250, height: 210, rotation: -4, label: "" },
-    { top: 18, left: 1355, width: 260, height: 220, rotation: 3, label: "" },
-    { top: 12, left: 1635, width: 250, height: 210, rotation: -5, label: "" },
+    // Top row - 6 larger frames spanning full width
+    { top: 5, left: 5, width: 280, height: 240, rotation: -6, label: "" },
+    { top: 20, left: 310, width: 300, height: 260, rotation: 4, label: "" },
+    { top: 10, left: 635, width: 280, height: 240, rotation: -3, label: "" },
+    { top: 15, left: 940, width: 300, height: 260, rotation: 5, label: "" },
+    { top: 8, left: 1265, width: 300, height: 260, rotation: -4, label: "" },
+    { top: 18, left: 1590, width: 300, height: 260, rotation: 3, label: "" },
 
-    // Middle row - 6 frames around center card
-    { top: 285, left: 5, width: 250, height: 210, rotation: 6, label: "TRAVEL" },
-    { top: 305, left: 275, width: 240, height: 200, rotation: -4, label: "" },
+    // Middle row - 5 frames around center card
+    { top: 285, left: 5, width: 280, height: 240, rotation: 6, label: "" },
+    { top: 305, left: 300, width: 260, height: 220, rotation: -4, label: "" },
     // CENTER CARD SPACE: 580-1040 x 280-640
-    { top: 295, left: 1060, width: 260, height: 220, rotation: 4, label: "" },
-    { top: 310, left: 1340, width: 250, height: 210, rotation: -5, label: "" },
-    { top: 290, left: 1610, width: 260, height: 220, rotation: 5, label: "" },
+    { top: 295, left: 1060, width: 280, height: 240, rotation: 4, label: "" },
+    { top: 310, left: 1360, width: 280, height: 240, rotation: -5, label: "" },
+    { top: 290, left: 1660, width: 250, height: 210, rotation: 5, label: "" },
 
-    // Lower row - 7 frames spanning full width (CRITICAL: covers bottom area)
-    { top: 675, left: 10, width: 250, height: 210, rotation: -4, label: "" },
-    { top: 690, left: 280, width: 240, height: 200, rotation: 5, label: "" },
-    { top: 680, left: 540, width: 260, height: 220, rotation: -3, label: "" },
-    { top: 685, left: 820, width: 250, height: 210, rotation: 4, label: "" },
-    { top: 675, left: 1090, width: 260, height: 220, rotation: -5, label: "" },
-    { top: 690, left: 1370, width: 250, height: 210, rotation: 3, label: "" },
-    { top: 680, left: 1640, width: 250, height: 210, rotation: -4, label: "" },
+    // Bottom row - 9 frames covering entire bottom including RIGHT SIDE
+    { top: 665, left: 5, width: 280, height: 240, rotation: -5, label: "" },
+    { top: 680, left: 300, width: 260, height: 220, rotation: 4, label: "" },
+    { top: 670, left: 580, width: 280, height: 240, rotation: -3, label: "" },
+    { top: 675, left: 880, width: 260, height: 220, rotation: 5, label: "" },
+    { top: 665, left: 1160, width: 280, height: 240, rotation: -4, label: "" },
+    { top: 680, left: 1460, width: 280, height: 240, rotation: 3, label: "" },
+    { top: 670, left: 1760, width: 140, height: 120, rotation: -5, label: "" },
   ];
 
-  // Single quote system - NO DUPLICATES (only 3 quotes in empty spaces)
+  // Handwritten quotes in empty spaces ONLY (no overlapping with frames)
   const quotePositions = [
-    { text: quotes[0] || "Wealth flows to me", top: 250, left: 540, maxWidth: 220, rotation: -2, fontSize: 24 },
-    { text: quotes[1] || "Living my dream", top: 615, left: 1150, maxWidth: 240, rotation: 3, fontSize: 26 },
-    { text: quotes[2] || "Thriving daily", top: 950, left: 350, maxWidth: 200, rotation: -3, fontSize: 22 },
+    { text: quotes[0] || "Wealth flows to me", top: 255, left: 570, maxWidth: 200, rotation: -2, fontSize: 22 },
+    { text: quotes[1] || "Living my dream life", top: 600, left: 100, maxWidth: 220, rotation: 3, fontSize: 24 },
+    { text: quotes[2] || "Adventures begin now", top: 615, left: 1100, maxWidth: 240, rotation: -3, fontSize: 23 },
   ];
 
   // Canvas rendering for download
