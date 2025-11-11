@@ -42,109 +42,19 @@ export async function POST(request: NextRequest) {
     const allQuotes: string[] = [];
 
     // ============================================
-    // STEP 1: Generate images with DALL-E (OpenAI)
-    // SKIP for AI template - AI template uses Gemini one-shot only
+    // STEP 1: SKIP DALL-E (cannot personalize with user's face)
+    // Use Gemini for ALL 8 images to maintain consistency
     // ============================================
-    const dalleImages: string[] = [];
-
-    if (selectedTemplate !== "ai") {
-      console.log("\n🎨 STEP 1/3: Generating 4 images with DALL-E 3 (OpenAI)...");
-
-      // Build 4 SCENARIO-BASED prompts for DALL-E 3 text-to-image generation
-      // Match the Gemini style: specific lifestyle scenarios with detailed context
-      const dalleScenarios = [
-        // Scenario 1: Fitness/Gym Success
-        "A fit young professional working out at a modern luxury gym with floor-to-ceiling windows and city views. They're doing strength training with dumbbells, wearing stylish athletic wear, showing muscular definition and confident focused expression. The gym has sleek black equipment, wooden floors, and warm afternoon sunlight streaming through tall windows. Professional fitness photography, shallow depth of field, cinematic lighting, aspirational wellness aesthetic, motivational atmosphere.",
-
-        // Scenario 2: Luxury Lifestyle/Celebration
-        "A successful young professional at an upscale champagne bar or rooftop lounge, wearing an elegant blazer and dress shirt, raising a glass of champagne in a celebratory toast with a genuine confident smile. The setting has warm golden ambient lighting, marble or brass bar counter, bottles of premium champagne in the background, bokeh lights creating a sophisticated evening atmosphere. Professional lifestyle photography, warm color grading, luxury celebration aesthetic, success vibes.",
-
-        // Scenario 3: Wellness/Meditation
-        "A peaceful young professional meditating in a serene outdoor wellness setting at golden hour sunrise. They're sitting cross-legged in lotus meditation position on a wooden deck or platform overlooking mountains or ocean, wearing comfortable neutral linen clothing, eyes gently closed with calm peaceful expression. Soft golden morning light, misty natural background, yoga mat, small zen plants around, tranquil atmosphere. Professional wellness photography, natural lighting, mindfulness and inner peace aesthetic.",
-
-        // Scenario 4: Professional Success
-        "A confident young professional working in a modern corner office with panoramic city skyline views through floor-to-ceiling windows. They're sitting at a sleek minimalist desk reviewing business charts on a laptop, wearing a tailored suit or smart business attire, professional yet approachable focused expression. The office has contemporary design, potted plants, afternoon natural sunlight, city buildings visible outside. Professional corporate photography, natural window light, executive success aesthetic, modern workspace."
-      ];
-
-      // Generate 4 DALL-E images with better retry logic
-      const maxRetries = 2;
-
-      for (let i = 0; i < 4; i++) {
-        console.log(`  [${i + 1}/4] Generating DALL-E image...`);
-
-        let retryCount = 0;
-        let imageGenerated = false;
-
-        while (!imageGenerated && retryCount <= maxRetries) {
-          try {
-            // Always use text-to-image generation (more reliable than edits)
-            console.log(`  Attempt ${retryCount + 1}/${maxRetries + 1}: Using DALL-E text-to-image generation`);
-            const response = await fetch("https://api.openai.com/v1/images/generations", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${openaiApiKey}`,
-              },
-              body: JSON.stringify({
-                model: "dall-e-3",
-                prompt: dalleScenarios[i],
-                n: 1,
-                size: "1024x1024",
-                quality: "standard",
-              }),
-            });
-
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error(`  🚨 DALL-E API HTTP ${response.status}: ${errorText}`);
-              throw new Error(`DALL-E API error: ${response.statusText} - ${errorText}`);
-            }
-
-            const data = await response.json();
-            const imageUrl = data.data[0].url;
-
-            // Download image and convert to base64
-            const imageResponse = await fetch(imageUrl);
-            const arrayBuffer = await imageResponse.arrayBuffer();
-            const base64 = Buffer.from(arrayBuffer).toString("base64");
-            dalleImages.push(base64);
-            imageGenerated = true;
-            console.log(`  ✓ Generated DALL-E image ${i + 1} successfully`);
-
-            // Wait 1 second between successful generations
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          } catch (error) {
-            retryCount++;
-            console.error(`  ✗ DETAILED ERROR for DALL-E image ${i + 1} (attempt ${retryCount}/${maxRetries + 1}):`);
-            console.error(`     Error type: ${error instanceof Error ? error.constructor.name : typeof error}`);
-            console.error(`     Error message: ${error instanceof Error ? error.message : String(error)}`);
-            if (error instanceof Error && error.stack) {
-              console.error(`     Stack trace: ${error.stack.split('\n').slice(0, 3).join('\n')}`);
-            }
-
-            if (retryCount <= maxRetries) {
-              console.log(`  🔄 Retrying in 2 seconds...`);
-              await new Promise(resolve => setTimeout(resolve, 2000));
-            } else {
-              console.log(`  ⚠️  Failed to generate DALL-E image ${i + 1} after ${maxRetries + 1} attempts, skipping...`);
-            }
-          }
-        }
-      }
-
-      console.log(`✅ Generated ${dalleImages.length}/4 DALL-E images`);
-    } else {
-      console.log("\n⏭️  STEP 1/3: Skipping DALL-E generation for AI template (using Gemini one-shot instead)");
-    }
+    console.log("\n⏭️  STEP 1/3: Skipping DALL-E (using Gemini for all images to maintain personalization)");
 
     // ============================================
-    // STEP 2: Generate MORE images with Gemini (combining user uploads + common lifestyle)
+    // STEP 2: Generate 8 images with Gemini (all personalized with user's selfie)
     // SKIP for AI template - AI template uses Gemini one-shot only
     // ============================================
     const geminiImages: string[] = [];
 
     if (selectedTemplate !== "ai") {
-      console.log("\n🎨 STEP 2/3: Generating 4 images with Gemini from user uploads...");
+      console.log("\n🎨 STEP 2/3: Generating 8 personalized images with Gemini...");
 
     // Strategy: Create 4 scenario combinations from user's uploaded images
     const combinations = [];
@@ -219,7 +129,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 4 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 4: User AT LUXURY ROOFTOP
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -227,9 +137,41 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Generate Gemini images from combinations (generate ALL combinations up to 4)
-    for (let i = 0; i < Math.min(4, combinations.length); i++) {
-      console.log(`  [${i + 1}/${Math.min(4, combinations.length)}] Generating Gemini combination ${i + 1}`);
+    if (combinations.length < 8 && hasSelfie) {
+      // PRIORITY 5: User doing FITNESS/GYM workout
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person working out at a modern luxury gym with floor-to-ceiling windows and city views, doing strength training with dumbbells, wearing athletic wear, confident focused expression. Their face must be clearly visible and match the input image exactly. Only change the clothing to gym attire and background to fitness center."
+      });
+    }
+
+    if (combinations.length < 8 && hasSelfie) {
+      // PRIORITY 6: User at UPSCALE CELEBRATION
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person at an upscale champagne bar or rooftop lounge, wearing an elegant blazer, raising a glass of champagne in a celebratory toast with a genuine smile, warm golden ambient lighting. Their face must be clearly visible and match the input image exactly. Only change the clothing to formal attire and background to luxury bar setting."
+      });
+    }
+
+    if (combinations.length < 8 && hasSelfie) {
+      // PRIORITY 7: User doing OUTDOOR MEDITATION/YOGA
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person meditating peacefully outdoors at golden hour sunrise, sitting cross-legged in lotus position on a deck overlooking mountains or ocean, wearing comfortable neutral clothing, eyes closed, serene expression. Their face must be clearly visible and match the input image exactly. Only change the background to peaceful outdoor wellness setting."
+      });
+    }
+
+    if (combinations.length < 8 && hasSelfie) {
+      // PRIORITY 8: User in MODERN OFFICE/WORKING
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person working in a modern corner office with panoramic city skyline views through floor-to-ceiling windows, sitting at a desk with laptop, wearing business attire, professional confident expression. Their face must be clearly visible and match the input image exactly. Only change the clothing to business attire and background to modern office."
+      });
+    }
+
+    // Generate Gemini images from combinations (generate ALL combinations up to 8)
+    for (let i = 0; i < Math.min(8, combinations.length); i++) {
+      console.log(`  [${i + 1}/${Math.min(8, combinations.length)}] Generating Gemini combination ${i + 1}`);
       try {
         const combo = combinations[i];
         const imageParts = combo.images.map((dataUrl: string) => ({
@@ -327,10 +269,10 @@ Return ONLY the 5 quotes, one per line, without quotes or numbering.`;
     }
 
     // ============================================
-    // STEP 4: Combine all images
+    // STEP 4: Combine all images (Gemini only)
     // ============================================
-    const allGeneratedImages = [...geminiImages, ...dalleImages];
-    console.log(`\n📊 Total images generated: ${allGeneratedImages.length} (${geminiImages.length} Gemini + ${dalleImages.length} DALL-E)`);
+    const allGeneratedImages = [...geminiImages];
+    console.log(`\n📊 Total images generated: ${allGeneratedImages.length} (all Gemini for personalization)`);
 
     // Return based on template type
     if (selectedTemplate === "ai") {
@@ -549,7 +491,7 @@ Add beige rectangular labels in bottom-right corner of select tiles:
         metadata: {
           total_images: allGeneratedImages.length,
           gemini_images: geminiImages.length,
-          dalle_images: dalleImages.length,
+          dalle_images: 0, // Skipped for personalization
         },
       });
     }
