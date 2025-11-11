@@ -14,22 +14,22 @@ export default function CleanGridTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Simple 3x3 grid layout - 8 LARGE images with TINY center card
+  // Simple 3x3 grid layout - 8 images with minimal gaps and larger sizes
   const gridPositions = [
-    // Top row - 3 LARGE images
-    { top: 20, left: 20, width: 420, height: 280, keyword: "" },
-    { top: 20, left: 480, width: 420, height: 280, keyword: "" },
-    { top: 20, left: 940, width: 420, height: 280, keyword: "" },
+    // Top row - 3 images (minimal gaps: 10px)
+    { top: 10, left: 10, width: 435, height: 240, keyword: "" },
+    { top: 10, left: 455, width: 435, height: 240, keyword: "" },
+    { top: 10, left: 900, width: 435, height: 240, keyword: "" },
 
-    // Middle row - 2 LARGE side images (center card in middle)
-    { top: 340, left: 20, width: 420, height: 280, keyword: "" },
-    // TINY CENTER CARD HERE (540-840 x 380-460)
-    { top: 340, left: 940, width: 420, height: 280, keyword: "" },
+    // Middle row - 2 side images (center card in middle)
+    { top: 260, left: 10, width: 435, height: 240, keyword: "" },
+    // CENTER CARD HERE (positioned between middle images)
+    { top: 260, left: 900, width: 435, height: 240, keyword: "" },
 
-    // Bottom row - 3 LARGE images
-    { top: 660, left: 20, width: 420, height: 280, keyword: "" },
-    { top: 660, left: 480, width: 420, height: 280, keyword: "" },
-    { top: 660, left: 940, width: 420, height: 280, keyword: "" },
+    // Bottom row - 3 images
+    { top: 510, left: 10, width: 435, height: 240, keyword: "" },
+    { top: 510, left: 455, width: 435, height: 240, keyword: "" },
+    { top: 510, left: 900, width: 435, height: 240, keyword: "" },
   ];
 
   // Canvas rendering for download
@@ -41,17 +41,17 @@ export default function CleanGridTemplate({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Set canvas size
-      canvas.width = 1344;
-      canvas.height = 768;
+      // Set canvas size (3x3 grid optimized)
+      canvas.width = 1345;
+      canvas.height = 760;
 
       // Draw gradient background (soft, professional)
-      const gradient = ctx.createLinearGradient(0, 0, 1344, 768);
+      const gradient = ctx.createLinearGradient(0, 0, 1345, 760);
       gradient.addColorStop(0, '#f8fafc');
       gradient.addColorStop(0.5, '#f1f5f9');
       gradient.addColorStop(1, '#e2e8f0');
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 1344, 768);
+      ctx.fillRect(0, 0, 1345, 760);
 
       // Load and draw images
       const loadImage = (src: string): Promise<HTMLImageElement> => {
@@ -144,11 +144,11 @@ export default function CleanGridTemplate({
         }
       }
 
-      // Draw center card - TINY SIZE
-      const centerX = 540;
-      const centerY = 380;
-      const centerW = 300;
-      const centerH = 80;
+      // Draw center card - Larger, more prominent size
+      const centerX = 500;
+      const centerY = 290;
+      const centerW = 345;
+      const centerH = 180;
 
       ctx.save();
       ctx.fillStyle = '#6366f1'; // Indigo
@@ -172,15 +172,16 @@ export default function CleanGridTemplate({
       ctx.closePath();
       ctx.fill();
 
-      // Center text - TINY CARD
+      // Center text - Larger, more readable
       ctx.shadowColor = 'transparent';
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 28px Inter, system-ui, sans-serif';
+      ctx.font = 'bold 56px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('2025', centerX + centerW / 2, centerY + 35);
+      ctx.fillText('2025', centerX + centerW / 2, centerY + 80);
 
-      ctx.font = '12px Inter, system-ui, sans-serif';
-      ctx.fillText('YOUR VISION BOARD', centerX + centerW / 2, centerY + 55);
+      ctx.font = '18px Inter, system-ui, sans-serif';
+      ctx.letterSpacing = '3px';
+      ctx.fillText('YOUR VISION BOARD', centerX + centerW / 2, centerY + 115);
 
       ctx.restore();
     };
@@ -219,15 +220,15 @@ export default function CleanGridTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={1344}
-        height={768}
+        width={1345}
+        height={760}
         style={{ display: 'none' }}
       />
 
       {/* Visible Vision Board */}
       <div
         ref={containerRef}
-        className="relative w-[1344px] h-[768px] mx-auto overflow-hidden"
+        className="relative w-[1345px] h-[760px] mx-auto overflow-hidden"
         style={{ background: 'linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0)' }}
       >
         {/* Grid Images */}
@@ -273,19 +274,19 @@ export default function CleanGridTemplate({
           );
         })}
 
-        {/* Center Card - TINY SIZE */}
+        {/* Center Card - Larger, more prominent */}
         <div
           className="absolute bg-indigo-500 shadow-2xl flex flex-col items-center justify-center"
           style={{
-            top: '380px',
-            left: '540px',
-            width: '300px',
-            height: '80px',
-            borderRadius: '12px',
+            top: '290px',
+            left: '500px',
+            width: '345px',
+            height: '180px',
+            borderRadius: '16px',
           }}
         >
-          <div className="text-white text-2xl font-bold">2025</div>
-          <div className="text-white text-xs tracking-wider">YOUR VISION BOARD</div>
+          <div className="text-white text-6xl font-bold mb-2">2025</div>
+          <div className="text-white text-lg tracking-widest">YOUR VISION BOARD</div>
         </div>
       </div>
     </>
