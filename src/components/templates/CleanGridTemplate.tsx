@@ -100,21 +100,24 @@ export default function CleanGridTemplate({
           // Clip for rounded corners
           ctx.clip();
 
-          // Draw image (cover fit for clean grid)
+          // Draw image with face-aware positioning (assume face is in upper-center area)
           const imgRatio = img.width / img.height;
           const boxRatio = pos.width / pos.height;
           let drawWidth, drawHeight, drawX, drawY;
 
           if (imgRatio > boxRatio) {
+            // Image is wider - fit to height, center horizontally
             drawHeight = pos.height;
             drawWidth = drawHeight * imgRatio;
             drawX = pos.left - (drawWidth - pos.width) / 2;
             drawY = pos.top;
           } else {
+            // Image is taller - fit to width, position to show upper portion (where faces usually are)
             drawWidth = pos.width;
             drawHeight = drawWidth / imgRatio;
             drawX = pos.left;
-            drawY = pos.top - (drawHeight - pos.height) / 2;
+            // Position image to show top 60% (where faces typically are) instead of centering
+            drawY = pos.top - ((drawHeight - pos.height) * 0.2); // Show more of the top
           }
 
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
@@ -254,7 +257,10 @@ export default function CleanGridTemplate({
                 src={image}
                 alt={`Vision ${idx + 1}`}
                 className="w-full h-full object-cover"
-                style={{ objectFit: 'cover' }}
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: 'center 30%' // Show upper portion where faces typically are
+                }}
               />
 
               {/* Keyword label */}
