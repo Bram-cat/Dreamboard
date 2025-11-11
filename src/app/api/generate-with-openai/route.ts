@@ -49,12 +49,17 @@ async function resizeToAspectRatio(base64Data: string, targetAspectRatio: number
       cropY = 0;
       console.log(`    ✂️  Cropping sides: ${cropWidth}x${cropHeight} from center`);
     } else {
-      // Image is too tall - crop top/bottom (favor upper 30% for faces)
+      // Image is too tall (portrait) - crop top/bottom
+      // For portrait images, keep MORE of the top to show faces
       cropWidth = metadata.width;
       cropHeight = Math.round(cropWidth / targetAspectRatio);
       cropX = 0;
-      cropY = Math.round((metadata.height - cropHeight) * 0.3); // Keep upper 30% visible
-      console.log(`    ✂️  Cropping top/bottom: ${cropWidth}x${cropHeight} from upper 30%`);
+
+      // Smart cropping: If portrait, keep upper 20% (more aggressive face preservation)
+      const excessHeight = metadata.height - cropHeight;
+      cropY = Math.round(excessHeight * 0.2); // Keep top 20% visible (was 30%)
+
+      console.log(`    ✂️  Cropping top/bottom: ${cropWidth}x${cropHeight} from upper 20% (face-aware)`);
     }
 
     // Ensure crop dimensions are within bounds
@@ -285,8 +290,8 @@ export async function POST(request: NextRequest) {
           }
         }));
 
-        // Add aspect ratio instruction to prompt
-        const aspectRatioPrompt = `${combo.prompt}\n\nIMPORTANT OUTPUT DIMENSIONS:\n- Generate image in LANDSCAPE format with aspect ratio 1.8:1 (width is 1.8x the height)\n- Example dimensions: 1800x1000px or 1440x800px\n- Image MUST be wider than it is tall - HORIZONTAL/LANDSCAPE orientation only`;
+        // Add VERY explicit aspect ratio instruction to prompt
+        const aspectRatioPrompt = `${combo.prompt}\n\n🚨 CRITICAL DIMENSIONS REQUIREMENT 🚨:\n- OUTPUT FORMAT: WIDE LANDSCAPE ONLY - NOT PORTRAIT!\n- ASPECT RATIO: 16:9 or 1.78:1 (WIDER than tall)\n- MINIMUM WIDTH: 1600px\n- ORIENTATION: HORIZONTAL/LANDSCAPE (width MUST be 1.78x greater than height)\n- DO NOT generate portrait/vertical images\n- DO NOT generate square images\n- MUST be WIDE LANDSCAPE format like a movie screen or TV\n\nExample valid dimensions:\n- 1920x1080 (16:9)\n- 1600x900 (16:9)\n- 1440x810 (16:9)`;
 
         const response = await genai.models.generateContent({
           model: "gemini-2.5-flash-image",
