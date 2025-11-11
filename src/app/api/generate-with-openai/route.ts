@@ -48,41 +48,22 @@ export async function POST(request: NextRequest) {
     const dalleImages: string[] = [];
 
     if (selectedTemplate !== "ai") {
-      console.log("\n🎨 STEP 1/3: Generating 4 images with DALL-E (OpenAI) - scenario-based prompts...");
+      console.log("\n🎨 STEP 1/3: Generating 4 images with DALL-E image editing (OpenAI)...");
 
-      // Build 4 SCENARIO-BASED prompts matching Gemini's quality
-      const dalleScenarios = [];
+      // Build 4 SCENARIO-BASED prompts for image editing
+      const dalleScenarios = [
+        "Person exercising at modern gym, lifting weights or doing yoga, fit and athletic body, wearing stylish workout clothes, confident expression, healthy lifestyle aesthetic, professional fitness photography",
+        "Successful person at elegant luxury restaurant, raising champagne glass in toast, wearing expensive formal attire, confident wealthy expression, 5-star dining ambiance, gold and elegant decor",
+        "Joyful person celebrating with arms raised, big smile, confetti falling, sunset background, positive energy, pure happiness expression, celebratory moment",
+        "Person meditating peacefully, cross-legged yoga pose, eyes closed, serene expression, natural outdoor setting or spa, wellness and mindfulness aesthetic"
+      ];
 
-      // Scenario 1: Exercise/Fitness (user explicitly requested)
-      dalleScenarios.push(
-        hasSelfie
-          ? "Fitness lifestyle scene: modern gym interior with weights and equipment, yoga mat, healthy green smoothie, wellness aesthetic, morning sunlight streaming through windows. CRITICAL: NO people, NO faces visible - only equipment and setting."
-          : "Person exercising at modern gym, lifting weights or doing yoga, fit and athletic body, wearing stylish workout clothes, confident expression, healthy lifestyle aesthetic, professional fitness photography"
-      );
-
-      // Scenario 2: Wealth/Success (user explicitly requested)
-      dalleScenarios.push(
-        hasSelfie
-          ? "Luxury wealth scene: elegant 5-star restaurant table setting, champagne in ice bucket, fine dining silverware, gold accents, candles, success aesthetic. CRITICAL: NO people, NO faces - only luxury objects."
-          : "Successful person at elegant luxury restaurant, raising champagne glass in toast, wearing expensive formal attire, confident wealthy expression, 5-star dining ambiance, gold and elegant decor"
-      );
-
-      // Scenario 3: Happiness/Celebration
-      dalleScenarios.push(
-        hasSelfie
-          ? "Joyful celebration scene: colorful balloons, confetti, champagne bottles, party decorations, festive aesthetic. CRITICAL: NO people, NO faces - celebration objects only."
-          : "Joyful person celebrating with arms raised, big smile, confetti falling, sunset background, positive energy, pure happiness expression, celebratory moment"
-      );
-
-      // Scenario 4: Wellness/Meditation
-      dalleScenarios.push(
-        hasSelfie
-          ? "Wellness scene: peaceful meditation space, yoga mat, candles, plants, spa aesthetic, serene calming atmosphere. CRITICAL: NO people, NO faces - wellness setting only."
-          : "Person meditating peacefully, cross-legged yoga pose, eyes closed, serene expression, natural outdoor setting or spa, wellness and mindfulness aesthetic"
-      );
-
-      // Ensure we have exactly 4 scenarios
-      const dallePrompts = dalleScenarios.slice(0, 4);
+      // Helper: Convert base64 to PNG blob for DALL-E edits
+      const base64ToBlob = async (base64Data: string): Promise<Blob> => {
+        const base64 = base64Data.includes(',') ? base64Data.split(',')[1] : base64Data;
+        const buffer = Buffer.from(base64, 'base64');
+        return new Blob([buffer], { type: 'image/png' });
+      };
 
       // Generate 4 DALL-E images with retry logic
       let dalleAttempts = 0;
@@ -90,39 +71,78 @@ export async function POST(request: NextRequest) {
 
       while (dalleImages.length < 4 && dalleAttempts < maxDalleAttempts) {
         const currentIndex = dalleImages.length;
-        console.log(`  [${currentIndex + 1}/4] Generating DALL-E image (scenario-based)`);
+        console.log(`  [${currentIndex + 1}/4] Editing DALL-E image with ${hasSelfie ? 'user selfie' : 'placeholder person'}`);
 
-        try{
-          const response = await fetch("https://api.openai.com/v1/images/generations", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${openaiApiKey}`,
-            },
-            body: JSON.stringify({
-              model: "dall-e-3",
-              prompt: dallePrompts[currentIndex],
-              n: 1,
-              size: "1024x1024",
-              quality: "standard",
-            }),
-          });
+        try {
+          // Use selfie if available, otherwise use placeholder
+          const baseImage = hasSelfie ? categorizedUploads.selfie : null;
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`  🚨 DALL-E API HTTP ${response.status}: ${errorText}`);
-            throw new Error(`DALL-E API error: ${response.statusText} - ${errorText}`);
+          if (!baseImage) {
+            // Fallback to text-to-image if no selfie available
+            console.log(`  ⚠️  No selfie found, using text-to-image generation instead`);
+            const response = await fetch("https://api.openai.com/v1/images/generations", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${openaiApiKey}`,
+              },
+              body: JSON.stringify({
+                model: "dall-e-3",
+                prompt: dalleScenarios[currentIndex],
+                n: 1,
+                size: "1024x1024",
+                quality: "standard",
+              }),
+            });
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error(`  🚨 DALL-E API HTTP ${response.status}: ${errorText}`);
+              throw new Error(`DALL-E API error: ${response.statusText} - ${errorText}`);
+            }
+
+            const data = await response.json();
+            const imageUrl = data.data[0].url;
+
+            // Download image and convert to base64
+            const imageResponse = await fetch(imageUrl);
+            const arrayBuffer = await imageResponse.arrayBuffer();
+            const base64 = Buffer.from(arrayBuffer).toString("base64");
+            dalleImages.push(base64);
+            console.log(`  ✓ Generated DALL-E image ${currentIndex + 1} (text-to-image)`);
+          } else {
+            // Use DALL-E 2 image editing with selfie
+            const formData = new FormData();
+            const imageBlob = await base64ToBlob(baseImage);
+            formData.append('image', imageBlob, 'selfie.png');
+            formData.append('prompt', dalleScenarios[currentIndex]);
+            formData.append('n', '1');
+            formData.append('size', '1024x1024');
+
+            const response = await fetch("https://api.openai.com/v1/images/edits", {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${openaiApiKey}`,
+              },
+              body: formData,
+            });
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error(`  🚨 DALL-E Edit API HTTP ${response.status}: ${errorText}`);
+              throw new Error(`DALL-E Edit API error: ${response.statusText} - ${errorText}`);
+            }
+
+            const data = await response.json();
+            const imageUrl = data.data[0].url;
+
+            // Download image and convert to base64
+            const imageResponse = await fetch(imageUrl);
+            const arrayBuffer = await imageResponse.arrayBuffer();
+            const base64 = Buffer.from(arrayBuffer).toString("base64");
+            dalleImages.push(base64);
+            console.log(`  ✓ Edited DALL-E image ${currentIndex + 1} with user selfie`);
           }
-
-          const data = await response.json();
-          const imageUrl = data.data[0].url;
-
-          // Download image and convert to base64
-          const imageResponse = await fetch(imageUrl);
-          const arrayBuffer = await imageResponse.arrayBuffer();
-          const base64 = Buffer.from(arrayBuffer).toString("base64");
-          dalleImages.push(base64);
-          console.log(`  ✓ Generated DALL-E image ${currentIndex + 1}`);
 
           await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
@@ -138,7 +158,7 @@ export async function POST(request: NextRequest) {
         dalleAttempts++;
       }
 
-      console.log(`✅ Generated ${dalleImages.length} DALL-E images`);
+      console.log(`✅ Generated ${dalleImages.length} DALL-E images (using image editing)`);
     } else {
       console.log("\n⏭️  STEP 1/3: Skipping DALL-E generation for AI template (using Gemini one-shot instead)");
     }

@@ -17,19 +17,19 @@ export default function CleanGridTemplate({
   // Simple 3x3 grid layout - 8 LARGE images with TINY center card
   const gridPositions = [
     // Top row - 3 LARGE images
-    { top: 20, left: 20, width: 420, height: 280, keyword: keywords[0] },
+    { top: 20, left: 20, width: 420, height: 280, keyword: "" },
     { top: 20, left: 480, width: 420, height: 280, keyword: "" },
-    { top: 20, left: 940, width: 420, height: 280, keyword: keywords[1] },
+    { top: 20, left: 940, width: 420, height: 280, keyword: "" },
 
     // Middle row - 2 LARGE side images (center card in middle)
     { top: 340, left: 20, width: 420, height: 280, keyword: "" },
     // TINY CENTER CARD HERE (540-840 x 380-460)
-    { top: 340, left: 940, width: 420, height: 280, keyword: keywords[2] },
+    { top: 340, left: 940, width: 420, height: 280, keyword: "" },
 
     // Bottom row - 3 LARGE images
     { top: 660, left: 20, width: 420, height: 280, keyword: "" },
-    { top: 660, left: 480, width: 420, height: 280, keyword: keywords[3] },
-    { top: 660, left: 940, width: 420, height: 280, keyword: keywords[4] },
+    { top: 660, left: 480, width: 420, height: 280, keyword: "" },
+    { top: 660, left: 940, width: 420, height: 280, keyword: "" },
   ];
 
   // Canvas rendering for download
@@ -227,7 +227,8 @@ export default function CleanGridTemplate({
       {/* Visible Vision Board */}
       <div
         ref={containerRef}
-        className="relative w-[1344px] h-[768px] mx-auto bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 overflow-hidden"
+        className="relative w-[1344px] h-[768px] mx-auto overflow-hidden"
+        style={{ background: 'linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0)' }}
       >
         {/* Grid Images */}
         {images.slice(0, 8).map((image, idx) => {
