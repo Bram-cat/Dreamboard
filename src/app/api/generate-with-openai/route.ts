@@ -402,12 +402,6 @@ Return ONLY the 5 quotes, one per line, without quotes or numbering.`;
       allQuotes.push("DREAM BIG");
     }
 
-    // ============================================
-    // STEP 4: Combine all images (Gemini only)
-    // ============================================
-    const allGeneratedImages = [...geminiImages];
-    console.log(`\n📊 Total images generated: ${allGeneratedImages.length} (all Gemini for personalization)`);
-
     // Return based on template type
     if (selectedTemplate === "ai") {
       // AI-generated collage using Gemini ONE-SHOT (no DALL-E, no multi-step)
