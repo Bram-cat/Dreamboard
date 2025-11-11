@@ -100,29 +100,37 @@ export default function CleanGridTemplate({
           // Clip for rounded corners
           ctx.clip();
 
-          // Draw image with face-aware positioning (assume face is in upper-center area)
+          // Images are pre-processed to exact 435x240 dimensions, so draw them directly
+          // Use 'cover' fit to fill frame completely
           const imgRatio = img.width / img.height;
           const boxRatio = pos.width / pos.height;
-          let drawWidth, drawHeight, drawX, drawY;
 
-          // Use 'cover' fit to fill frame, with smart positioning for portraits
-          if (imgRatio > boxRatio) {
-            // Image is wider - fit to height, crop sides
-            drawHeight = pos.height;
-            drawWidth = drawHeight * imgRatio;
-            drawX = pos.left - (drawWidth - pos.width) / 2;
-            drawY = pos.top;
+          // Check if image matches expected aspect ratio (within 1% tolerance)
+          const aspectRatioMatch = Math.abs(imgRatio - boxRatio) < 0.01;
+
+          if (aspectRatioMatch) {
+            // Perfect match - draw directly
+            ctx.drawImage(img, pos.left, pos.top, pos.width, pos.height);
           } else {
-            // Image is taller (portrait) - fit to width, show upper 40% for face visibility
-            drawWidth = pos.width;
-            drawHeight = drawWidth / imgRatio;
-            drawX = pos.left;
-            // Position to show upper portion (faces) - 30% from top instead of center
-            const excessHeight = drawHeight - pos.height;
-            drawY = pos.top - (excessHeight * 0.3);
-          }
+            // Fallback for images that weren't properly pre-processed
+            let drawWidth, drawHeight, drawX, drawY;
 
-          ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+            if (imgRatio > boxRatio) {
+              // Image is wider - fit to height, crop sides
+              drawHeight = pos.height;
+              drawWidth = drawHeight * imgRatio;
+              drawX = pos.left - (drawWidth - pos.width) / 2;
+              drawY = pos.top;
+            } else {
+              // Image is taller - fit to width, show upper portion
+              drawWidth = pos.width;
+              drawHeight = drawWidth / imgRatio;
+              drawX = pos.left;
+              drawY = pos.top - (drawHeight - pos.height) * 0.3;
+            }
+
+            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+          }
 
           // Draw keyword label at bottom if exists
           if (pos.keyword) {
@@ -258,10 +266,11 @@ export default function CleanGridTemplate({
               <img
                 src={image}
                 alt={`Vision ${idx + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full"
                 style={{
-                  objectFit: 'cover', // Fill frame completely
-                  objectPosition: 'center 30%' // Show upper portion for better face framing
+                  objectFit: 'fill', // Images are pre-processed to exact dimensions, so fill works perfectly
+                  width: '100%',
+                  height: '100%'
                 }}
               />
 

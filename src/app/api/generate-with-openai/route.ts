@@ -5,6 +5,8 @@ import sharp from "sharp";
 // Helper function to resize/crop image to target aspect ratio (435x240 = 1.8125:1)
 async function resizeToAspectRatio(base64Data: string, targetAspectRatio: number): Promise<string> {
   try {
+    console.log(`    📐 Processing image to aspect ratio ${targetAspectRatio}:1`);
+
     const imageBuffer = Buffer.from(base64Data, 'base64');
     const metadata = await sharp(imageBuffer).metadata();
 
@@ -12,8 +14,20 @@ async function resizeToAspectRatio(base64Data: string, targetAspectRatio: number
       throw new Error('Could not read image dimensions');
     }
 
+    console.log(`    📏 Original dimensions: ${metadata.width}x${metadata.height} (${(metadata.width / metadata.height).toFixed(2)}:1)`);
+
     const sourceAspectRatio = metadata.width / metadata.height;
     let cropWidth, cropHeight, cropX, cropY;
+
+    // Calculate crop dimensions
+    if (Math.abs(sourceAspectRatio - targetAspectRatio) < 0.01) {
+      // Already correct aspect ratio, just optimize
+      console.log(`    ✓ Image already has correct aspect ratio`);
+      const optimizedBuffer = await sharp(imageBuffer)
+        .jpeg({ quality: 95 })
+        .toBuffer();
+      return optimizedBuffer.toString('base64');
+    }
 
     if (sourceAspectRatio > targetAspectRatio) {
       // Image is too wide - crop sides (center crop)
@@ -21,23 +35,39 @@ async function resizeToAspectRatio(base64Data: string, targetAspectRatio: number
       cropWidth = Math.round(cropHeight * targetAspectRatio);
       cropX = Math.round((metadata.width - cropWidth) / 2);
       cropY = 0;
+      console.log(`    ✂️  Cropping sides: ${cropWidth}x${cropHeight} from center`);
     } else {
       // Image is too tall - crop top/bottom (favor upper 30% for faces)
       cropWidth = metadata.width;
       cropHeight = Math.round(cropWidth / targetAspectRatio);
       cropX = 0;
       cropY = Math.round((metadata.height - cropHeight) * 0.3); // Keep upper 30% visible
+      console.log(`    ✂️  Cropping top/bottom: ${cropWidth}x${cropHeight} from upper 30%`);
     }
 
-    // Crop image to target aspect ratio
+    // Ensure crop dimensions are within bounds
+    cropWidth = Math.min(cropWidth, metadata.width);
+    cropHeight = Math.min(cropHeight, metadata.height);
+    cropX = Math.max(0, Math.min(cropX, metadata.width - cropWidth));
+    cropY = Math.max(0, Math.min(cropY, metadata.height - cropHeight));
+
+    // Crop and resize to exact target dimensions (435x240)
+    const targetWidth = 435;
+    const targetHeight = 240;
+
     const croppedBuffer = await sharp(imageBuffer)
       .extract({ left: cropX, top: cropY, width: cropWidth, height: cropHeight })
+      .resize(targetWidth, targetHeight, {
+        fit: 'fill',
+        kernel: 'lanczos3'
+      })
       .jpeg({ quality: 95 })
       .toBuffer();
 
+    console.log(`    ✅ Final dimensions: ${targetWidth}x${targetHeight}`);
     return croppedBuffer.toString('base64');
   } catch (error) {
-    console.error('Error resizing image:', error);
+    console.error('    ❌ Error resizing image:', error);
     // Return original if resize fails
     return base64Data;
   }
@@ -548,7 +578,8 @@ Add beige rectangular labels in bottom-right corner of select tiles:
       // Return individual images for HTML templates (polaroid or grid)
       console.log(`\n🎨 Returning ${allGeneratedImages.length} individual images for template: ${selectedTemplate}`);
 
-      const individualImages = allGeneratedImages.map(base64 => `data:image/png;base64,${base64}`);
+      // Images are now JPEG format after sharp processing
+      const individualImages = allGeneratedImages.map(base64 => `data:image/jpeg;base64,${base64}`);
 
       return NextResponse.json({
         status: "success",
