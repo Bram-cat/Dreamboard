@@ -105,20 +105,19 @@ export default function CleanGridTemplate({
           const boxRatio = pos.width / pos.height;
           let drawWidth, drawHeight, drawX, drawY;
 
+          // Use 'contain' fit to show complete image without cropping
           if (imgRatio > boxRatio) {
-            // Image is wider - fit to height, center horizontally
-            drawHeight = pos.height;
-            drawWidth = drawHeight * imgRatio;
-            drawX = pos.left - (drawWidth - pos.width) / 2;
-            drawY = pos.top;
-          } else {
-            // Image is taller - fit to width, position to show upper portion (where faces usually are)
+            // Image is wider than box - fit to width, letterbox top/bottom
             drawWidth = pos.width;
-            drawHeight = drawWidth / imgRatio;
+            drawHeight = pos.width / imgRatio;
             drawX = pos.left;
-            // Position image to show the top portion (faces) - shift less upward
-            // Only offset by 10% instead of centering (which would be 50%)
-            drawY = pos.top - ((drawHeight - pos.height) * 0.1); // Show top 60% of image
+            drawY = pos.top + (pos.height - drawHeight) / 2; // Center vertically
+          } else {
+            // Image is taller than box - fit to height, pillarbox left/right
+            drawHeight = pos.height;
+            drawWidth = pos.height * imgRatio;
+            drawX = pos.left + (pos.width - drawWidth) / 2; // Center horizontally
+            drawY = pos.top;
           }
 
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
@@ -259,8 +258,8 @@ export default function CleanGridTemplate({
                 alt={`Vision ${idx + 1}`}
                 className="w-full h-full object-cover"
                 style={{
-                  objectFit: 'cover',
-                  objectPosition: 'center 20%' // Show upper portion where faces typically are (20% from top)
+                  objectFit: 'contain', // Show complete image without cropping
+                  objectPosition: 'center center'
                 }}
               />
 

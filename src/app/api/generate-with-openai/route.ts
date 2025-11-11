@@ -56,12 +56,39 @@ export async function POST(request: NextRequest) {
     if (selectedTemplate !== "ai") {
       console.log("\n🎨 STEP 2/3: Generating 8 personalized images with Gemini...");
 
-    // Strategy: Create 4 scenario combinations from user's uploaded images
+    // Strategy: Create up to 11 diverse images, then select best 8
     const combinations = [];
 
-    // PRIORITY COMBINATIONS: User with their uploads (selfie+car, selfie+house, car+house+destination)
+    // PRIORITY 1: STANDALONE ASSETS (show the actual dream items)
+    // These are important to include even without selfie
 
-    // 1. If has selfie + car: person WITH their car
+    // 1A. Dream Car (standalone or with generic person if no selfie)
+    if (hasDreamCar) {
+      combinations.push({
+        images: [categorizedUploads.dreamCar],
+        prompt: "Professional automotive photography of this EXACT luxury car. Show the complete vehicle in a beautiful outdoor setting with golden hour lighting. The car should be the main focus, parked in an upscale location (modern driveway, scenic overlook, or luxury showroom). Maintain the exact car model, brand, and color. High-end automotive photography style, aspirational luxury aesthetic, 4K quality."
+      });
+    }
+
+    // 1B. Dream House (standalone)
+    if (hasDreamHouse) {
+      combinations.push({
+        images: [categorizedUploads.dreamHouse],
+        prompt: "Professional real estate photography of this EXACT dream house. Show the complete property with beautiful architecture clearly visible. Golden hour lighting, well-maintained landscaping, upscale neighborhood setting. Maintain the exact house design and features. High-end architectural photography style, aspirational homeownership aesthetic, 4K quality."
+      });
+    }
+
+    // 1C. Dream Destination (standalone)
+    if (hasDestination) {
+      combinations.push({
+        images: [categorizedUploads.destination],
+        prompt: "Professional travel photography of this EXACT destination. Show the iconic landmarks and beautiful scenery of this location. Natural lighting, vibrant colors, stunning composition. Maintain recognizable features of the destination. High-end travel photography style, wanderlust aesthetic, 4K quality."
+      });
+    }
+
+    // PRIORITY 2: COMBINED SCENARIOS (user with their dream items)
+
+    // 2A. If has selfie + car: person WITH their car
     if (hasSelfie && hasDreamCar) {
       combinations.push({
         images: [categorizedUploads.selfie, categorizedUploads.dreamCar],
@@ -85,27 +112,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 4. If has car + house + destination: triple combination wealth scene
-    if (hasDreamCar && hasDreamHouse && hasDestination) {
-      combinations.push({
-        images: [categorizedUploads.dreamCar, categorizedUploads.dreamHouse, categorizedUploads.destination],
-        prompt: "Create a beautiful composite scene blending these three elements: this car, this house, and this destination. Make it look like a luxury lifestyle collage - car parked at a beautiful property with destination vibes in the background. Keep all elements recognizable and aspirational."
-      });
-    }
+    // PRIORITY 3: LIFESTYLE SCENARIOS WITH SELFIE (only if user uploaded selfie)
+    // These show the user living their best life
 
-    // 5. If has car + house: combined property wealth scene
-    if (hasDreamCar && hasDreamHouse) {
-      combinations.push({
-        images: [categorizedUploads.dreamCar, categorizedUploads.dreamHouse],
-        prompt: "Create a beautiful scene showing this EXACT car parked in front of this EXACT house. Keep both the car brand/model and house architecture clearly recognizable. Add beautiful lighting, landscaping, and atmosphere to make it look aspirational and wealthy."
-      });
-    }
-
-    // 5. Add keyword-based scenario generation to reach 4 Gemini images
-    // ALWAYS prefer using user's selfie for scenarios
-    // User explicitly requested: exercise, rich, happiness, wellness scenarios
-
-    if (combinations.length < 8 && hasSelfie) {
+    if (combinations.length < 11 && hasSelfie) {
       // PRIORITY 1: User with TRAVEL/ADVENTURE
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -113,7 +123,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 8 && hasSelfie) {
+    if (combinations.length < 11 && hasSelfie) {
       // PRIORITY 2: User with GOOD FOOD/HEALTHY LIFESTYLE
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -121,7 +131,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 8 && hasSelfie) {
+    if (combinations.length < 11 && hasSelfie) {
       // PRIORITY 3: User in PROFESSIONAL/OFFICE SUCCESS setting
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -129,7 +139,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 8 && hasSelfie) {
+    if (combinations.length < 11 && hasSelfie) {
       // PRIORITY 4: User AT LUXURY ROOFTOP
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -137,7 +147,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 8 && hasSelfie) {
+    if (combinations.length < 11 && hasSelfie) {
       // PRIORITY 5: User doing FITNESS/GYM workout
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -145,7 +155,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 8 && hasSelfie) {
+    if (combinations.length < 11 && hasSelfie) {
       // PRIORITY 6: User at UPSCALE CELEBRATION
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -153,7 +163,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 8 && hasSelfie) {
+    if (combinations.length < 11 && hasSelfie) {
       // PRIORITY 7: User doing OUTDOOR MEDITATION/YOGA
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -161,7 +171,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 8 && hasSelfie) {
+    if (combinations.length < 11 && hasSelfie) {
       // PRIORITY 8: User in MODERN OFFICE/WORKING
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -169,9 +179,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Generate Gemini images from combinations (generate ALL combinations up to 8)
-    for (let i = 0; i < Math.min(8, combinations.length); i++) {
-      console.log(`  [${i + 1}/${Math.min(8, combinations.length)}] Generating Gemini combination ${i + 1}`);
+    // Generate Gemini images from combinations (generate up to 11, then select best 8)
+    console.log(`\n📋 Prepared ${combinations.length} image combinations`);
+
+    for (let i = 0; i < Math.min(11, combinations.length); i++) {
+      console.log(`  [${i + 1}/${Math.min(11, combinations.length)}] Generating Gemini image ${i + 1}`);
       try {
         const combo = combinations[i];
         const imageParts = combo.images.map((dataUrl: string) => ({
@@ -210,7 +222,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-      console.log(`✅ Generated ${geminiImages.length} Gemini images`);
+      console.log(`✅ Generated ${geminiImages.length} Gemini images total`);
+
+      // Select best 8 images from generated set
+      if (geminiImages.length > 8) {
+        console.log(`\n📊 Selecting best 8 images from ${geminiImages.length} generated...`);
+        // Priority selection: Take first 8 (which includes standalone assets first, then combined scenarios)
+        geminiImages.splice(8); // Keep only first 8
+        console.log(`✅ Selected 8 diverse images for vision board`);
+      }
     } else {
       console.log("\n⏭️  STEP 2/3: Skipping Gemini multi-step generation for AI template (using one-shot instead)");
     }
