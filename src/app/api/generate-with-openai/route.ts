@@ -51,11 +51,19 @@ export async function POST(request: NextRequest) {
       console.log("\n🎨 STEP 1/3: Generating 4 images with DALL-E 3 (OpenAI)...");
 
       // Build 4 SCENARIO-BASED prompts for DALL-E 3 text-to-image generation
+      // Match the Gemini style: specific lifestyle scenarios with detailed context
       const dalleScenarios = [
-        "Professional photograph of a person exercising at a modern luxury gym, lifting weights or doing yoga, fit and athletic body, wearing stylish designer workout clothes, confident expression, healthy lifestyle aesthetic, cinematic lighting, 4K quality",
-        "Professional photograph of a successful person at an elegant luxury restaurant, raising a champagne glass in a toast, wearing expensive formal attire, confident wealthy expression, 5-star dining ambiance with gold and elegant decor, warm ambient lighting, sophisticated atmosphere",
-        "Professional photograph of a joyful person celebrating with arms raised high, genuine big smile, golden confetti falling around them, beautiful sunset background, positive energy radiating, pure happiness expression, celebratory moment captured perfectly, vibrant colors",
-        "Professional photograph of a person meditating peacefully in cross-legged lotus yoga pose, eyes gently closed, serene and calm expression, beautiful natural outdoor setting or luxury spa environment, wellness and mindfulness aesthetic, soft natural lighting, tranquil atmosphere"
+        // Scenario 1: Fitness/Gym Success
+        "A fit young professional working out at a modern luxury gym with floor-to-ceiling windows and city views. They're doing strength training with dumbbells, wearing stylish athletic wear, showing muscular definition and confident focused expression. The gym has sleek black equipment, wooden floors, and warm afternoon sunlight streaming through tall windows. Professional fitness photography, shallow depth of field, cinematic lighting, aspirational wellness aesthetic, motivational atmosphere.",
+
+        // Scenario 2: Luxury Lifestyle/Celebration
+        "A successful young professional at an upscale champagne bar or rooftop lounge, wearing an elegant blazer and dress shirt, raising a glass of champagne in a celebratory toast with a genuine confident smile. The setting has warm golden ambient lighting, marble or brass bar counter, bottles of premium champagne in the background, bokeh lights creating a sophisticated evening atmosphere. Professional lifestyle photography, warm color grading, luxury celebration aesthetic, success vibes.",
+
+        // Scenario 3: Wellness/Meditation
+        "A peaceful young professional meditating in a serene outdoor wellness setting at golden hour sunrise. They're sitting cross-legged in lotus meditation position on a wooden deck or platform overlooking mountains or ocean, wearing comfortable neutral linen clothing, eyes gently closed with calm peaceful expression. Soft golden morning light, misty natural background, yoga mat, small zen plants around, tranquil atmosphere. Professional wellness photography, natural lighting, mindfulness and inner peace aesthetic.",
+
+        // Scenario 4: Professional Success
+        "A confident young professional working in a modern corner office with panoramic city skyline views through floor-to-ceiling windows. They're sitting at a sleek minimalist desk reviewing business charts on a laptop, wearing a tailored suit or smart business attire, professional yet approachable focused expression. The office has contemporary design, potted plants, afternoon natural sunlight, city buildings visible outside. Professional corporate photography, natural window light, executive success aesthetic, modern workspace."
       ];
 
       // Generate 4 DALL-E images with better retry logic
