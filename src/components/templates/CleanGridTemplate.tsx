@@ -105,19 +105,21 @@ export default function CleanGridTemplate({
           const boxRatio = pos.width / pos.height;
           let drawWidth, drawHeight, drawX, drawY;
 
-          // Use 'contain' fit to show complete image without cropping
+          // Use 'cover' fit to fill frame, with smart positioning for portraits
           if (imgRatio > boxRatio) {
-            // Image is wider than box - fit to width, letterbox top/bottom
-            drawWidth = pos.width;
-            drawHeight = pos.width / imgRatio;
-            drawX = pos.left;
-            drawY = pos.top + (pos.height - drawHeight) / 2; // Center vertically
-          } else {
-            // Image is taller than box - fit to height, pillarbox left/right
+            // Image is wider - fit to height, crop sides
             drawHeight = pos.height;
-            drawWidth = pos.height * imgRatio;
-            drawX = pos.left + (pos.width - drawWidth) / 2; // Center horizontally
+            drawWidth = drawHeight * imgRatio;
+            drawX = pos.left - (drawWidth - pos.width) / 2;
             drawY = pos.top;
+          } else {
+            // Image is taller (portrait) - fit to width, show upper 40% for face visibility
+            drawWidth = pos.width;
+            drawHeight = drawWidth / imgRatio;
+            drawX = pos.left;
+            // Position to show upper portion (faces) - 30% from top instead of center
+            const excessHeight = drawHeight - pos.height;
+            drawY = pos.top - (excessHeight * 0.3);
           }
 
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
@@ -258,8 +260,8 @@ export default function CleanGridTemplate({
                 alt={`Vision ${idx + 1}`}
                 className="w-full h-full object-cover"
                 style={{
-                  objectFit: 'contain', // Show complete image without cropping
-                  objectPosition: 'center center'
+                  objectFit: 'cover', // Fill frame completely
+                  objectPosition: 'center 30%' // Show upper portion for better face framing
                 }}
               />
 
