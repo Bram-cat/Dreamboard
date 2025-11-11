@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
     const dalleImages: string[] = [];
 
     if (selectedTemplate !== "ai") {
-      console.log("\n🎨 STEP 1/3: Generating 7 images with DALL-E (OpenAI) - scenario-based prompts...");
+      console.log("\n🎨 STEP 1/3: Generating 4 images with DALL-E (OpenAI) - scenario-based prompts...");
 
-      // Build 7 SCENARIO-BASED prompts matching Gemini's quality
+      // Build 4 SCENARIO-BASED prompts matching Gemini's quality
       const dalleScenarios = [];
 
       // Scenario 1: Exercise/Fitness (user explicitly requested)
@@ -74,38 +74,23 @@ export async function POST(request: NextRequest) {
           : "Joyful person celebrating with arms raised, big smile, confetti falling, sunset background, positive energy, pure happiness expression, celebratory moment"
       );
 
-      // Scenario 4: Travel/Adventure
-      if (!hasDestination) {
-        dalleScenarios.push("Exotic tropical destination: pristine turquoise beach water, white sand, palm trees swaying, luxury resort in background, paradise travel photography, aspirational vacation aesthetic");
-      }
-
-      // Scenario 5: Dream Car
-      if (!hasDreamCar) {
-        dalleScenarios.push("Luxury dream car: sleek red Ferrari or Lamborghini supercar, polished exterior gleaming, modern showroom or scenic coastal road, automotive photography, wealth and success aesthetic");
-      }
-
-      // Scenario 6: Dream House
-      if (!hasDreamHouse) {
-        dalleScenarios.push("Luxury dream house: stunning modern mansion exterior, contemporary architecture, infinity pool, manicured landscaping, palm trees, sunset lighting, real estate photography, aspirational home");
-      }
-
-      // Scenario 7: Wellness/Meditation
+      // Scenario 4: Wellness/Meditation
       dalleScenarios.push(
         hasSelfie
           ? "Wellness scene: peaceful meditation space, yoga mat, candles, plants, spa aesthetic, serene calming atmosphere. CRITICAL: NO people, NO faces - wellness setting only."
           : "Person meditating peacefully, cross-legged yoga pose, eyes closed, serene expression, natural outdoor setting or spa, wellness and mindfulness aesthetic"
       );
 
-      // Ensure we have exactly 7 scenarios
-      const dallePrompts = dalleScenarios.slice(0, 7);
+      // Ensure we have exactly 4 scenarios
+      const dallePrompts = dalleScenarios.slice(0, 4);
 
-      // Generate 7 DALL-E images with retry logic
+      // Generate 4 DALL-E images with retry logic
       let dalleAttempts = 0;
-      const maxDalleAttempts = 10; // 7 images + 3 retries
+      const maxDalleAttempts = 6; // 4 images + 2 retries
 
-      while (dalleImages.length < 7 && dalleAttempts < maxDalleAttempts) {
+      while (dalleImages.length < 4 && dalleAttempts < maxDalleAttempts) {
         const currentIndex = dalleImages.length;
-        console.log(`  [${currentIndex + 1}/7] Generating DALL-E image (scenario-based)`);
+        console.log(`  [${currentIndex + 1}/4] Generating DALL-E image (scenario-based)`);
 
         try{
           const response = await fetch("https://api.openai.com/v1/images/generations", {
@@ -165,9 +150,9 @@ export async function POST(request: NextRequest) {
     const geminiImages: string[] = [];
 
     if (selectedTemplate !== "ai") {
-      console.log("\n🎨 STEP 2/3: Generating 8 images with Gemini from user uploads...");
+      console.log("\n🎨 STEP 2/3: Generating 4 images with Gemini from user uploads...");
 
-    // Strategy: Create 8 scenario combinations from user's uploaded images
+    // Strategy: Create 4 scenario combinations from user's uploaded images
     const combinations = [];
 
     // PRIORITY COMBINATIONS: User with their uploads (selfie+car, selfie+house, car+house+destination)
@@ -212,91 +197,45 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 5. Add keyword-based scenario generation to reach AT LEAST 8 Gemini images
+    // 5. Add keyword-based scenario generation to reach 4 Gemini images
     // ALWAYS prefer using user's selfie for scenarios
     // User explicitly requested: exercise, rich, happiness, wellness scenarios
 
-    if (combinations.length < 8 && hasSelfie) {
-      // PRIORITY 1: User doing EXERCISE/FITNESS (user explicitly requested this)
-      combinations.push({
-        images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person exercising at a gym, doing yoga, running, or working out, looking fit and healthy. Their face must be clearly visible and match the input image exactly. Only change the clothing to workout attire and background to a fitness setting."
-      });
-    }
-
-    if (combinations.length < 8 && hasSelfie) {
-      // PRIORITY 2: User showing WEALTH/RICH (user explicitly requested this)
-      combinations.push({
-        images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person at an elegant luxury restaurant dining, champagne glass, fine dining, looking wealthy and successful. Their face must be clearly visible and match the input image exactly. Only change the clothing to elegant attire and background to luxury dining."
-      });
-    }
-
-    if (combinations.length < 8 && hasSelfie) {
-      // PRIORITY 3: User showing HAPPINESS (user explicitly requested this)
-      combinations.push({
-        images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person celebrating with joyful expression, smiling, positive energy, happy moment. Their face must be clearly visible and match the input image exactly. Only change the background to a celebratory/joyful setting."
-      });
-    }
-
-    if (combinations.length < 8 && hasSelfie) {
-      // PRIORITY 4: User with WELLNESS/MEDITATION (common lifestyle)
-      combinations.push({
-        images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person meditating peacefully, doing yoga, or in a spa/relaxation setting, looking calm and centered. Their face must be clearly visible and match the input image exactly. Only change the background to a wellness setting."
-      });
-    }
-
-    if (combinations.length < 8 && hasSelfie) {
-      // PRIORITY 5: User with TRAVEL/ADVENTURE
+    if (combinations.length < 4 && hasSelfie) {
+      // PRIORITY 1: User with TRAVEL/ADVENTURE
       combinations.push({
         images: [categorizedUploads.selfie],
         prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person at a beautiful exotic travel destination - beach, mountains, or tropical location, looking happy and adventurous. Their face must be clearly visible and match the input image exactly. Only change the background to a travel destination."
       });
     }
 
-    if (combinations.length < 8 && hasSelfie) {
-      // PRIORITY 6: User with GOOD FOOD/HEALTHY LIFESTYLE
+    if (combinations.length < 4 && hasSelfie) {
+      // PRIORITY 2: User with GOOD FOOD/HEALTHY LIFESTYLE
       combinations.push({
         images: [categorizedUploads.selfie],
         prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person enjoying healthy food - smoothie bowl, fresh salad, or preparing nutritious meal, looking healthy and wellness-focused. Their face must be clearly visible and match the input image exactly. Only change the background to a healthy food setting."
       });
     }
 
-    if (combinations.length < 8 && hasSelfie) {
-      // PRIORITY 7: User in PROFESSIONAL/OFFICE SUCCESS setting
+    if (combinations.length < 4 && hasSelfie) {
+      // PRIORITY 3: User in PROFESSIONAL/OFFICE SUCCESS setting
       combinations.push({
         images: [categorizedUploads.selfie],
         prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person in a professional office setting, working on laptop, modern workspace, looking successful and confident. Their face must be clearly visible and match the input image exactly. Only change the clothing to business attire and background to modern office."
       });
     }
 
-    // If still not enough, add original uploads enhanced
-    if (combinations.length < 8 && hasDreamCar) {
+    if (combinations.length < 4 && hasSelfie) {
+      // PRIORITY 4: User AT LUXURY ROOFTOP
       combinations.push({
-        images: [categorizedUploads.dreamCar],
-        prompt: "Enhance this car image to look more luxurious and aspirational. Keep the car brand and model exactly the same. Only improve the setting and lighting."
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person at a stylish rooftop or penthouse with city skyline view, looking successful and confident. Their face must be clearly visible and match the input image exactly. Only change the background to luxury rooftop setting."
       });
     }
 
-    if (combinations.length < 8 && hasDreamHouse) {
-      combinations.push({
-        images: [categorizedUploads.dreamHouse],
-        prompt: "Enhance this house image to look more beautiful and aspirational. Keep the house architecture exactly the same. Only improve the landscaping and lighting."
-      });
-    }
-
-    if (combinations.length < 8 && hasDestination) {
-      combinations.push({
-        images: [categorizedUploads.destination],
-        prompt: "Enhance this destination image to look more vibrant and travel-worthy. Keep landmarks recognizable. Only improve colors and atmosphere."
-      });
-    }
-
-    // Generate Gemini images from combinations (generate ALL combinations up to 8)
-    for (let i = 0; i < Math.min(8, combinations.length); i++) {
-      console.log(`  [${i + 1}/${Math.min(8, combinations.length)}] Generating Gemini combination ${i + 1}`);
+    // Generate Gemini images from combinations (generate ALL combinations up to 4)
+    for (let i = 0; i < Math.min(4, combinations.length); i++) {
+      console.log(`  [${i + 1}/${Math.min(4, combinations.length)}] Generating Gemini combination ${i + 1}`);
       try {
         const combo = combinations[i];
         const imageParts = combo.images.map((dataUrl: string) => ({
