@@ -3,6 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import sharp from "sharp";
 
 // Helper function to resize/crop image to target aspect ratio (435x240 = 1.8125:1)
+// IMPROVED STRATEGY: Use 'entropy' for better face/content preservation
 async function resizeToAspectRatio(base64Data: string, targetAspectRatio: number): Promise<string> {
   try {
     console.log(`    📐 Processing image to aspect ratio ${targetAspectRatio}:1`);
@@ -16,81 +17,33 @@ async function resizeToAspectRatio(base64Data: string, targetAspectRatio: number
 
     console.log(`    📏 Original dimensions: ${metadata.width}x${metadata.height} (${(metadata.width / metadata.height).toFixed(2)}:1)`);
 
-    const sourceAspectRatio = metadata.width / metadata.height;
-    let cropWidth, cropHeight, cropX, cropY;
-
-    // Calculate crop dimensions
-    if (Math.abs(sourceAspectRatio - targetAspectRatio) < 0.01) {
-      // Already correct aspect ratio, just resize to exact dimensions
-      console.log(`    ✓ Image already has correct aspect ratio`);
-      const targetWidth = 435;
-      const targetHeight = 240;
-
-      const resizedBuffer = await sharp(imageBuffer)
-        .resize(targetWidth, targetHeight, {
-          fit: 'cover',
-          position: 'centre',
-          kernel: 'lanczos3'
-        })
-        .jpeg({ quality: 95, mozjpeg: true })
-        .toBuffer();
-
-      const finalMetadata = await sharp(resizedBuffer).metadata();
-      console.log(`    ✅ Final dimensions: ${finalMetadata.width}x${finalMetadata.height}`);
-
-      return resizedBuffer.toString('base64');
-    }
-
-    if (sourceAspectRatio > targetAspectRatio) {
-      // Image is too wide - crop sides (center crop)
-      cropHeight = metadata.height;
-      cropWidth = Math.round(cropHeight * targetAspectRatio);
-      cropX = Math.round((metadata.width - cropWidth) / 2);
-      cropY = 0;
-      console.log(`    ✂️  Cropping sides: ${cropWidth}x${cropHeight} from center`);
-    } else {
-      // Image is too tall (portrait) - crop top/bottom
-      // For portrait images, keep MORE of the top to show faces
-      cropWidth = metadata.width;
-      cropHeight = Math.round(cropWidth / targetAspectRatio);
-      cropX = 0;
-
-      // Smart cropping: If portrait, keep upper 20% (more aggressive face preservation)
-      const excessHeight = metadata.height - cropHeight;
-      cropY = Math.round(excessHeight * 0.2); // Keep top 20% visible (was 30%)
-
-      console.log(`    ✂️  Cropping top/bottom: ${cropWidth}x${cropHeight} from upper 20% (face-aware)`);
-    }
-
-    // Ensure crop dimensions are within bounds
-    cropWidth = Math.min(cropWidth, metadata.width);
-    cropHeight = Math.min(cropHeight, metadata.height);
-    cropX = Math.max(0, Math.min(cropX, metadata.width - cropWidth));
-    cropY = Math.max(0, Math.min(cropY, metadata.height - cropHeight));
-
-    // Crop and resize to exact target dimensions (435x240)
     const targetWidth = 435;
     const targetHeight = 240;
+    const currentAspectRatio = metadata.width / metadata.height;
 
-    const croppedBuffer = await sharp(imageBuffer)
-      .extract({ left: cropX, top: cropY, width: cropWidth, height: cropHeight })
+    console.log(`    📊 Current aspect ratio: ${currentAspectRatio.toFixed(2)}:1, Target: ${targetAspectRatio}:1`);
+
+    // SMART STRATEGY: Use 'entropy' which focuses on high-detail areas (faces, important content)
+    // Entropy-based cropping is better than 'attention' for portrait images that need to be landscape
+    const resizedBuffer = await sharp(imageBuffer)
       .resize(targetWidth, targetHeight, {
-        fit: 'cover',
-        position: 'centre',
-        kernel: 'lanczos3'
+        fit: 'cover',                // Crop to fill the dimensions exactly
+        position: 'entropy',         // Focus on high-information areas (faces, details)
+        kernel: 'lanczos3',          // High quality resampling
+        withoutEnlargement: false    // Allow enlargement if needed
       })
       .jpeg({ quality: 95, mozjpeg: true })
       .toBuffer();
 
     // Verify final dimensions
-    const finalMetadata = await sharp(croppedBuffer).metadata();
+    const finalMetadata = await sharp(resizedBuffer).metadata();
     console.log(`    ✅ Final dimensions: ${finalMetadata.width}x${finalMetadata.height}`);
 
     if (finalMetadata.width !== targetWidth || finalMetadata.height !== targetHeight) {
-      console.warn(`    ⚠️  Warning: Final dimensions don't match target!`);
+      console.error(`    ❌ ERROR: Dimensions are ${finalMetadata.width}x${finalMetadata.height} but should be ${targetWidth}x${targetHeight}`);
     }
 
-    return croppedBuffer.toString('base64');
+    return resizedBuffer.toString('base64');
   } catch (error) {
     console.error('    ❌ Error resizing image:', error);
     // Return original if resize fails
@@ -139,13 +92,74 @@ export async function POST(request: NextRequest) {
     const allQuotes: string[] = [];
 
     // ============================================
-    // STEP 1: SKIP DALL-E (cannot personalize with user's face)
-    // Use Gemini for ALL 8 images to maintain consistency
+    // STEP 1: Generate 4 images with OpenAI DALL-E 3
+    // Use for generic aspirational scenes (no personalization needed)
     // ============================================
-    console.log("\n⏭️  STEP 1/3: Skipping DALL-E (using Gemini for all images to maintain personalization)");
+    const openaiImages: string[] = [];
+
+    if (selectedTemplate !== "ai") {
+      console.log("\n🎨 STEP 1/3: Generating 4 generic aspirational images with OpenAI DALL-E 3...");
+
+      // Generic prompts for DALL-E (no personalization, just aspirational scenes)
+      const dallePrompts = [
+        `Professional photograph of a luxury modern dream house with beautiful architecture, perfectly landscaped front yard, golden hour lighting, upscale neighborhood, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
+        `Professional photograph of a high-end luxury sports car in sleek design, parked in an elegant setting, dramatic lighting, automotive photography, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
+        `Professional travel photography of an exotic tropical paradise destination, turquoise waters, white sand beach, palm trees, beautiful sunset, wanderlust aesthetic, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
+        `Professional lifestyle photography of a modern luxury rooftop penthouse interior with panoramic city skyline views through floor-to-ceiling windows, elegant furniture, golden hour lighting, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`
+      ];
+
+      for (let i = 0; i < dallePrompts.length; i++) {
+        console.log(`  [${i + 1}/4] Generating DALL-E image ${i + 1}...`);
+        try {
+          const response = await fetch("https://api.openai.com/v1/images/generations", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${openaiApiKey}`,
+            },
+            body: JSON.stringify({
+              model: "dall-e-3",
+              prompt: dallePrompts[i],
+              n: 1,
+              size: "1792x1024", // 16:9 landscape format
+              quality: "hd",
+            }),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            console.error(`  ✗ OpenAI API error:`, error);
+            continue;
+          }
+
+          const data = await response.json();
+          const imageUrl = data.data[0]?.url;
+
+          if (imageUrl) {
+            // Fetch the image and convert to base64
+            const imageResponse = await fetch(imageUrl);
+            const imageBuffer = await imageResponse.arrayBuffer();
+            const base64Image = Buffer.from(imageBuffer).toString("base64");
+
+            // Process image to ensure correct aspect ratio
+            const processedImage = await resizeToAspectRatio(base64Image, 1.8125);
+            openaiImages.push(processedImage);
+            console.log(`  ✓ Generated and processed DALL-E image ${i + 1}`);
+          }
+
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error(`  ✗ Error generating DALL-E image ${i + 1}:`, error);
+        }
+      }
+
+      console.log(`✅ Generated ${openaiImages.length} DALL-E images total`);
+    } else {
+      console.log("\n⏭️  STEP 1/3: Skipping DALL-E for AI template");
+    }
 
     // ============================================
-    // STEP 2: Generate 8 images with Gemini (all personalized with user's selfie)
+    // STEP 2: Generate 4 images with Gemini (personalized with user's selfie)
     // SKIP for AI template - AI template uses Gemini one-shot only
     // ============================================
     const geminiImages: string[] = [];
@@ -276,11 +290,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Generate Gemini images from combinations (generate up to 11, then select best 8)
-    console.log(`\n📋 Prepared ${combinations.length} image combinations`);
+    // Generate Gemini images from combinations (generate only 4 to combine with 4 DALL-E images)
+    console.log(`\n📋 Prepared ${combinations.length} image combinations, will generate 4 for Gemini`);
 
-    for (let i = 0; i < Math.min(11, combinations.length); i++) {
-      console.log(`  [${i + 1}/${Math.min(11, combinations.length)}] Generating Gemini image ${i + 1}`);
+    for (let i = 0; i < Math.min(4, combinations.length); i++) {
+      console.log(`  [${i + 1}/4] Generating Gemini image ${i + 1}`);
       try {
         const combo = combinations[i];
         const imageParts = combo.images.map((dataUrl: string) => ({
@@ -325,17 +339,15 @@ export async function POST(request: NextRequest) {
     }
 
       console.log(`✅ Generated ${geminiImages.length} Gemini images total`);
-
-      // Select best 8 images from generated set
-      if (geminiImages.length > 8) {
-        console.log(`\n📊 Selecting best 8 images from ${geminiImages.length} generated...`);
-        // Priority selection: Take first 8 (which includes standalone assets first, then combined scenarios)
-        geminiImages.splice(8); // Keep only first 8
-        console.log(`✅ Selected 8 diverse images for vision board`);
-      }
     } else {
       console.log("\n⏭️  STEP 2/3: Skipping Gemini multi-step generation for AI template (using one-shot instead)");
     }
+
+    // ============================================
+    // COMBINE: Merge OpenAI + Gemini images (4 + 4 = 8 total)
+    // ============================================
+    const allGeneratedImages = [...openaiImages, ...geminiImages];
+    console.log(`\n🎉 Combined images: ${openaiImages.length} from DALL-E + ${geminiImages.length} from Gemini = ${allGeneratedImages.length} total`);
 
     // ============================================
     // STEP 3: Generate inspirational quotes with AI
@@ -614,7 +626,7 @@ Add beige rectangular labels in bottom-right corner of select tiles:
         metadata: {
           total_images: allGeneratedImages.length,
           gemini_images: geminiImages.length,
-          dalle_images: 0, // Skipped for personalization
+          dalle_images: openaiImages.length,
         },
       });
     }
