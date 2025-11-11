@@ -48,38 +48,29 @@ export async function POST(request: NextRequest) {
     const dalleImages: string[] = [];
 
     if (selectedTemplate !== "ai") {
-      console.log("\n🎨 STEP 1/3: Generating 4 images with DALL-E image editing (OpenAI)...");
+      console.log("\n🎨 STEP 1/3: Generating 4 images with DALL-E 3 (OpenAI)...");
 
-      // Build 4 SCENARIO-BASED prompts for image editing
+      // Build 4 SCENARIO-BASED prompts for DALL-E 3 text-to-image generation
       const dalleScenarios = [
-        "Person exercising at modern gym, lifting weights or doing yoga, fit and athletic body, wearing stylish workout clothes, confident expression, healthy lifestyle aesthetic, professional fitness photography",
-        "Successful person at elegant luxury restaurant, raising champagne glass in toast, wearing expensive formal attire, confident wealthy expression, 5-star dining ambiance, gold and elegant decor",
-        "Joyful person celebrating with arms raised, big smile, confetti falling, sunset background, positive energy, pure happiness expression, celebratory moment",
-        "Person meditating peacefully, cross-legged yoga pose, eyes closed, serene expression, natural outdoor setting or spa, wellness and mindfulness aesthetic"
+        "Professional photograph of a person exercising at a modern luxury gym, lifting weights or doing yoga, fit and athletic body, wearing stylish designer workout clothes, confident expression, healthy lifestyle aesthetic, cinematic lighting, 4K quality",
+        "Professional photograph of a successful person at an elegant luxury restaurant, raising a champagne glass in a toast, wearing expensive formal attire, confident wealthy expression, 5-star dining ambiance with gold and elegant decor, warm ambient lighting, sophisticated atmosphere",
+        "Professional photograph of a joyful person celebrating with arms raised high, genuine big smile, golden confetti falling around them, beautiful sunset background, positive energy radiating, pure happiness expression, celebratory moment captured perfectly, vibrant colors",
+        "Professional photograph of a person meditating peacefully in cross-legged lotus yoga pose, eyes gently closed, serene and calm expression, beautiful natural outdoor setting or luxury spa environment, wellness and mindfulness aesthetic, soft natural lighting, tranquil atmosphere"
       ];
 
-      // Helper: Convert base64 to PNG blob for DALL-E edits
-      const base64ToBlob = async (base64Data: string): Promise<Blob> => {
-        const base64 = base64Data.includes(',') ? base64Data.split(',')[1] : base64Data;
-        const buffer = Buffer.from(base64, 'base64');
-        return new Blob([buffer], { type: 'image/png' });
-      };
+      // Generate 4 DALL-E images with better retry logic
+      const maxRetries = 2;
 
-      // Generate 4 DALL-E images with retry logic
-      let dalleAttempts = 0;
-      const maxDalleAttempts = 6; // 4 images + 2 retries
+      for (let i = 0; i < 4; i++) {
+        console.log(`  [${i + 1}/4] Generating DALL-E image...`);
 
-      while (dalleImages.length < 4 && dalleAttempts < maxDalleAttempts) {
-        const currentIndex = dalleImages.length;
-        console.log(`  [${currentIndex + 1}/4] Editing DALL-E image with ${hasSelfie ? 'user selfie' : 'placeholder person'}`);
+        let retryCount = 0;
+        let imageGenerated = false;
 
-        try {
-          // Use selfie if available, otherwise use placeholder
-          const baseImage = hasSelfie ? categorizedUploads.selfie : null;
-
-          if (!baseImage) {
-            // Fallback to text-to-image if no selfie available
-            console.log(`  ⚠️  No selfie found, using text-to-image generation instead`);
+        while (!imageGenerated && retryCount <= maxRetries) {
+          try {
+            // Always use text-to-image generation (more reliable than edits)
+            console.log(`  Attempt ${retryCount + 1}/${maxRetries + 1}: Using DALL-E text-to-image generation`);
             const response = await fetch("https://api.openai.com/v1/images/generations", {
               method: "POST",
               headers: {
@@ -88,7 +79,7 @@ export async function POST(request: NextRequest) {
               },
               body: JSON.stringify({
                 model: "dall-e-3",
-                prompt: dalleScenarios[currentIndex],
+                prompt: dalleScenarios[i],
                 n: 1,
                 size: "1024x1024",
                 quality: "standard",
@@ -109,56 +100,31 @@ export async function POST(request: NextRequest) {
             const arrayBuffer = await imageResponse.arrayBuffer();
             const base64 = Buffer.from(arrayBuffer).toString("base64");
             dalleImages.push(base64);
-            console.log(`  ✓ Generated DALL-E image ${currentIndex + 1} (text-to-image)`);
-          } else {
-            // Use DALL-E 2 image editing with selfie
-            const formData = new FormData();
-            const imageBlob = await base64ToBlob(baseImage);
-            formData.append('image', imageBlob, 'selfie.png');
-            formData.append('prompt', dalleScenarios[currentIndex]);
-            formData.append('n', '1');
-            formData.append('size', '1024x1024');
+            imageGenerated = true;
+            console.log(`  ✓ Generated DALL-E image ${i + 1} successfully`);
 
-            const response = await fetch("https://api.openai.com/v1/images/edits", {
-              method: "POST",
-              headers: {
-                "Authorization": `Bearer ${openaiApiKey}`,
-              },
-              body: formData,
-            });
-
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error(`  🚨 DALL-E Edit API HTTP ${response.status}: ${errorText}`);
-              throw new Error(`DALL-E Edit API error: ${response.statusText} - ${errorText}`);
+            // Wait 1 second between successful generations
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          } catch (error) {
+            retryCount++;
+            console.error(`  ✗ DETAILED ERROR for DALL-E image ${i + 1} (attempt ${retryCount}/${maxRetries + 1}):`);
+            console.error(`     Error type: ${error instanceof Error ? error.constructor.name : typeof error}`);
+            console.error(`     Error message: ${error instanceof Error ? error.message : String(error)}`);
+            if (error instanceof Error && error.stack) {
+              console.error(`     Stack trace: ${error.stack.split('\n').slice(0, 3).join('\n')}`);
             }
 
-            const data = await response.json();
-            const imageUrl = data.data[0].url;
-
-            // Download image and convert to base64
-            const imageResponse = await fetch(imageUrl);
-            const arrayBuffer = await imageResponse.arrayBuffer();
-            const base64 = Buffer.from(arrayBuffer).toString("base64");
-            dalleImages.push(base64);
-            console.log(`  ✓ Edited DALL-E image ${currentIndex + 1} with user selfie`);
+            if (retryCount <= maxRetries) {
+              console.log(`  🔄 Retrying in 2 seconds...`);
+              await new Promise(resolve => setTimeout(resolve, 2000));
+            } else {
+              console.log(`  ⚠️  Failed to generate DALL-E image ${i + 1} after ${maxRetries + 1} attempts, skipping...`);
+            }
           }
-
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error(`  ✗ DETAILED ERROR for DALL-E image ${currentIndex + 1}:`);
-          console.error(`     Error type: ${error instanceof Error ? error.constructor.name : typeof error}`);
-          console.error(`     Error message: ${error instanceof Error ? error.message : String(error)}`);
-          if (error instanceof Error && error.stack) {
-            console.error(`     Stack trace: ${error.stack.split('\n').slice(0, 3).join('\n')}`);
-          }
-          console.log(`  🔄 Will retry if needed (attempt ${dalleAttempts + 1}/${maxDalleAttempts})`);
         }
-
-        dalleAttempts++;
       }
 
-      console.log(`✅ Generated ${dalleImages.length} DALL-E images (using image editing)`);
+      console.log(`✅ Generated ${dalleImages.length}/4 DALL-E images`);
     } else {
       console.log("\n⏭️  STEP 1/3: Skipping DALL-E generation for AI template (using Gemini one-shot instead)");
     }
