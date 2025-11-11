@@ -116,8 +116,9 @@ export default function CleanGridTemplate({
             drawWidth = pos.width;
             drawHeight = drawWidth / imgRatio;
             drawX = pos.left;
-            // Position image to show top 60% (where faces typically are) instead of centering
-            drawY = pos.top - ((drawHeight - pos.height) * 0.2); // Show more of the top
+            // Position image to show the top portion (faces) - shift less upward
+            // Only offset by 10% instead of centering (which would be 50%)
+            drawY = pos.top - ((drawHeight - pos.height) * 0.1); // Show top 60% of image
           }
 
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
@@ -259,7 +260,7 @@ export default function CleanGridTemplate({
                 className="w-full h-full object-cover"
                 style={{
                   objectFit: 'cover',
-                  objectPosition: 'center 30%' // Show upper portion where faces typically are
+                  objectPosition: 'center 20%' // Show upper portion where faces typically are (20% from top)
                 }}
               />
 
