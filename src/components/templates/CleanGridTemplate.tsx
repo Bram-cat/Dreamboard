@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface CleanGridTemplateProps {
-  images: string[]; // 14 images (7 DALL-E + 7 Gemini)
+  images: string[]; // 15 images (7 OpenAI + 8 Gemini)
   keywords: string[];
 }
 
@@ -14,31 +14,32 @@ export default function CleanGridTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Clean grid positions - MINIMAL DESIGN, NO ROTATION
-  // 3x5 grid layout with center card
+  // Clean 3x3 grid layout - NO OVERLAPPING with smaller center card
   const gridPositions = [
-    // Row 1 (3 images)
-    { top: 20, left: 20, width: 400, height: 220, keyword: keywords[0] },
-    { top: 20, left: 472, width: 400, height: 220, keyword: "" },
-    { top: 20, left: 924, width: 400, height: 220, keyword: keywords[1] },
+    // Top row - 3 images
+    { top: 20, left: 20, width: 400, height: 240, keyword: keywords[0] },
+    { top: 20, left: 472, width: 400, height: 240, keyword: "" },
+    { top: 20, left: 924, width: 400, height: 240, keyword: keywords[1] },
 
-    // Row 2 (3 images with center card)
-    { top: 260, left: 20, width: 250, height: 220, keyword: "" },
-    // CENTER CARD HERE (292x240)
-    { top: 260, left: 1074, width: 250, height: 220, keyword: keywords[2] },
+    // Middle row - 2 images (sides only, center card in middle)
+    { top: 290, left: 20, width: 380, height: 180, keyword: "" },
+    // CENTER CARD HERE (442-902 x 290-470)
+    { top: 290, left: 944, width: 380, height: 180, keyword: keywords[2] },
 
-    // Row 3 (3 images)
-    { top: 500, left: 20, width: 400, height: 220, keyword: "" },
-    { top: 500, left: 472, width: 400, height: 220, keyword: keywords[3] },
-    { top: 500, left: 924, width: 400, height: 220, keyword: "" },
+    // Bottom row - 3 images
+    { top: 500, left: 20, width: 400, height: 240, keyword: "" },
+    { top: 500, left: 472, width: 400, height: 240, keyword: keywords[3] },
+    { top: 500, left: 924, width: 400, height: 240, keyword: "" },
 
-    // Additional images for 14 total
-    { top: 20, left: 20, width: 195, height: 140, keyword: "" },
-    { top: 20, left: 227, width: 195, height: 140, keyword: "" },
-    { top: 20, left: 1129, width: 195, height: 140, keyword: "" },
-    { top: 500, left: 20, width: 195, height: 140, keyword: "" },
-    { top: 500, left: 227, width: 195, height: 140, keyword: "" },
-    { top: 500, left: 1129, width: 195, height: 140, keyword: keywords[4] },
+    // Additional smaller images for 15 total
+    { top: 20, left: 1360, width: 190, height: 150, keyword: "" },
+    { top: 190, left: 1360, width: 190, height: 150, keyword: "" },
+    { top: 360, left: 1360, width: 190, height: 150, keyword: "" },
+    { top: 530, left: 1360, width: 190, height: 150, keyword: "" },
+    { top: 690, left: 1360, width: 190, height: 150, keyword: keywords[4] },
+    // Additional row 1
+    { top: 290, left: 20, width: 180, height: 180, keyword: "" },
+    { top: 290, left: 944, width: 180, height: 180, keyword: "" },
   ];
 
   // Canvas rendering for download
@@ -74,7 +75,7 @@ export default function CleanGridTemplate({
       };
 
       // Draw all grid images
-      for (let idx = 0; idx < Math.min(14, images.length); idx++) {
+      for (let idx = 0; idx < Math.min(15, images.length); idx++) {
         const pos = gridPositions[idx];
         if (!pos) continue;
 
@@ -153,11 +154,11 @@ export default function CleanGridTemplate({
         }
       }
 
-      // Draw center card
-      const centerX = 292;
-      const centerY = 270;
-      const centerW = 760;
-      const centerH = 220;
+      // Draw center card - SMALLER SIZE
+      const centerX = 442;
+      const centerY = 290;
+      const centerW = 460;
+      const centerH = 180;
 
       ctx.save();
       ctx.fillStyle = '#6366f1'; // Indigo
@@ -181,19 +182,19 @@ export default function CleanGridTemplate({
       ctx.closePath();
       ctx.fill();
 
-      // Center text
+      // Center text - SCALED FOR SMALLER CARD
       ctx.shadowColor = 'transparent';
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 56px Inter, system-ui, sans-serif';
+      ctx.font = 'bold 48px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('2025', centerX + centerW / 2, centerY + 90);
+      ctx.fillText('2025', centerX + centerW / 2, centerY + 70);
 
-      ctx.font = '24px Inter, system-ui, sans-serif';
-      ctx.fillText('YOUR VISION BOARD', centerX + centerW / 2, centerY + 130);
+      ctx.font = '20px Inter, system-ui, sans-serif';
+      ctx.fillText('YOUR VISION BOARD', centerX + centerW / 2, centerY + 105);
 
-      ctx.font = 'italic 16px Inter, system-ui, sans-serif';
+      ctx.font = 'italic 14px Inter, system-ui, sans-serif';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-      ctx.fillText('Created with DreamBoard', centerX + centerW / 2, centerY + 165);
+      ctx.fillText('Created with DreamBoard', centerX + centerW / 2, centerY + 135);
 
       ctx.restore();
     };
@@ -243,7 +244,7 @@ export default function CleanGridTemplate({
         className="relative w-[1344px] h-[768px] mx-auto bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 overflow-hidden"
       >
         {/* Grid Images */}
-        {images.slice(0, 14).map((image, idx) => {
+        {images.slice(0, 15).map((image, idx) => {
           const pos = gridPositions[idx];
           if (!pos) return null;
 
@@ -285,20 +286,20 @@ export default function CleanGridTemplate({
           );
         })}
 
-        {/* Center Card */}
+        {/* Center Card - SMALLER SIZE */}
         <div
           className="absolute bg-indigo-500 shadow-2xl flex flex-col items-center justify-center"
           style={{
-            top: '270px',
-            left: '292px',
-            width: '760px',
-            height: '220px',
+            top: '290px',
+            left: '442px',
+            width: '460px',
+            height: '180px',
             borderRadius: '16px',
           }}
         >
-          <div className="text-white text-6xl font-bold mb-2">2025</div>
-          <div className="text-white text-2xl tracking-wider">YOUR VISION BOARD</div>
-          <div className="text-white/80 text-sm italic mt-3">Created with DreamBoard</div>
+          <div className="text-white text-5xl font-bold mb-1">2025</div>
+          <div className="text-white text-xl tracking-wider">YOUR VISION BOARD</div>
+          <div className="text-white/80 text-xs italic mt-2">Created with DreamBoard</div>
         </div>
       </div>
     </>

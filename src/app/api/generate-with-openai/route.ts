@@ -48,77 +48,66 @@ export async function POST(request: NextRequest) {
     const dalleImages: string[] = [];
 
     if (selectedTemplate !== "ai") {
-      console.log("\n🎨 STEP 1/3: Generating 10 images with DALL-E (5 keywords + 5 common lifestyle)...");
+      console.log("\n🎨 STEP 1/3: Generating 7 images with DALL-E (OpenAI) - scenario-based prompts...");
 
-      // Ensure we have 7 keywords: 5 user keywords + 2 ALWAYS common lifestyle
-      const defaultThemes = ["success", "luxury", "wellness", "adventure", "celebration"];
-      const expandedKeywords = [...keywords];
-      while (expandedKeywords.length < 5) {
-        expandedKeywords.push(defaultThemes[expandedKeywords.length % defaultThemes.length]);
-      }
+      // Build 7 SCENARIO-BASED prompts matching Gemini's quality
+      const dalleScenarios = [];
 
-      // ALWAYS add common lifestyle themes + generate house/car/destination if user didn't upload
-      expandedKeywords.push("fitness");
-      expandedKeywords.push("wealth");
+      // Scenario 1: Exercise/Fitness (user explicitly requested)
+      dalleScenarios.push(
+        hasSelfie
+          ? "Fitness lifestyle scene: modern gym interior with weights and equipment, yoga mat, healthy green smoothie, wellness aesthetic, morning sunlight streaming through windows. CRITICAL: NO people, NO faces visible - only equipment and setting."
+          : "Person exercising at modern gym, lifting weights or doing yoga, fit and athletic body, wearing stylish workout clothes, confident expression, healthy lifestyle aesthetic, professional fitness photography"
+      );
 
-      // CRITICAL: If user didn't upload dream house/car/destination, add them to DALL-E generation
-      if (!hasDreamHouse) {
-        expandedKeywords.push("dream house");
-      }
-      if (!hasDreamCar) {
-        expandedKeywords.push("dream car");
-      }
+      // Scenario 2: Wealth/Success (user explicitly requested)
+      dalleScenarios.push(
+        hasSelfie
+          ? "Luxury wealth scene: elegant 5-star restaurant table setting, champagne in ice bucket, fine dining silverware, gold accents, candles, success aesthetic. CRITICAL: NO people, NO faces - only luxury objects."
+          : "Successful person at elegant luxury restaurant, raising champagne glass in toast, wearing expensive formal attire, confident wealthy expression, 5-star dining ambiance, gold and elegant decor"
+      );
+
+      // Scenario 3: Happiness/Celebration
+      dalleScenarios.push(
+        hasSelfie
+          ? "Joyful celebration scene: colorful balloons, confetti, champagne bottles, party decorations, festive aesthetic. CRITICAL: NO people, NO faces - celebration objects only."
+          : "Joyful person celebrating with arms raised, big smile, confetti falling, sunset background, positive energy, pure happiness expression, celebratory moment"
+      );
+
+      // Scenario 4: Travel/Adventure
       if (!hasDestination) {
-        expandedKeywords.push("travel destination");
+        dalleScenarios.push("Exotic tropical destination: pristine turquoise beach water, white sand, palm trees swaying, luxury resort in background, paradise travel photography, aspirational vacation aesthetic");
       }
 
-      // CRITICAL: Generate MORE images to fill the board (at least 13-14 images needed)
-      const dallePrompts = expandedKeywords.slice(0, 10).map((keyword: string) => {
-        // Create contextual prompts based on keywords
-        if (keyword.toLowerCase().includes("rich") || keyword.toLowerCase().includes("wealth") || keyword.toLowerCase().includes("money")) {
-          return hasSelfie
-            ? `Lifestyle image showing wealth and success: luxury dinner at 5-star restaurant, champagne, elegant table setting, gold accents, success aesthetic. CRITICAL: NO people, NO faces, NO humans - only objects and settings.`
-            : `Person at elegant luxury dinner, expensive champagne, 5-star restaurant, wealthy lifestyle, success aesthetic, confident and happy expression`;
-        }
-        if (keyword.toLowerCase().includes("travel") || keyword.toLowerCase().includes("destination")) {
-          return `Exotic travel destination: pristine tropical beach with turquoise water, palm trees, luxury resort, paradise aesthetic, travel photography`;
-        }
-        if (keyword.toLowerCase().includes("happy") || keyword.toLowerCase().includes("joy")) {
-          return hasSelfie
-            ? `Happiness aesthetic: sunny morning light streaming through window, fresh flowers, cozy reading nook, peaceful joy. CRITICAL: NO people, NO faces, NO humans.`
-            : `Joyful person celebrating life, arms raised in happiness, sunrise or sunset, positive energy, smiling and content`;
-        }
-        if (keyword.toLowerCase().includes("fit") || keyword.toLowerCase().includes("health") || keyword.toLowerCase().includes("exercise") || keyword.toLowerCase().includes("gym") || keyword.toLowerCase().includes("wellness")) {
-          return hasSelfie
-            ? `Fitness lifestyle scene: yoga mat in sunlit room, healthy smoothie bowl, workout equipment, gym interior, wellness aesthetic. CRITICAL: NO people, NO faces, NO humans - only fitness equipment and wellness settings.`
-            : `Person exercising at gym, doing yoga, or running, fit and healthy lifestyle, workout aesthetic, active and energetic`;
-        }
-        if (keyword.toLowerCase().includes("car") || keyword.toLowerCase().includes("dream car")) {
-          return `Luxury sports car: high-end exotic supercar, sleek red Ferrari or Lamborghini, polished exterior, modern automotive photography, dream car aesthetic, wealthy lifestyle`;
-        }
-        if (keyword.toLowerCase().includes("house") || keyword.toLowerCase().includes("dream house")) {
-          return `Luxury modern home: stunning contemporary mansion exterior, beautiful architectural design, pool, manicured landscaping, palm trees, dream house aesthetic, wealthy lifestyle`;
-        }
-        if (keyword.toLowerCase().includes("food") || keyword.toLowerCase().includes("nutrition") || keyword.toLowerCase().includes("healthy eating")) {
-          return hasSelfie
-            ? `Healthy food aesthetic: fresh smoothie bowl with berries, colorful salad, organic ingredients, nutritious meal prep, wellness food. CRITICAL: NO people, NO faces, NO humans - only food and table settings.`
-            : `Person enjoying healthy meal, fresh smoothie bowl, nutritious food, wellness dining, happy and healthy lifestyle`;
-        }
-        // Default: lifestyle image based on keyword
-        return hasSelfie
-          ? `Aspirational lifestyle image representing "${keyword}": magazine aesthetic, vibrant, inspiring, high quality setting. CRITICAL: NO people, NO faces, NO humans - only objects and settings.`
-          : `Aspirational person living their best life, representing "${keyword}": magazine aesthetic, vibrant, inspiring lifestyle, confident and successful expression`;
-      });
+      // Scenario 5: Dream Car
+      if (!hasDreamCar) {
+        dalleScenarios.push("Luxury dream car: sleek red Ferrari or Lamborghini supercar, polished exterior gleaming, modern showroom or scenic coastal road, automotive photography, wealth and success aesthetic");
+      }
 
-      // ALWAYS generate at least 10 DALL-E images with retry logic (to fill board properly)
+      // Scenario 6: Dream House
+      if (!hasDreamHouse) {
+        dalleScenarios.push("Luxury dream house: stunning modern mansion exterior, contemporary architecture, infinity pool, manicured landscaping, palm trees, sunset lighting, real estate photography, aspirational home");
+      }
+
+      // Scenario 7: Wellness/Meditation
+      dalleScenarios.push(
+        hasSelfie
+          ? "Wellness scene: peaceful meditation space, yoga mat, candles, plants, spa aesthetic, serene calming atmosphere. CRITICAL: NO people, NO faces - wellness setting only."
+          : "Person meditating peacefully, cross-legged yoga pose, eyes closed, serene expression, natural outdoor setting or spa, wellness and mindfulness aesthetic"
+      );
+
+      // Ensure we have exactly 7 scenarios
+      const dallePrompts = dalleScenarios.slice(0, 7);
+
+      // Generate 7 DALL-E images with retry logic
       let dalleAttempts = 0;
-      const maxDalleAttempts = 15; // 10 images + 5 retries
+      const maxDalleAttempts = 10; // 7 images + 3 retries
 
-      while (dalleImages.length < 10 && dalleAttempts < maxDalleAttempts) {
+      while (dalleImages.length < 7 && dalleAttempts < maxDalleAttempts) {
         const currentIndex = dalleImages.length;
-        console.log(`  [${currentIndex + 1}/10] Generating DALL-E image for: ${expandedKeywords[currentIndex]}`);
+        console.log(`  [${currentIndex + 1}/7] Generating DALL-E image (scenario-based)`);
 
-        try {
+        try{
           const response = await fetch("https://api.openai.com/v1/images/generations", {
             method: "POST",
             headers: {
@@ -176,9 +165,9 @@ export async function POST(request: NextRequest) {
     const geminiImages: string[] = [];
 
     if (selectedTemplate !== "ai") {
-      console.log("\n🎨 STEP 2/3: Generating images with Gemini from user uploads...");
+      console.log("\n🎨 STEP 2/3: Generating 8 images with Gemini from user uploads...");
 
-    // Strategy: Create combinations of user's uploaded images
+    // Strategy: Create 8 scenario combinations from user's uploaded images
     const combinations = [];
 
     // PRIORITY COMBINATIONS: User with their uploads (selfie+car, selfie+house, car+house+destination)
@@ -223,11 +212,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 5. Add keyword-based scenario generation to reach AT LEAST 10 Gemini images
+    // 5. Add keyword-based scenario generation to reach AT LEAST 8 Gemini images
     // ALWAYS prefer using user's selfie for scenarios
     // User explicitly requested: exercise, rich, happiness, wellness scenarios
 
-    if (combinations.length < 10 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 1: User doing EXERCISE/FITNESS (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -235,7 +224,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 10 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 2: User showing WEALTH/RICH (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -243,7 +232,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 10 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 3: User showing HAPPINESS (user explicitly requested this)
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -251,7 +240,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 10 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 4: User with WELLNESS/MEDITATION (common lifestyle)
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -259,7 +248,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 10 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 5: User with TRAVEL/ADVENTURE
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -267,7 +256,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 10 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 6: User with GOOD FOOD/HEALTHY LIFESTYLE
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -275,7 +264,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 10 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 7: User in PROFESSIONAL/OFFICE SUCCESS setting
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -284,46 +273,30 @@ export async function POST(request: NextRequest) {
     }
 
     // If still not enough, add original uploads enhanced
-    if (combinations.length < 10 && hasDreamCar) {
+    if (combinations.length < 8 && hasDreamCar) {
       combinations.push({
         images: [categorizedUploads.dreamCar],
         prompt: "Enhance this car image to look more luxurious and aspirational. Keep the car brand and model exactly the same. Only improve the setting and lighting."
       });
     }
 
-    if (combinations.length < 10 && hasDreamHouse) {
+    if (combinations.length < 8 && hasDreamHouse) {
       combinations.push({
         images: [categorizedUploads.dreamHouse],
         prompt: "Enhance this house image to look more beautiful and aspirational. Keep the house architecture exactly the same. Only improve the landscaping and lighting."
       });
     }
 
-    if (combinations.length < 10 && hasDestination) {
+    if (combinations.length < 8 && hasDestination) {
       combinations.push({
         images: [categorizedUploads.destination],
         prompt: "Enhance this destination image to look more vibrant and travel-worthy. Keep landmarks recognizable. Only improve colors and atmosphere."
       });
     }
 
-    // If STILL not 10 images, add more diverse scenarios with user's face
-    const additionalScenarios = [
-      "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT generate a different person. Show this EXACT person relaxing at home in cozy luxury setting, looking content and successful. Their face must match the input exactly.",
-      "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT generate a different person. Show this EXACT person at a stylish rooftop or penthouse with city view, looking successful. Their face must match the input exactly.",
-      "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT generate a different person. Show this EXACT person shopping in luxury boutique or enjoying high-end lifestyle, looking happy. Their face must match the input exactly."
-    ];
-
-    let scenarioIndex = 0;
-    while (combinations.length < 10 && hasSelfie && scenarioIndex < additionalScenarios.length) {
-      combinations.push({
-        images: [categorizedUploads.selfie],
-        prompt: additionalScenarios[scenarioIndex]
-      });
-      scenarioIndex++;
-    }
-
-    // Generate Gemini images from combinations (generate ALL combinations up to 10)
-    for (let i = 0; i < Math.min(10, combinations.length); i++) {
-      console.log(`  [${i + 1}/${Math.min(10, combinations.length)}] Generating Gemini combination ${i + 1}`);
+    // Generate Gemini images from combinations (generate ALL combinations up to 8)
+    for (let i = 0; i < Math.min(8, combinations.length); i++) {
+      console.log(`  [${i + 1}/${Math.min(8, combinations.length)}] Generating Gemini combination ${i + 1}`);
       try {
         const combo = combinations[i];
         const imageParts = combo.images.map((dataUrl: string) => ({
