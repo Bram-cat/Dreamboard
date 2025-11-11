@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     if (hasSelfie && hasDreamCar) {
       combinations.push({
         images: [categorizedUploads.selfie, categorizedUploads.dreamCar],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical to the first image. DO NOT change their ethnicity, age, or any facial characteristic. Show this EXACT person standing proudly next to this EXACT car. Keep the car brand and model clearly visible. Make the scene aspirational with beautiful lighting and setting, but the person and car must be recognizable."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE 1 = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face, facial structure, skin tone, hair style, hair color, eye shape, eye color, nose shape, mouth shape, facial hair, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nINPUT IMAGE 2 = CAR TO INCLUDE:\n- Include this exact car model and brand\n\nOUTPUT IMAGE REQUIREMENTS:\n- Show the EXACT person from image 1 standing confidently next to the car from image 2\n- Person's face must be clearly visible, front-facing or 3/4 angle, well-lit\n- Maintain perfect facial accuracy - same person, same face\n- Beautiful outdoor setting, professional photography lighting\n- Aspirational, high-quality lifestyle aesthetic"
       });
     }
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     if (hasSelfie && hasDreamHouse) {
       combinations.push({
         images: [categorizedUploads.selfie, categorizedUploads.dreamHouse],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical to the first image. DO NOT change their ethnicity, age, or any facial characteristic. Show this EXACT person in front of this EXACT house, looking proud and successful. Keep the house architecture recognizable. Only enhance the lighting and atmosphere."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE 1 = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face, facial structure, skin tone, hair style, hair color, eye shape, eye color, nose shape, mouth shape, facial hair, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nINPUT IMAGE 2 = HOUSE TO INCLUDE:\n- Include this exact house architecture and design\n\nOUTPUT IMAGE REQUIREMENTS:\n- Show the EXACT person from image 1 in front of the house from image 2, looking proud and successful\n- Person's face must be clearly visible, front-facing or 3/4 angle, well-lit\n- Maintain perfect facial accuracy - same person, same face\n- Golden hour lighting, professional real estate photography style\n- Aspirational homeownership aesthetic"
       });
     }
 
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     if (hasSelfie && hasDestination) {
       combinations.push({
         images: [categorizedUploads.selfie, categorizedUploads.destination],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical to the first image. DO NOT change their ethnicity, age, or any facial characteristic. Show this EXACT person at this EXACT destination, traveling and enjoying life. Keep destination landmarks recognizable. Make it aspirational but preserve their identity 100%."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE 1 = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face, facial structure, skin tone, hair style, hair color, eye shape, eye color, nose shape, mouth shape, facial hair, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nINPUT IMAGE 2 = DESTINATION TO INCLUDE:\n- Include this exact destination location and landmarks\n\nOUTPUT IMAGE REQUIREMENTS:\n- Show the EXACT person from image 1 at the destination from image 2, traveling and enjoying the experience\n- Person's face must be clearly visible, front-facing or 3/4 angle, well-lit\n- Maintain perfect facial accuracy - same person, same face\n- Natural outdoor lighting, professional travel photography style\n- Joyful, adventurous aesthetic"
       });
     }
 
@@ -105,27 +105,27 @@ export async function POST(request: NextRequest) {
     // ALWAYS prefer using user's selfie for scenarios
     // User explicitly requested: exercise, rich, happiness, wellness scenarios
 
-    if (combinations.length < 4 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 1: User with TRAVEL/ADVENTURE
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person at a beautiful exotic travel destination - beach, mountains, or tropical location, looking happy and adventurous. Their face must be clearly visible and match the input image exactly. Only change the background to a travel destination."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- Show EXACT same person at a beautiful exotic travel destination (beach, mountains, or tropical paradise)\n- Face clearly visible, front-facing or 3/4 angle, genuine happy smile\n- Perfect facial accuracy - same person, same face\n- Casual travel clothing, natural outdoor lighting\n- Professional travel photography style, joyful adventurous aesthetic"
       });
     }
 
-    if (combinations.length < 4 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 2: User with GOOD FOOD/HEALTHY LIFESTYLE
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person enjoying healthy food - smoothie bowl, fresh salad, or preparing nutritious meal, looking healthy and wellness-focused. Their face must be clearly visible and match the input image exactly. Only change the background to a healthy food setting."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- Show EXACT same person enjoying healthy food (smoothie bowl, fresh salad, or preparing nutritious meal)\n- Face clearly visible, front-facing or 3/4 angle, happy healthy expression\n- Perfect facial accuracy - same person, same face\n- Bright clean kitchen or cafe, natural lighting\n- Professional food photography style, wellness vitality aesthetic"
       });
     }
 
-    if (combinations.length < 4 && hasSelfie) {
+    if (combinations.length < 8 && hasSelfie) {
       // PRIORITY 3: User in PROFESSIONAL/OFFICE SUCCESS setting
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person in a professional office setting, working on laptop, modern workspace, looking successful and confident. Their face must be clearly visible and match the input image exactly. Only change the clothing to business attire and background to modern office."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- Show EXACT same person working in professional office, laptop at modern workspace\n- Face clearly visible, front-facing or 3/4 angle, confident professional expression\n- Perfect facial accuracy - same person, same face\n- Business attire (suit/blazer), modern office with windows\n- Professional corporate photography style, success confidence aesthetic"
       });
     }
 
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
       // PRIORITY 4: User AT LUXURY ROOFTOP
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person at a stylish rooftop or penthouse with city skyline view, looking successful and confident. Their face must be clearly visible and match the input image exactly. Only change the background to luxury rooftop setting."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- Show EXACT same person at stylish rooftop or penthouse with city skyline view\n- Face clearly visible, front-facing or 3/4 angle, successful confident smile\n- Perfect facial accuracy - same person, same face\n- Smart casual or semi-formal attire, evening golden hour lighting\n- Professional lifestyle photography style, luxury success aesthetic"
       });
     }
 
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
       // PRIORITY 5: User doing FITNESS/GYM workout
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person working out at a modern luxury gym with floor-to-ceiling windows and city views, doing strength training with dumbbells, wearing athletic wear, confident focused expression. Their face must be clearly visible and match the input image exactly. Only change the clothing to gym attire and background to fitness center."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- Show EXACT same person working out at modern luxury gym with floor-to-ceiling windows, doing strength training with dumbbells\n- Face clearly visible, front-facing or 3/4 angle, focused determined expression\n- Perfect facial accuracy - same person, same face\n- Athletic wear, gym with natural lighting\n- Professional fitness photography style, strength confidence aesthetic"
       });
     }
 
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
       // PRIORITY 6: User at UPSCALE CELEBRATION
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person at an upscale champagne bar or rooftop lounge, wearing an elegant blazer, raising a glass of champagne in a celebratory toast with a genuine smile, warm golden ambient lighting. Their face must be clearly visible and match the input image exactly. Only change the clothing to formal attire and background to luxury bar setting."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- Show EXACT same person at upscale champagne bar/rooftop lounge, raising champagne glass in celebratory toast\n- Face clearly visible, front-facing or 3/4 angle, genuine happy smile\n- Perfect facial accuracy - same person, same face\n- Elegant blazer/formal attire, warm golden ambient lighting\n- Professional lifestyle photography style, luxury celebration aesthetic"
       });
     }
 
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
       // PRIORITY 7: User doing OUTDOOR MEDITATION/YOGA
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person meditating peacefully outdoors at golden hour sunrise, sitting cross-legged in lotus position on a deck overlooking mountains or ocean, wearing comfortable neutral clothing, eyes closed, serene expression. Their face must be clearly visible and match the input image exactly. Only change the background to peaceful outdoor wellness setting."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- Show EXACT same person meditating peacefully outdoors at golden hour sunrise, cross-legged lotus position on deck overlooking mountains/ocean\n- Face visible (can have eyes closed), peaceful serene expression\n- Perfect facial accuracy - same person, same face\n- Comfortable neutral clothing, soft golden morning light\n- Professional wellness photography style, tranquility mindfulness aesthetic"
       });
     }
 
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
       // PRIORITY 8: User in MODERN OFFICE/WORKING
       combinations.push({
         images: [categorizedUploads.selfie],
-        prompt: "CRITICAL IDENTITY PRESERVATION: This person's face, skin tone, hair, eyes, nose, mouth, and ALL facial features MUST remain 100% identical. DO NOT change their ethnicity, age, or any facial characteristic. DO NOT generate a different person. Show this EXACT person working in a modern corner office with panoramic city skyline views through floor-to-ceiling windows, sitting at a desk with laptop, wearing business attire, professional confident expression. Their face must be clearly visible and match the input image exactly. Only change the clothing to business attire and background to modern office."
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- Show EXACT same person in modern corner office with panoramic city skyline views through floor-to-ceiling windows, at desk with laptop\n- Face clearly visible, front-facing or 3/4 angle, professional confident expression\n- Perfect facial accuracy - same person, same face\n- Business attire (suit/blazer), afternoon natural sunlight\n- Professional corporate photography style, executive success aesthetic"
       });
     }
 

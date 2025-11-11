@@ -468,7 +468,16 @@ export default function Home() {
     if (!collageReady || images.length === 0) return;
 
     try {
-      // Use html2canvas for ALL templates to capture the entire board
+      // Check if the template has its own download function (for canvas-based templates)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (typeof (window as any).downloadVisionBoard === 'function') {
+        // Use the template's built-in canvas download (CleanGridTemplate, etc.)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (window as any).downloadVisionBoard();
+        return;
+      }
+
+      // Fallback to html2canvas for templates without canvas download
       const boardElement = document.querySelector('.vision-board-template') as HTMLElement;
       if (!boardElement) {
         setError("Could not find board to download");
