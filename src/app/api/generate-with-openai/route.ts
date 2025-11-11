@@ -1,5 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import sharp from "sharp";
+
+// Helper function to resize/crop image to target aspect ratio (435x240 = 1.8125:1)
+async function resizeToAspectRatio(base64Data: string, targetAspectRatio: number): Promise<string> {
+  try {
+    const imageBuffer = Buffer.from(base64Data, 'base64');
+    const metadata = await sharp(imageBuffer).metadata();
+
+    if (!metadata.width || !metadata.height) {
+      throw new Error('Could not read image dimensions');
+    }
+
+    const sourceAspectRatio = metadata.width / metadata.height;
+    let cropWidth, cropHeight, cropX, cropY;
+
+    if (sourceAspectRatio > targetAspectRatio) {
+      // Image is too wide - crop sides (center crop)
+      cropHeight = metadata.height;
+      cropWidth = Math.round(cropHeight * targetAspectRatio);
+      cropX = Math.round((metadata.width - cropWidth) / 2);
+      cropY = 0;
+    } else {
+      // Image is too tall - crop top/bottom (favor upper 30% for faces)
+      cropWidth = metadata.width;
+      cropHeight = Math.round(cropWidth / targetAspectRatio);
+      cropX = 0;
+      cropY = Math.round((metadata.height - cropHeight) * 0.3); // Keep upper 30% visible
+    }
+
+    // Crop image to target aspect ratio
+    const croppedBuffer = await sharp(imageBuffer)
+      .extract({ left: cropX, top: cropY, width: cropWidth, height: cropHeight })
+      .jpeg({ quality: 95 })
+      .toBuffer();
+
+    return croppedBuffer.toString('base64');
+  } catch (error) {
+    console.error('Error resizing image:', error);
+    // Return original if resize fails
+    return base64Data;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -193,13 +235,16 @@ export async function POST(request: NextRequest) {
           }
         }));
 
+        // Add aspect ratio instruction to prompt
+        const aspectRatioPrompt = `${combo.prompt}\n\nIMPORTANT OUTPUT DIMENSIONS:\n- Generate image in LANDSCAPE format with aspect ratio 1.8:1 (width is 1.8x the height)\n- Example dimensions: 1800x1000px or 1440x800px\n- Image MUST be wider than it is tall - HORIZONTAL/LANDSCAPE orientation only`;
+
         const response = await genai.models.generateContent({
           model: "gemini-2.5-flash-image",
           contents: [{
             role: "user",
             parts: [
               ...imageParts,
-              { text: combo.prompt }
+              { text: aspectRatioPrompt }
             ]
           }],
           config: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
@@ -211,8 +256,10 @@ export async function POST(request: NextRequest) {
             part.inlineData?.mimeType?.startsWith("image/")
           );
           if (imagePart?.inlineData?.data) {
-            geminiImages.push(imagePart.inlineData.data);
-            console.log(`  ✓ Generated Gemini image ${i + 1}`);
+            // Process image to ensure correct aspect ratio
+            const processedImage = await resizeToAspectRatio(imagePart.inlineData.data, 1.8125); // 435/240 = 1.8125
+            geminiImages.push(processedImage);
+            console.log(`  ✓ Generated and processed Gemini image ${i + 1}`);
           }
         }
 
