@@ -100,37 +100,13 @@ export default function CleanGridTemplate({
           // Clip for rounded corners
           ctx.clip();
 
-          // Images are pre-processed to exact 435x240 dimensions, so draw them directly
-          // Use 'cover' fit to fill frame completely
-          const imgRatio = img.width / img.height;
-          const boxRatio = pos.width / pos.height;
-
-          // Check if image matches expected aspect ratio (within 1% tolerance)
-          const aspectRatioMatch = Math.abs(imgRatio - boxRatio) < 0.01;
-
-          if (aspectRatioMatch) {
-            // Perfect match - draw directly
-            ctx.drawImage(img, pos.left, pos.top, pos.width, pos.height);
-          } else {
-            // Fallback for images that weren't properly pre-processed
-            let drawWidth, drawHeight, drawX, drawY;
-
-            if (imgRatio > boxRatio) {
-              // Image is wider - fit to height, crop sides
-              drawHeight = pos.height;
-              drawWidth = drawHeight * imgRatio;
-              drawX = pos.left - (drawWidth - pos.width) / 2;
-              drawY = pos.top;
-            } else {
-              // Image is taller - fit to width, show upper portion
-              drawWidth = pos.width;
-              drawHeight = drawWidth / imgRatio;
-              drawX = pos.left;
-              drawY = pos.top - (drawHeight - pos.height) * 0.3;
-            }
-
-            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-          }
+          // Images are pre-processed to exact 435x240 dimensions
+          // Draw them to completely fill the frame
+          ctx.drawImage(
+            img,
+            0, 0, img.width, img.height,  // Source rectangle (entire image)
+            pos.left, pos.top, pos.width, pos.height  // Destination rectangle (frame)
+          );
 
           // Draw keyword label at bottom if exists
           if (pos.keyword) {
@@ -266,11 +242,12 @@ export default function CleanGridTemplate({
               <img
                 src={image}
                 alt={`Vision ${idx + 1}`}
-                className="w-full h-full"
                 style={{
-                  objectFit: 'fill', // Images are pre-processed to exact dimensions, so fill works perfectly
                   width: '100%',
-                  height: '100%'
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center center',
+                  display: 'block'
                 }}
               />
 

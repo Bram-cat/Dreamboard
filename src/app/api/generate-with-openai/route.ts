@@ -21,12 +21,24 @@ async function resizeToAspectRatio(base64Data: string, targetAspectRatio: number
 
     // Calculate crop dimensions
     if (Math.abs(sourceAspectRatio - targetAspectRatio) < 0.01) {
-      // Already correct aspect ratio, just optimize
+      // Already correct aspect ratio, just resize to exact dimensions
       console.log(`    ✓ Image already has correct aspect ratio`);
-      const optimizedBuffer = await sharp(imageBuffer)
-        .jpeg({ quality: 95 })
+      const targetWidth = 435;
+      const targetHeight = 240;
+
+      const resizedBuffer = await sharp(imageBuffer)
+        .resize(targetWidth, targetHeight, {
+          fit: 'cover',
+          position: 'centre',
+          kernel: 'lanczos3'
+        })
+        .jpeg({ quality: 95, mozjpeg: true })
         .toBuffer();
-      return optimizedBuffer.toString('base64');
+
+      const finalMetadata = await sharp(resizedBuffer).metadata();
+      console.log(`    ✅ Final dimensions: ${finalMetadata.width}x${finalMetadata.height}`);
+
+      return resizedBuffer.toString('base64');
     }
 
     if (sourceAspectRatio > targetAspectRatio) {
@@ -58,13 +70,21 @@ async function resizeToAspectRatio(base64Data: string, targetAspectRatio: number
     const croppedBuffer = await sharp(imageBuffer)
       .extract({ left: cropX, top: cropY, width: cropWidth, height: cropHeight })
       .resize(targetWidth, targetHeight, {
-        fit: 'fill',
+        fit: 'cover',
+        position: 'centre',
         kernel: 'lanczos3'
       })
-      .jpeg({ quality: 95 })
+      .jpeg({ quality: 95, mozjpeg: true })
       .toBuffer();
 
-    console.log(`    ✅ Final dimensions: ${targetWidth}x${targetHeight}`);
+    // Verify final dimensions
+    const finalMetadata = await sharp(croppedBuffer).metadata();
+    console.log(`    ✅ Final dimensions: ${finalMetadata.width}x${finalMetadata.height}`);
+
+    if (finalMetadata.width !== targetWidth || finalMetadata.height !== targetHeight) {
+      console.warn(`    ⚠️  Warning: Final dimensions don't match target!`);
+    }
+
     return croppedBuffer.toString('base64');
   } catch (error) {
     console.error('    ❌ Error resizing image:', error);
