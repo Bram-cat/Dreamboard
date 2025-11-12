@@ -92,88 +92,16 @@ export async function POST(request: NextRequest) {
     const allQuotes: string[] = [];
 
     // ============================================
-    // STEP 1: Generate images with OpenAI DALL-E 3
-    // Use for generic aspirational scenes (no personalization needed)
-    // Grid template: 4 images, Other templates: 8 images
-    // ============================================
-    const openaiImages: string[] = [];
-    const numOpenAIImages = selectedTemplate === "grid" ? 4 : 8;
-
-    if (selectedTemplate !== "ai") {
-      console.log(`\n🎨 STEP 1/3: Generating ${numOpenAIImages} generic aspirational images with OpenAI DALL-E 3...`);
-
-      // Generic prompts for DALL-E (no personalization, just aspirational scenes)
-      const dallePrompts = [
-        `Professional photograph of a luxury modern dream house with beautiful architecture, perfectly landscaped front yard, golden hour lighting, upscale neighborhood, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
-        `Professional photograph of a high-end luxury sports car in sleek design, parked in an elegant setting, dramatic lighting, automotive photography, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
-        `Professional travel photography of an exotic tropical paradise destination, turquoise waters, white sand beach, palm trees, beautiful sunset, wanderlust aesthetic, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
-        `Professional lifestyle photography of a modern luxury rooftop penthouse interior with panoramic city skyline views through floor-to-ceiling windows, elegant furniture, golden hour lighting, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
-        `Professional photograph of a luxury yacht sailing in crystal blue waters at sunset, elegant design, maritime lifestyle, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
-        `Professional photograph of a high-end fitness gym with modern equipment, floor-to-ceiling windows, motivational atmosphere, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
-        `Professional travel photography of mountain peaks at sunrise, adventurous landscape, breathtaking views, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
-        `Professional photograph of an elegant restaurant interior, fine dining setup, ambient lighting, luxury lifestyle, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`
-      ];
-
-      for (let i = 0; i < Math.min(numOpenAIImages, dallePrompts.length); i++) {
-        console.log(`  [${i + 1}/${numOpenAIImages}] Generating DALL-E image ${i + 1}...`);
-        try {
-          const response = await fetch("https://api.openai.com/v1/images/generations", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${openaiApiKey}`,
-            },
-            body: JSON.stringify({
-              model: "dall-e-3",
-              prompt: dallePrompts[i],
-              n: 1,
-              size: "1792x1024", // 16:9 landscape format
-              quality: "hd",
-            }),
-          });
-
-          if (!response.ok) {
-            const error = await response.json();
-            console.error(`  ✗ OpenAI API error:`, error);
-            continue;
-          }
-
-          const data = await response.json();
-          const imageUrl = data.data[0]?.url;
-
-          if (imageUrl) {
-            // Fetch the image and convert to base64
-            const imageResponse = await fetch(imageUrl);
-            const imageBuffer = await imageResponse.arrayBuffer();
-            const base64Image = Buffer.from(imageBuffer).toString("base64");
-
-            // Process image to ensure correct aspect ratio
-            const processedImage = await resizeToAspectRatio(base64Image, 1.8125);
-            openaiImages.push(processedImage);
-            console.log(`  ✓ Generated and processed DALL-E image ${i + 1}`);
-          }
-
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error(`  ✗ Error generating DALL-E image ${i + 1}:`, error);
-        }
-      }
-
-      console.log(`✅ Generated ${openaiImages.length} DALL-E images total`);
-    } else {
-      console.log("\n⏭️  STEP 1/3: Skipping DALL-E for AI template");
-    }
-
-    // ============================================
-    // STEP 2: Generate images with Gemini (personalized with user's selfie)
-    // Grid template: 4 images, Other templates: 7 images
-    // SKIP for AI template - AI template uses Gemini one-shot only
+    // NEW STRATEGY: Generate ALL images with Gemini for personalization
+    // Grid template: 8 images, Other templates: 15 images
+    // All images will include user's face/items for a cohesive personal vision board
+    // NO generic OpenAI images - everything is personalized
     // ============================================
     const geminiImages: string[] = [];
-    const numGeminiImages = selectedTemplate === "grid" ? 4 : 7;
+    const numGeminiImages = selectedTemplate === "grid" ? 8 : 15;
 
     if (selectedTemplate !== "ai") {
-      console.log(`\n🎨 STEP 2/3: Generating ${numGeminiImages} personalized images with Gemini...`);
+      console.log(`\n🎨 STEP 1/2: Generating ${numGeminiImages} personalized images with Gemini (ALL images)...`);
 
     // Strategy: Create diverse image combinations from user uploads + lifestyle scenarios
     const combinations = [];
@@ -346,22 +274,22 @@ export async function POST(request: NextRequest) {
       }
     }
 
-      console.log(`✅ Generated ${geminiImages.length} Gemini images total`);
+      console.log(`✅ Generated ${geminiImages.length} personalized Gemini images total`);
     } else {
-      console.log("\n⏭️  STEP 2/3: Skipping Gemini multi-step generation for AI template (using one-shot instead)");
+      console.log("\n⏭️  STEP 1/2: Skipping Gemini multi-step generation for AI template (using one-shot instead)");
     }
 
     // ============================================
-    // COMBINE: Merge OpenAI + Gemini images
-    // Grid: 8 total (4 + 4), Others: 15 total (8 + 7)
+    // Use ONLY Gemini images (all personalized)
+    // Grid: 8 total, Others: 15 total
     // ============================================
-    const allGeneratedImages = [...openaiImages, ...geminiImages];
-    console.log(`\n🎉 Combined images: ${openaiImages.length} from DALL-E + ${geminiImages.length} from Gemini = ${allGeneratedImages.length} total`);
+    const allGeneratedImages = [...geminiImages];
+    console.log(`\n🎉 Total images generated: ${allGeneratedImages.length} (all personalized with Gemini)`);
 
     // ============================================
-    // STEP 3: Generate inspirational quotes with AI
+    // STEP 2: Generate inspirational quotes with AI
     // ============================================
-    console.log("\n💬 STEP 3/3: Generating inspirational quotes with AI...");
+    console.log("\n💬 STEP 2/2: Generating inspirational quotes with AI...");
 
     try {
       // Use Gemini to generate real inspirational quotes based on keywords
@@ -629,7 +557,7 @@ Add beige rectangular labels in bottom-right corner of select tiles:
         metadata: {
           total_images: allGeneratedImages.length,
           gemini_images: geminiImages.length,
-          dalle_images: openaiImages.length,
+          generation_method: "gemini_personalized_only",
         },
       });
     }

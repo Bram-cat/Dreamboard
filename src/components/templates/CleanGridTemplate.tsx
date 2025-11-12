@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface CleanGridTemplateProps {
-  images: string[]; // 8 images (4 OpenAI + 4 Gemini)
+  images: string[]; // 8 personalized images (all Gemini)
   keywords: string[];
 }
 

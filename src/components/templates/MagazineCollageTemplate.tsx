@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface MagazineCollageTemplateProps {
-  images: string[]; // 15 images (8 DALL-E + 7 Gemini)
+  images: string[]; // 15 personalized images (all Gemini)
   keywords: string[];
 }
 
