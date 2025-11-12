@@ -92,24 +92,7 @@ export default function MagazineCollageTemplate({
           ctx.rotate((pos.rotate * Math.PI) / 180);
           ctx.translate(-(pos.width / 2), -(pos.height / 2));
 
-          // Draw tape at corners (before image)
-          const drawTape = (x: number, y: number, angle: number) => {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate((angle * Math.PI) / 180);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            ctx.fillRect(-25, -8, 50, 16);
-            ctx.strokeStyle = 'rgba(200, 200, 200, 0.5)';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(-25, -8, 50, 16);
-            ctx.restore();
-          };
-
-          // Tape at top corners
-          drawTape(10, -5, 45);
-          drawTape(pos.width - 10, -5, -45);
-
-          // Draw white photo border
+          // Draw white photo border with shadow
           ctx.fillStyle = '#ffffff';
           ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
           ctx.shadowBlur = 15;
@@ -118,7 +101,7 @@ export default function MagazineCollageTemplate({
           ctx.fillRect(0, 0, pos.width, pos.height);
           ctx.shadowColor = 'transparent';
 
-          // Draw image
+          // Draw image inside the border
           const padding = 12;
           const imgRatio = img.width / img.height;
           const boxRatio = (pos.width - padding * 2) / (pos.height - padding * 2);
@@ -137,6 +120,23 @@ export default function MagazineCollageTemplate({
           }
 
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+
+          // Draw tape decorations AFTER image (so they appear on top)
+          const drawTape = (x: number, y: number, angle: number) => {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate((angle * Math.PI) / 180);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.fillRect(-25, -8, 50, 16);
+            ctx.strokeStyle = 'rgba(200, 200, 200, 0.5)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(-25, -8, 50, 16);
+            ctx.restore();
+          };
+
+          // Tape at top corners
+          drawTape(10, -5, 45);
+          drawTape(pos.width - 10, -5, -45);
 
           ctx.restore();
         } catch (error) {
