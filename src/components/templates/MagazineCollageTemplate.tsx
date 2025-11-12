@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface MagazineCollageTemplateProps {
-  images: string[]; // 8 images (4 DALL-E + 4 Gemini)
+  images: string[]; // 15 images (8 DALL-E + 7 Gemini)
   keywords: string[];
 }
 
@@ -14,28 +14,29 @@ export default function MagazineCollageTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // LANDSCAPE Magazine collage - scattered dynamic arrangement across wide canvas
-  // 8 images arranged horizontally with varying sizes for authentic collage feel
+  // LANDSCAPE Magazine collage - 15 images scattered across wide canvas
+  // Dynamic arrangement with varying sizes for authentic collage feel
   const collagePositions = [
-    // Top left cluster
-    { top: 30, left: 30, width: 350, height: 240, rotate: -4, zIndex: 12 },
-    { top: 70, left: 400, width: 330, height: 220, rotate: 3, zIndex: 10 },
+    // Top row - 5 images
+    { top: 20, left: 20, width: 280, height: 200, rotate: -4, zIndex: 12 },
+    { top: 40, left: 320, width: 260, height: 180, rotate: 3, zIndex: 10 },
+    { top: 15, left: 600, width: 290, height: 200, rotate: -2, zIndex: 11 },
+    { top: 35, left: 910, width: 270, height: 190, rotate: 5, zIndex: 9 },
+    { top: 25, left: 1200, width: 280, height: 200, rotate: -3, zIndex: 13 },
 
-    // Top center-right cluster
-    { top: 20, left: 760, width: 340, height: 230, rotate: -2, zIndex: 11 },
-    { top: 80, left: 1120, width: 320, height: 210, rotate: 5, zIndex: 9 },
+    // Middle row - 5 images
+    { top: 250, left: 30, width: 290, height: 200, rotate: 2, zIndex: 14 },
+    { top: 260, left: 340, width: 270, height: 190, rotate: -4, zIndex: 8 },
+    { top: 240, left: 630, width: 280, height: 200, rotate: 3, zIndex: 10 },
+    { top: 270, left: 930, width: 260, height: 180, rotate: -2, zIndex: 12 },
+    { top: 250, left: 1210, width: 270, height: 190, rotate: 4, zIndex: 11 },
 
-    // Middle left
-    { top: 330, left: 40, width: 360, height: 250, rotate: 2, zIndex: 13 },
-
-    // Middle center-right
-    { top: 310, left: 750, width: 340, height: 230, rotate: -3, zIndex: 10 },
-
-    // Bottom left-center
-    { top: 630, left: 50, width: 350, height: 230, rotate: -5, zIndex: 11 },
-
-    // Bottom right
-    { top: 620, left: 1080, width: 330, height: 220, rotate: 4, zIndex: 12 },
+    // Bottom row - 5 images
+    { top: 480, left: 40, width: 280, height: 200, rotate: -5, zIndex: 13 },
+    { top: 500, left: 340, width: 270, height: 190, rotate: 3, zIndex: 9 },
+    { top: 490, left: 630, width: 290, height: 200, rotate: -3, zIndex: 11 },
+    { top: 510, left: 940, width: 260, height: 180, rotate: 4, zIndex: 10 },
+    { top: 495, left: 1220, width: 270, height: 190, rotate: -2, zIndex: 12 },
   ];
 
   // Canvas rendering for download
@@ -193,8 +194,8 @@ export default function MagazineCollageTemplate({
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
         }}
       >
-        {/* Collage Images - 8 total */}
-        {images.slice(0, 8).map((image, idx) => {
+        {/* Collage Images - 15 total */}
+        {images.slice(0, 15).map((image, idx) => {
           const pos = collagePositions[idx];
           if (!pos) return null;
 

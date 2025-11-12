@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface PolaroidScatteredTemplateProps {
-  images: string[]; // 20 images (10 DALL-E + 10 Gemini)
+  images: string[]; // 15 images (8 DALL-E + 7 Gemini)
   quotes: string[];
 }
 
@@ -14,27 +14,29 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Polaroid scrapbook layout - LARGE frames to fill all empty spaces
+  // Polaroid scrapbook layout - 15 images scattered with center card
   const gridPositions = [
-    // Top row - 5 LARGE frames spanning full width
-    { top: 5, left: 5, width: 340, height: 290, rotation: -5, label: "" },
-    { top: 15, left: 365, width: 360, height: 310, rotation: 4, label: "" },
-    { top: 10, left: 745, width: 340, height: 290, rotation: -3, label: "" },
-    { top: 8, left: 1105, width: 360, height: 310, rotation: 4, label: "" },
-    { top: 12, left: 1485, width: 420, height: 340, rotation: -5, label: "" },
+    // Top row - 5 frames
+    { top: 10, left: 10, width: 360, height: 290, rotation: -4, label: "" },
+    { top: 20, left: 390, width: 350, height: 280, rotation: 3, label: "" },
+    { top: 15, left: 760, width: 340, height: 270, rotation: -2, label: "" },
+    { top: 25, left: 1120, width: 360, height: 290, rotation: 5, label: "" },
+    { top: 12, left: 1500, width: 380, height: 300, rotation: -3, label: "" },
 
-    // Middle row - 4 LARGE frames around smaller center card
-    { top: 325, left: 5, width: 340, height: 290, rotation: 6, label: "" },
-    { top: 340, left: 365, width: 320, height: 270, rotation: -4, label: "" },
-    // SMALLER CENTER CARD SPACE: 800-1120 x 380-680
-    { top: 330, left: 1140, width: 340, height: 290, rotation: 4, label: "" },
-    { top: 345, left: 1500, width: 400, height: 320, rotation: -5, label: "" },
+    // Middle row - 4 frames (around center card)
+    { top: 330, left: 15, width: 350, height: 280, rotation: 4, label: "" },
+    { top: 340, left: 385, width: 340, height: 270, rotation: -3, label: "" },
+    // CENTER CARD SPACE
+    { top: 335, left: 1140, width: 350, height: 280, rotation: 3, label: "" },
+    { top: 350, left: 1510, width: 360, height: 290, rotation: -4, label: "" },
 
-    // Bottom row - 4 LARGE frames covering entire bottom
-    { top: 720, left: 5, width: 340, height: 290, rotation: -4, label: "" },
-    { top: 735, left: 365, width: 360, height: 310, rotation: 5, label: "" },
-    { top: 725, left: 745, width: 340, height: 290, rotation: -3, label: "" },
-    { top: 730, left: 1505, width: 400, height: 320, rotation: 4, label: "" },
+    // Bottom row - 6 frames
+    { top: 640, left: 10, width: 340, height: 270, rotation: -5, label: "" },
+    { top: 655, left: 370, width: 350, height: 280, rotation: 4, label: "" },
+    { top: 645, left: 740, width: 360, height: 290, rotation: -2, label: "" },
+    { top: 660, left: 1120, width: 340, height: 270, rotation: 3, label: "" },
+    { top: 650, left: 1480, width: 350, height: 280, rotation: -4, label: "" },
+    { top: 670, left: 220, width: 330, height: 260, rotation: 5, label: "" },
   ];
 
   // Canvas rendering for download
@@ -65,8 +67,8 @@ export default function PolaroidScatteredTemplate({
         });
       };
 
-      // Draw all polaroid frames with rotation (max 13 frames)
-      for (let idx = 0; idx < Math.min(13, images.length); idx++) {
+      // Draw all polaroid frames with rotation (max 15 frames)
+      for (let idx = 0; idx < Math.min(15, images.length); idx++) {
         const pos = gridPositions[idx];
         if (!pos) continue;
 
@@ -239,7 +241,7 @@ export default function PolaroidScatteredTemplate({
         }}
       >
         {/* Polaroid Frames - Rotated Scrapbook Style */}
-        {images.slice(0, 13).map((image, idx) => {
+        {images.slice(0, 15).map((image, idx) => {
           const pos = gridPositions[idx];
           if (!pos) return null;
 

@@ -92,24 +92,30 @@ export async function POST(request: NextRequest) {
     const allQuotes: string[] = [];
 
     // ============================================
-    // STEP 1: Generate 4 images with OpenAI DALL-E 3
+    // STEP 1: Generate images with OpenAI DALL-E 3
     // Use for generic aspirational scenes (no personalization needed)
+    // Grid template: 4 images, Other templates: 8 images
     // ============================================
     const openaiImages: string[] = [];
+    const numOpenAIImages = selectedTemplate === "grid" ? 4 : 8;
 
     if (selectedTemplate !== "ai") {
-      console.log("\n🎨 STEP 1/3: Generating 4 generic aspirational images with OpenAI DALL-E 3...");
+      console.log(`\n🎨 STEP 1/3: Generating ${numOpenAIImages} generic aspirational images with OpenAI DALL-E 3...`);
 
       // Generic prompts for DALL-E (no personalization, just aspirational scenes)
       const dallePrompts = [
         `Professional photograph of a luxury modern dream house with beautiful architecture, perfectly landscaped front yard, golden hour lighting, upscale neighborhood, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
         `Professional photograph of a high-end luxury sports car in sleek design, parked in an elegant setting, dramatic lighting, automotive photography, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
         `Professional travel photography of an exotic tropical paradise destination, turquoise waters, white sand beach, palm trees, beautiful sunset, wanderlust aesthetic, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
-        `Professional lifestyle photography of a modern luxury rooftop penthouse interior with panoramic city skyline views through floor-to-ceiling windows, elegant furniture, golden hour lighting, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`
+        `Professional lifestyle photography of a modern luxury rooftop penthouse interior with panoramic city skyline views through floor-to-ceiling windows, elegant furniture, golden hour lighting, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
+        `Professional photograph of a luxury yacht sailing in crystal blue waters at sunset, elegant design, maritime lifestyle, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
+        `Professional photograph of a high-end fitness gym with modern equipment, floor-to-ceiling windows, motivational atmosphere, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
+        `Professional travel photography of mountain peaks at sunrise, adventurous landscape, breathtaking views, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`,
+        `Professional photograph of an elegant restaurant interior, fine dining setup, ambient lighting, luxury lifestyle, 4K quality, HORIZONTAL LANDSCAPE orientation 16:9`
       ];
 
-      for (let i = 0; i < dallePrompts.length; i++) {
-        console.log(`  [${i + 1}/4] Generating DALL-E image ${i + 1}...`);
+      for (let i = 0; i < Math.min(numOpenAIImages, dallePrompts.length); i++) {
+        console.log(`  [${i + 1}/${numOpenAIImages}] Generating DALL-E image ${i + 1}...`);
         try {
           const response = await fetch("https://api.openai.com/v1/images/generations", {
             method: "POST",
@@ -159,15 +165,17 @@ export async function POST(request: NextRequest) {
     }
 
     // ============================================
-    // STEP 2: Generate 4 images with Gemini (personalized with user's selfie)
+    // STEP 2: Generate images with Gemini (personalized with user's selfie)
+    // Grid template: 4 images, Other templates: 7 images
     // SKIP for AI template - AI template uses Gemini one-shot only
     // ============================================
     const geminiImages: string[] = [];
+    const numGeminiImages = selectedTemplate === "grid" ? 4 : 7;
 
     if (selectedTemplate !== "ai") {
-      console.log("\n🎨 STEP 2/3: Generating 8 personalized images with Gemini...");
+      console.log(`\n🎨 STEP 2/3: Generating ${numGeminiImages} personalized images with Gemini...`);
 
-    // Strategy: Create up to 11 diverse images, then select best 8
+    // Strategy: Create diverse image combinations from user uploads + lifestyle scenarios
     const combinations = [];
 
     // PRIORITY 1: STANDALONE ASSETS (show the actual dream items)
@@ -290,11 +298,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Generate Gemini images from combinations (generate only 4 to combine with 4 DALL-E images)
-    console.log(`\n📋 Prepared ${combinations.length} image combinations, will generate 4 for Gemini`);
+    // Generate Gemini images from combinations
+    console.log(`\n📋 Prepared ${combinations.length} image combinations, will generate ${numGeminiImages} for Gemini`);
 
-    for (let i = 0; i < Math.min(4, combinations.length); i++) {
-      console.log(`  [${i + 1}/4] Generating Gemini image ${i + 1}`);
+    for (let i = 0; i < Math.min(numGeminiImages, combinations.length); i++) {
+      console.log(`  [${i + 1}/${numGeminiImages}] Generating Gemini image ${i + 1}`);
       try {
         const combo = combinations[i];
         const imageParts = combo.images.map((dataUrl: string) => ({
@@ -344,7 +352,8 @@ export async function POST(request: NextRequest) {
     }
 
     // ============================================
-    // COMBINE: Merge OpenAI + Gemini images (4 + 4 = 8 total)
+    // COMBINE: Merge OpenAI + Gemini images
+    // Grid: 8 total (4 + 4), Others: 15 total (8 + 7)
     // ============================================
     const allGeneratedImages = [...openaiImages, ...geminiImages];
     console.log(`\n🎉 Combined images: ${openaiImages.length} from DALL-E + ${geminiImages.length} from Gemini = ${allGeneratedImages.length} total`);
