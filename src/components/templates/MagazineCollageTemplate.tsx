@@ -15,27 +15,27 @@ export default function MagazineCollageTemplate({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // TIGHT-FIT Magazine collage - 13 visible images properly arranged around center card
-  // Compact layout with center "2025 VISION BOARD" card - NO GAPS
+  // Compact layout with center "2025 VISION BOARD" card - LARGER FRAMES to fill gaps
   const collagePositions = [
-    // Top row - 6 images (tightly packed across entire width)
-    { top: 10, left: 10, width: 240, height: 170, rotate: -3, zIndex: 20 },
-    { top: 15, left: 260, width: 240, height: 170, rotate: 2, zIndex: 21 },
-    { top: 10, left: 510, width: 240, height: 170, rotate: -2, zIndex: 22 },
-    { top: 15, left: 760, width: 240, height: 170, rotate: 3, zIndex: 23 },
-    { top: 10, left: 1010, width: 240, height: 170, rotate: -2, zIndex: 24 },
-    { top: 12, left: 1260, width: 240, height: 170, rotate: 3, zIndex: 25 },
+    // Top row - 6 images (much larger frames, overlapping edges)
+    { top: 5, left: 5, width: 280, height: 200, rotate: -3, zIndex: 20 },
+    { top: 8, left: 270, width: 280, height: 200, rotate: 2, zIndex: 21 },
+    { top: 5, left: 535, width: 280, height: 200, rotate: -2, zIndex: 22 },
+    { top: 8, left: 800, width: 280, height: 200, rotate: 3, zIndex: 23 },
+    { top: 5, left: 1065, width: 280, height: 200, rotate: -2, zIndex: 24 },
+    { top: 8, left: 1330, width: 285, height: 200, rotate: 3, zIndex: 25 },
 
-    // Middle row - 4 images around center card (2 left + CENTER CARD + 2 right)
-    { top: 195, left: 10, width: 240, height: 170, rotate: 2, zIndex: 26 },
-    { top: 200, left: 260, width: 240, height: 170, rotate: -3, zIndex: 27 },
+    // Middle row - 4 images around center card (much larger frames)
+    { top: 195, left: 5, width: 280, height: 200, rotate: 2, zIndex: 26 },
+    { top: 200, left: 270, width: 280, height: 200, rotate: -3, zIndex: 27 },
     // CENTER CARD SPACE (540x210, 280x200) - NO IMAGES HERE
-    { top: 195, left: 1130, width: 240, height: 170, rotate: 3, zIndex: 28 },
-    { top: 200, left: 1380, width: 230, height: 165, rotate: -2, zIndex: 29 },
+    { top: 195, left: 1055, width: 280, height: 200, rotate: 3, zIndex: 28 },
+    { top: 200, left: 1330, width: 285, height: 200, rotate: -2, zIndex: 29 },
 
-    // Bottom row - 3 images (fill remaining spaces with larger sizes)
-    { top: 425, left: 10, width: 360, height: 185, rotate: -2, zIndex: 30 },
-    { top: 430, left: 620, width: 360, height: 185, rotate: 3, zIndex: 31 },
-    { top: 425, left: 1230, width: 380, height: 185, rotate: -3, zIndex: 32 },
+    // Bottom row - 3 images (MUCH larger to fill all bottom space)
+    { top: 415, left: 5, width: 530, height: 200, rotate: -2, zIndex: 30 },
+    { top: 418, left: 545, width: 530, height: 200, rotate: 3, zIndex: 31 },
+    { top: 415, left: 1085, width: 530, height: 200, rotate: -3, zIndex: 32 },
   ];
 
   // Canvas rendering for download
