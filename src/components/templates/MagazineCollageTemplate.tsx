@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface MagazineCollageTemplateProps {
-  images: string[]; // 15 personalized images (all Gemini)
+  images: string[]; // 13 personalized images (all Gemini) - reduced to fit around center card
   keywords: string[];
 }
 
@@ -14,7 +14,7 @@ export default function MagazineCollageTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // TIGHT-FIT Magazine collage - 15 images properly arranged around center card
+  // TIGHT-FIT Magazine collage - 13 visible images properly arranged around center card
   // Compact layout with center "2025 VISION BOARD" card
   const collagePositions = [
     // Top row - 5 images (tightly packed)
@@ -27,15 +27,13 @@ export default function MagazineCollageTemplate({
     // Middle row - 4 images around center card (2 left + CENTER CARD + 2 right)
     { top: 210, left: 10, width: 250, height: 180, rotate: 2, zIndex: 14 },
     { top: 215, left: 270, width: 260, height: 185, rotate: -3, zIndex: 8 },
-    // CENTER CARD SPACE (820x210, 260x200)
+    // CENTER CARD SPACE (550x210, 260x200) - NO IMAGES HERE
     { top: 210, left: 1090, width: 250, height: 180, rotate: 3, zIndex: 12 },
     { top: 215, left: 1350, width: 260, height: 185, rotate: -2, zIndex: 11 },
 
-    // Bottom row - 6 images (tightly packed)
+    // Bottom row - 4 images (reduced to fit layout without overlapping center card)
     { top: 420, left: 10, width: 240, height: 175, rotate: -2, zIndex: 13 },
     { top: 425, left: 260, width: 250, height: 180, rotate: 3, zIndex: 9 },
-    { top: 420, left: 520, width: 240, height: 175, rotate: -3, zIndex: 11 },
-    { top: 425, left: 770, width: 250, height: 180, rotate: 2, zIndex: 10 },
     { top: 420, left: 1030, width: 240, height: 175, rotate: -2, zIndex: 12 },
     { top: 425, left: 1280, width: 250, height: 180, rotate: 3, zIndex: 14 },
   ];
@@ -251,8 +249,8 @@ export default function MagazineCollageTemplate({
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
         }}
       >
-        {/* Collage Images - 15 total */}
-        {images.slice(0, 15).map((image, idx) => {
+        {/* Collage Images - 13 total (around center card) */}
+        {images.slice(0, 13).map((image, idx) => {
           const pos = collagePositions[idx];
           if (!pos) return null;
 

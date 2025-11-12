@@ -47,12 +47,12 @@ export async function POST(request: NextRequest) {
 
     // ============================================
     // NEW STRATEGY: Generate ALL images with Gemini for personalization
-    // Grid template: 8 images, Other templates: 15 images
+    // Grid template: 8 images, Magazine: 13 images, Polaroid: 15 images
     // All images will include user's face/items for a cohesive personal vision board
     // NO generic OpenAI images - everything is personalized
     // ============================================
     const geminiImages: string[] = [];
-    const numGeminiImages = selectedTemplate === "grid" ? 8 : 15;
+    const numGeminiImages = selectedTemplate === "grid" ? 8 : selectedTemplate === "magazine" ? 13 : 15;
 
     if (selectedTemplate !== "ai") {
       console.log(`\n🎨 STEP 1/2: Generating ${numGeminiImages} personalized images with Gemini (ALL images)...`);
