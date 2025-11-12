@@ -1,55 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
-import sharp from "sharp";
 
-// Helper function to resize/crop image to target aspect ratio (435x240 = 1.8125:1)
-// IMPROVED STRATEGY: Use 'entropy' for better face/content preservation
-async function resizeToAspectRatio(base64Data: string, targetAspectRatio: number): Promise<string> {
-  try {
-    console.log(`    📐 Processing image to aspect ratio ${targetAspectRatio}:1`);
-
-    const imageBuffer = Buffer.from(base64Data, 'base64');
-    const metadata = await sharp(imageBuffer).metadata();
-
-    if (!metadata.width || !metadata.height) {
-      throw new Error('Could not read image dimensions');
-    }
-
-    console.log(`    📏 Original dimensions: ${metadata.width}x${metadata.height} (${(metadata.width / metadata.height).toFixed(2)}:1)`);
-
-    const targetWidth = 435;
-    const targetHeight = 240;
-    const currentAspectRatio = metadata.width / metadata.height;
-
-    console.log(`    📊 Current aspect ratio: ${currentAspectRatio.toFixed(2)}:1, Target: ${targetAspectRatio}:1`);
-
-    // SMART STRATEGY: Use 'entropy' which focuses on high-detail areas (faces, important content)
-    // Entropy-based cropping is better than 'attention' for portrait images that need to be landscape
-    const resizedBuffer = await sharp(imageBuffer)
-      .resize(targetWidth, targetHeight, {
-        fit: 'cover',                // Crop to fill the dimensions exactly
-        position: 'entropy',         // Focus on high-information areas (faces, details)
-        kernel: 'lanczos3',          // High quality resampling
-        withoutEnlargement: false    // Allow enlargement if needed
-      })
-      .jpeg({ quality: 95, mozjpeg: true })
-      .toBuffer();
-
-    // Verify final dimensions
-    const finalMetadata = await sharp(resizedBuffer).metadata();
-    console.log(`    ✅ Final dimensions: ${finalMetadata.width}x${finalMetadata.height}`);
-
-    if (finalMetadata.width !== targetWidth || finalMetadata.height !== targetHeight) {
-      console.error(`    ❌ ERROR: Dimensions are ${finalMetadata.width}x${finalMetadata.height} but should be ${targetWidth}x${targetHeight}`);
-    }
-
-    return resizedBuffer.toString('base64');
-  } catch (error) {
-    console.error('    ❌ Error resizing image:', error);
-    // Return original if resize fails
-    return base64Data;
-  }
-}
+// NO CROPPING - Preserve original image dimensions
+// Let CSS handle the framing to avoid cutting off faces
+// Images are generated in landscape format by Gemini, so no need to crop
 
 export async function POST(request: NextRequest) {
   try {
@@ -162,7 +116,10 @@ export async function POST(request: NextRequest) {
     // PRIORITY 3: LIFESTYLE SCENARIOS WITH SELFIE (only if user uploaded selfie)
     // These show the user living their best life
 
-    if (combinations.length < 11 && hasSelfie) {
+    // Add enough lifestyle scenarios to reach required image count
+    const maxCombinations = numGeminiImages; // Use template-specific count
+
+    if (combinations.length < maxCombinations && hasSelfie) {
       // PRIORITY 1: User with TRAVEL/ADVENTURE
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -170,7 +127,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 11 && hasSelfie) {
+    if (combinations.length < maxCombinations && hasSelfie) {
       // PRIORITY 2: User with GOOD FOOD/HEALTHY LIFESTYLE
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -178,7 +135,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 11 && hasSelfie) {
+    if (combinations.length < maxCombinations && hasSelfie) {
       // PRIORITY 3: User in PROFESSIONAL/OFFICE SUCCESS setting
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -186,7 +143,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 11 && hasSelfie) {
+    if (combinations.length < maxCombinations && hasSelfie) {
       // PRIORITY 4: User AT LUXURY ROOFTOP
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -194,7 +151,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 11 && hasSelfie) {
+    if (combinations.length < maxCombinations && hasSelfie) {
       // PRIORITY 5: User doing FITNESS/GYM workout
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -202,7 +159,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 11 && hasSelfie) {
+    if (combinations.length < maxCombinations && hasSelfie) {
       // PRIORITY 6: User at UPSCALE CELEBRATION
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -210,7 +167,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 11 && hasSelfie) {
+    if (combinations.length < maxCombinations && hasSelfie) {
       // PRIORITY 7: User doing OUTDOOR MEDITATION/YOGA
       combinations.push({
         images: [categorizedUploads.selfie],
@@ -218,11 +175,68 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (combinations.length < 11 && hasSelfie) {
+    if (combinations.length < maxCombinations && hasSelfie) {
       // PRIORITY 8: User in MODERN OFFICE/WORKING
       combinations.push({
         images: [categorizedUploads.selfie],
         prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- CRITICAL: LANDSCAPE/HORIZONTAL orientation (16:9 aspect ratio) - wider than tall\n- Show EXACT same person in modern corner office with panoramic city skyline views through floor-to-ceiling windows, at desk with laptop\n- Composition: Person positioned in LEFT or RIGHT third of frame, with city skyline/windows on the other side\n- Face clearly visible, front-facing or 3/4 angle, professional confident expression\n- Include full head with space above, waist-up seated at desk shot\n- Perfect facial accuracy - same person, same face\n- Business attire (suit/blazer), afternoon natural sunlight\n- HORIZONTAL LANDSCAPE FORMAT - Professional corporate photography style, executive success aesthetic"
+      });
+    }
+
+    // Add more diverse scenarios to reach 15 images for non-grid templates
+    if (combinations.length < maxCombinations && hasSelfie) {
+      // Additional scenario 1: Reading/Learning
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- CRITICAL: LANDSCAPE/HORIZONTAL orientation (16:9 aspect ratio) - wider than tall\n- Show EXACT same person reading a book in cozy modern library or bookshelf background\n- Composition: Person positioned in LEFT or RIGHT third of frame, with bookshelves on the other side\n- Face clearly visible, front-facing or 3/4 angle, thoughtful focused expression\n- Include full head with space above, waist-up seated shot\n- Perfect facial accuracy - same person, same face\n- Smart casual attire, warm natural lighting\n- HORIZONTAL LANDSCAPE FORMAT - Professional lifestyle photography style, knowledge growth aesthetic"
+      });
+    }
+
+    if (combinations.length < maxCombinations && hasSelfie) {
+      // Additional scenario 2: Outdoor Running/Jogging
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- CRITICAL: LANDSCAPE/HORIZONTAL orientation (16:9 aspect ratio) - wider than tall\n- Show EXACT same person jogging outdoors in beautiful park at sunrise, energetic and active\n- Composition: Person positioned in LEFT or RIGHT third of frame, with park scenery on the other side\n- Face clearly visible, front-facing or 3/4 angle, energetic determined expression\n- Include full head with space above, full body or 3/4 body running shot\n- Perfect facial accuracy - same person, same face\n- Athletic running gear, golden morning light\n- HORIZONTAL LANDSCAPE FORMAT - Professional fitness photography style, active healthy aesthetic"
+      });
+    }
+
+    if (combinations.length < maxCombinations && hasSelfie) {
+      // Additional scenario 3: Creative/Art Studio
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- CRITICAL: LANDSCAPE/HORIZONTAL orientation (16:9 aspect ratio) - wider than tall\n- Show EXACT same person in creative modern workspace/studio with art or design materials\n- Composition: Person positioned in LEFT or RIGHT third of frame, with creative workspace on the other side\n- Face clearly visible, front-facing or 3/4 angle, inspired creative expression\n- Include full head with space above, waist-up or upper body shot\n- Perfect facial accuracy - same person, same face\n- Casual creative attire, bright natural studio lighting\n- HORIZONTAL LANDSCAPE FORMAT - Professional lifestyle photography style, creative inspiration aesthetic"
+      });
+    }
+
+    if (combinations.length < maxCombinations && hasSelfie) {
+      // Additional scenario 4: Coffee Shop/Networking
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- CRITICAL: LANDSCAPE/HORIZONTAL orientation (16:9 aspect ratio) - wider than tall\n- Show EXACT same person at upscale coffee shop with laptop, working remotely or networking\n- Composition: Person positioned in LEFT or RIGHT third of frame, with cafe ambiance on the other side\n- Face clearly visible, front-facing or 3/4 angle, friendly approachable smile\n- Include full head with space above, waist-up seated shot\n- Perfect facial accuracy - same person, same face\n- Smart casual attire, warm ambient coffee shop lighting\n- HORIZONTAL LANDSCAPE FORMAT - Professional lifestyle photography style, entrepreneurial networking aesthetic"
+      });
+    }
+
+    if (combinations.length < maxCombinations && hasSelfie) {
+      // Additional scenario 5: Evening Dinner/Fine Dining
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- CRITICAL: LANDSCAPE/HORIZONTAL orientation (16:9 aspect ratio) - wider than tall\n- Show EXACT same person at elegant fine dining restaurant with beautiful table setting\n- Composition: Person positioned in LEFT or RIGHT third of frame, with restaurant ambiance on the other side\n- Face clearly visible, front-facing or 3/4 angle, sophisticated content smile\n- Include full head with space above, waist-up seated at table shot\n- Perfect facial accuracy - same person, same face\n- Formal elegant attire, warm ambient restaurant lighting\n- HORIZONTAL LANDSCAPE FORMAT - Professional lifestyle photography style, luxury dining aesthetic"
+      });
+    }
+
+    if (combinations.length < maxCombinations && hasSelfie) {
+      // Additional scenario 6: Tech/Innovation Lab
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- CRITICAL: LANDSCAPE/HORIZONTAL orientation (16:9 aspect ratio) - wider than tall\n- Show EXACT same person in modern tech startup office or innovation lab with multiple monitors\n- Composition: Person positioned in LEFT or RIGHT third of frame, with tech workspace on the other side\n- Face clearly visible, front-facing or 3/4 angle, innovative focused expression\n- Include full head with space above, waist-up at workstation shot\n- Perfect facial accuracy - same person, same face\n- Tech startup casual attire, bright modern office lighting\n- HORIZONTAL LANDSCAPE FORMAT - Professional tech photography style, innovation leadership aesthetic"
+      });
+    }
+
+    if (combinations.length < maxCombinations && hasSelfie) {
+      // Additional scenario 7: Public Speaking/Presentation
+      combinations.push({
+        images: [categorizedUploads.selfie],
+        prompt: "CRITICAL FACE PRESERVATION - EXACT REPLICA REQUIRED:\n\nINPUT IMAGE = REFERENCE FACE (MUST COPY EXACTLY):\n- Copy this EXACT face: same facial structure, skin tone, hair (style + color), eyes (shape + color), nose shape, mouth shape, facial hair, jawline, and ALL features\n- DO NOT generate a different person or modify ANY facial features\n- This person's complete identity MUST be preserved 100%\n\nOUTPUT REQUIREMENTS:\n- CRITICAL: LANDSCAPE/HORIZONTAL orientation (16:9 aspect ratio) - wider than tall\n- Show EXACT same person giving presentation on stage at conference or business event\n- Composition: Person positioned in LEFT or RIGHT third of frame, with presentation screen/stage on the other side\n- Face clearly visible, front-facing or 3/4 angle, confident engaging expression\n- Include full head with space above, waist-up or 3/4 body standing shot\n- Perfect facial accuracy - same person, same face\n- Professional business attire, stage spotlighting\n- HORIZONTAL LANDSCAPE FORMAT - Professional event photography style, thought leadership aesthetic"
       });
     }
 
@@ -261,10 +275,9 @@ export async function POST(request: NextRequest) {
             part.inlineData?.mimeType?.startsWith("image/")
           );
           if (imagePart?.inlineData?.data) {
-            // Process image to ensure correct aspect ratio
-            const processedImage = await resizeToAspectRatio(imagePart.inlineData.data, 1.8125); // 435/240 = 1.8125
-            geminiImages.push(processedImage);
-            console.log(`  ✓ Generated and processed Gemini image ${i + 1}`);
+            // Keep original image - no cropping to preserve faces
+            geminiImages.push(imagePart.inlineData.data);
+            console.log(`  ✓ Generated Gemini image ${i + 1} (original size preserved)`);
           }
         }
 
@@ -543,10 +556,10 @@ Add beige rectangular labels in bottom-right corner of select tiles:
         },
       });
     } else {
-      // Return individual images for HTML templates (polaroid or grid)
+      // Return individual images for HTML templates (polaroid, magazine, or grid)
       console.log(`\n🎨 Returning ${allGeneratedImages.length} individual images for template: ${selectedTemplate}`);
 
-      // Images are now JPEG format after sharp processing
+      // Images are in original format from Gemini (no cropping)
       const individualImages = allGeneratedImages.map(base64 => `data:image/jpeg;base64,${base64}`);
 
       return NextResponse.json({
