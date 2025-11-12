@@ -15,14 +15,15 @@ export default function MagazineCollageTemplate({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // TIGHT-FIT Magazine collage - 13 visible images properly arranged around center card
-  // Compact layout with center "2025 VISION BOARD" card
+  // Compact layout with center "2025 VISION BOARD" card - NO GAPS
   const collagePositions = [
-    // Top row - 5 images (tightly packed)
+    // Top row - 5 images (tightly packed, no gaps)
     { top: 10, left: 10, width: 260, height: 185, rotate: -3, zIndex: 10 },
     { top: 15, left: 280, width: 250, height: 180, rotate: 2, zIndex: 11 },
     { top: 10, left: 540, width: 260, height: 185, rotate: -2, zIndex: 12 },
     { top: 15, left: 810, width: 250, height: 180, rotate: 3, zIndex: 9 },
     { top: 10, left: 1070, width: 260, height: 185, rotate: -2, zIndex: 13 },
+    { top: 12, left: 1340, width: 270, height: 190, rotate: 3, zIndex: 11 },
 
     // Middle row - 4 images around center card (2 left + CENTER CARD + 2 right)
     { top: 210, left: 10, width: 250, height: 180, rotate: 2, zIndex: 14 },
@@ -31,11 +32,10 @@ export default function MagazineCollageTemplate({
     { top: 210, left: 1090, width: 250, height: 180, rotate: 3, zIndex: 12 },
     { top: 215, left: 1350, width: 260, height: 185, rotate: -2, zIndex: 11 },
 
-    // Bottom row - 4 images (reduced to fit layout without overlapping center card)
-    { top: 420, left: 10, width: 240, height: 175, rotate: -2, zIndex: 13 },
-    { top: 425, left: 260, width: 250, height: 180, rotate: 3, zIndex: 9 },
-    { top: 420, left: 1030, width: 240, height: 175, rotate: -2, zIndex: 12 },
-    { top: 425, left: 1280, width: 250, height: 180, rotate: 3, zIndex: 14 },
+    // Bottom row - 3 images (fill remaining spaces)
+    { top: 420, left: 10, width: 270, height: 190, rotate: -2, zIndex: 13 },
+    { top: 425, left: 290, width: 250, height: 180, rotate: 3, zIndex: 9 },
+    { top: 420, left: 1280, width: 330, height: 195, rotate: -3, zIndex: 14 },
   ];
 
   // Canvas rendering for download
