@@ -17,25 +17,25 @@ export default function MagazineCollageTemplate({
   // TIGHT-FIT Magazine collage - 13 visible images properly arranged around center card
   // Compact layout with center "2025 VISION BOARD" card - NO GAPS
   const collagePositions = [
-    // Top row - 5 images (tightly packed, no gaps)
-    { top: 10, left: 10, width: 260, height: 185, rotate: -3, zIndex: 10 },
-    { top: 15, left: 280, width: 250, height: 180, rotate: 2, zIndex: 11 },
-    { top: 10, left: 540, width: 260, height: 185, rotate: -2, zIndex: 12 },
-    { top: 15, left: 810, width: 250, height: 180, rotate: 3, zIndex: 9 },
-    { top: 10, left: 1070, width: 260, height: 185, rotate: -2, zIndex: 13 },
-    { top: 12, left: 1340, width: 270, height: 190, rotate: 3, zIndex: 11 },
+    // Top row - 6 images (tightly packed across entire width)
+    { top: 10, left: 10, width: 240, height: 170, rotate: -3, zIndex: 20 },
+    { top: 15, left: 260, width: 240, height: 170, rotate: 2, zIndex: 21 },
+    { top: 10, left: 510, width: 240, height: 170, rotate: -2, zIndex: 22 },
+    { top: 15, left: 760, width: 240, height: 170, rotate: 3, zIndex: 23 },
+    { top: 10, left: 1010, width: 240, height: 170, rotate: -2, zIndex: 24 },
+    { top: 12, left: 1260, width: 240, height: 170, rotate: 3, zIndex: 25 },
 
     // Middle row - 4 images around center card (2 left + CENTER CARD + 2 right)
-    { top: 210, left: 10, width: 250, height: 180, rotate: 2, zIndex: 14 },
-    { top: 215, left: 270, width: 260, height: 185, rotate: -3, zIndex: 8 },
-    // CENTER CARD SPACE (550x210, 260x200) - NO IMAGES HERE
-    { top: 210, left: 1090, width: 250, height: 180, rotate: 3, zIndex: 12 },
-    { top: 215, left: 1350, width: 260, height: 185, rotate: -2, zIndex: 11 },
+    { top: 195, left: 10, width: 240, height: 170, rotate: 2, zIndex: 26 },
+    { top: 200, left: 260, width: 240, height: 170, rotate: -3, zIndex: 27 },
+    // CENTER CARD SPACE (540x210, 280x200) - NO IMAGES HERE
+    { top: 195, left: 1130, width: 240, height: 170, rotate: 3, zIndex: 28 },
+    { top: 200, left: 1380, width: 230, height: 165, rotate: -2, zIndex: 29 },
 
-    // Bottom row - 3 images (fill remaining spaces)
-    { top: 420, left: 10, width: 270, height: 190, rotate: -2, zIndex: 13 },
-    { top: 425, left: 290, width: 250, height: 180, rotate: 3, zIndex: 9 },
-    { top: 420, left: 1280, width: 330, height: 195, rotate: -3, zIndex: 14 },
+    // Bottom row - 3 images (fill remaining spaces with larger sizes)
+    { top: 425, left: 10, width: 360, height: 185, rotate: -2, zIndex: 30 },
+    { top: 430, left: 620, width: 360, height: 185, rotate: 3, zIndex: 31 },
+    { top: 425, left: 1230, width: 380, height: 185, rotate: -3, zIndex: 32 },
   ];
 
   // Canvas rendering for download
@@ -145,9 +145,9 @@ export default function MagazineCollageTemplate({
       }
 
       // Draw center "2025 VISION BOARD" card
-      const centerX = 550;
+      const centerX = 540;
       const centerY = 210;
-      const centerW = 260;
+      const centerW = 280;
       const centerH = 200;
 
       ctx.save();
@@ -306,8 +306,8 @@ export default function MagazineCollageTemplate({
           className="absolute bg-white shadow-2xl flex flex-col items-center justify-center"
           style={{
             top: '210px',
-            left: '550px',
-            width: '260px',
+            left: '540px',
+            width: '280px',
             height: '200px',
             zIndex: 100,
           }}
