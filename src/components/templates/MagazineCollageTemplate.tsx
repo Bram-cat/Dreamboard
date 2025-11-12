@@ -14,29 +14,30 @@ export default function MagazineCollageTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // LANDSCAPE Magazine collage - 15 images scattered across wide canvas
-  // Dynamic arrangement with varying sizes for authentic collage feel
+  // TIGHT-FIT Magazine collage - 15 images properly arranged around center card
+  // Compact layout with center "2025 VISION BOARD" card
   const collagePositions = [
-    // Top row - 5 images
-    { top: 20, left: 20, width: 280, height: 200, rotate: -4, zIndex: 12 },
-    { top: 40, left: 320, width: 260, height: 180, rotate: 3, zIndex: 10 },
-    { top: 15, left: 600, width: 290, height: 200, rotate: -2, zIndex: 11 },
-    { top: 35, left: 910, width: 270, height: 190, rotate: 5, zIndex: 9 },
-    { top: 25, left: 1200, width: 280, height: 200, rotate: -3, zIndex: 13 },
+    // Top row - 5 images (tightly packed)
+    { top: 10, left: 10, width: 260, height: 185, rotate: -3, zIndex: 10 },
+    { top: 15, left: 280, width: 250, height: 180, rotate: 2, zIndex: 11 },
+    { top: 10, left: 540, width: 260, height: 185, rotate: -2, zIndex: 12 },
+    { top: 15, left: 810, width: 250, height: 180, rotate: 3, zIndex: 9 },
+    { top: 10, left: 1070, width: 260, height: 185, rotate: -2, zIndex: 13 },
 
-    // Middle row - 5 images
-    { top: 250, left: 30, width: 290, height: 200, rotate: 2, zIndex: 14 },
-    { top: 260, left: 340, width: 270, height: 190, rotate: -4, zIndex: 8 },
-    { top: 240, left: 630, width: 280, height: 200, rotate: 3, zIndex: 10 },
-    { top: 270, left: 930, width: 260, height: 180, rotate: -2, zIndex: 12 },
-    { top: 250, left: 1210, width: 270, height: 190, rotate: 4, zIndex: 11 },
+    // Middle row - 4 images around center card (2 left + CENTER CARD + 2 right)
+    { top: 210, left: 10, width: 250, height: 180, rotate: 2, zIndex: 14 },
+    { top: 215, left: 270, width: 260, height: 185, rotate: -3, zIndex: 8 },
+    // CENTER CARD SPACE (820x210, 260x200)
+    { top: 210, left: 1090, width: 250, height: 180, rotate: 3, zIndex: 12 },
+    { top: 215, left: 1350, width: 260, height: 185, rotate: -2, zIndex: 11 },
 
-    // Bottom row - 5 images
-    { top: 480, left: 40, width: 280, height: 200, rotate: -5, zIndex: 13 },
-    { top: 500, left: 340, width: 270, height: 190, rotate: 3, zIndex: 9 },
-    { top: 490, left: 630, width: 290, height: 200, rotate: -3, zIndex: 11 },
-    { top: 510, left: 940, width: 260, height: 180, rotate: 4, zIndex: 10 },
-    { top: 495, left: 1220, width: 270, height: 190, rotate: -2, zIndex: 12 },
+    // Bottom row - 6 images (tightly packed)
+    { top: 420, left: 10, width: 240, height: 175, rotate: -2, zIndex: 13 },
+    { top: 425, left: 260, width: 250, height: 180, rotate: 3, zIndex: 9 },
+    { top: 420, left: 520, width: 240, height: 175, rotate: -3, zIndex: 11 },
+    { top: 425, left: 770, width: 250, height: 180, rotate: 2, zIndex: 10 },
+    { top: 420, left: 1030, width: 240, height: 175, rotate: -2, zIndex: 12 },
+    { top: 425, left: 1280, width: 250, height: 180, rotate: 3, zIndex: 14 },
   ];
 
   // Canvas rendering for download
@@ -48,18 +49,18 @@ export default function MagazineCollageTemplate({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Set canvas size - LANDSCAPE orientation (wide format)
-      canvas.width = 1500;
-      canvas.height = 900;
+      // Set canvas size - Compact tight-fit layout
+      canvas.width = 1620;
+      canvas.height = 620;
 
       // Draw cork board background
       ctx.fillStyle = '#d4a574';
-      ctx.fillRect(0, 0, 1500, 900);
+      ctx.fillRect(0, 0, 1620, 620);
 
       // Add texture (noise pattern)
-      for (let i = 0; i < 5000; i++) {
-        const x = Math.random() * 1500;
-        const y = Math.random() * 900;
+      for (let i = 0; i < 3500; i++) {
+        const x = Math.random() * 1620;
+        const y = Math.random() * 620;
         const brightness = Math.random() * 30 - 15;
         ctx.fillStyle = `rgba(${120 + brightness}, ${80 + brightness}, ${50 + brightness}, 0.3)`;
         ctx.fillRect(x, y, 2, 2);
@@ -144,6 +145,62 @@ export default function MagazineCollageTemplate({
           console.error(`Failed to load image ${idx}:`, error);
         }
       }
+
+      // Draw center "2025 VISION BOARD" card
+      const centerX = 550;
+      const centerY = 210;
+      const centerW = 260;
+      const centerH = 200;
+
+      ctx.save();
+      ctx.translate(centerX + centerW / 2, centerY + centerH / 2);
+      ctx.rotate(0); // No rotation for center card
+
+      // White background card
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetX = 4;
+      ctx.shadowOffsetY = 4;
+      ctx.fillRect(-centerW / 2, -centerH / 2, centerW, centerH);
+      ctx.shadowColor = 'transparent';
+
+      // Purple border
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.lineWidth = 5;
+      ctx.strokeRect(-centerW / 2 + 12, -centerH / 2 + 12, centerW - 24, centerH - 24);
+
+      // Decorative stars at top
+      ctx.fillStyle = '#2a2a2a';
+      ctx.font = '20px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('★', -50, -65);
+      ctx.fillText('★', 50, -65);
+
+      // "2025" text
+      ctx.fillStyle = '#2a2a2a';
+      ctx.font = 'bold 48px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('2025', 0, -15);
+
+      // "VISION BOARD" text
+      ctx.font = 'italic 18px "Brush Script MT", cursive, Georgia';
+      ctx.fillText('VISION BOARD', 0, 15);
+
+      // Wavy line decoration
+      ctx.strokeStyle = '#2a2a2a';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(-60, 45);
+      ctx.quadraticCurveTo(-30, 40, 0, 45);
+      ctx.quadraticCurveTo(30, 50, 60, 45);
+      ctx.stroke();
+
+      // Bottom star
+      ctx.font = '20px Arial';
+      ctx.fillText('★', 0, 75);
+
+      ctx.restore();
     };
 
     renderToCanvas();
@@ -180,15 +237,15 @@ export default function MagazineCollageTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={1500}
-        height={900}
+        width={1620}
+        height={620}
         style={{ display: 'none' }}
       />
 
-      {/* Visible Vision Board - LANDSCAPE orientation */}
+      {/* Visible Vision Board - Compact tight-fit layout */}
       <div
         ref={containerRef}
-        className="relative w-[1500px] h-[900px] mx-auto overflow-hidden"
+        className="relative w-[1620px] h-[620px] mx-auto overflow-hidden"
         style={{
           backgroundColor: '#d4a574',
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
@@ -245,6 +302,88 @@ export default function MagazineCollageTemplate({
             </div>
           );
         })}
+
+        {/* Center "2025 VISION BOARD" Card */}
+        <div
+          className="absolute bg-white shadow-2xl flex flex-col items-center justify-center"
+          style={{
+            top: '210px',
+            left: '550px',
+            width: '260px',
+            height: '200px',
+            zIndex: 100,
+          }}
+        >
+          {/* Purple Border */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '12px',
+              left: '12px',
+              right: '12px',
+              bottom: '12px',
+              border: '5px solid #8b5cf6',
+            }}
+          />
+
+          {/* Decorative Stars at top */}
+          <div style={{
+            position: 'absolute',
+            top: '18%',
+            fontSize: '20px',
+            color: '#2a2a2a',
+            display: 'flex',
+            gap: '100px'
+          }}>
+            <span>★</span>
+            <span>★</span>
+          </div>
+
+          {/* Main Text Container */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px',
+            marginTop: '0'
+          }}>
+            <div style={{
+              fontSize: '48px',
+              fontWeight: 'bold',
+              color: '#2a2a2a',
+              lineHeight: '1'
+            }}>
+              2025
+            </div>
+            <div style={{
+              fontFamily: '"Brush Script MT", cursive, Georgia',
+              fontStyle: 'italic',
+              fontSize: '18px',
+              color: '#2a2a2a',
+            }}>
+              VISION BOARD
+            </div>
+          </div>
+
+          {/* Wavy Line */}
+          <svg style={{
+            position: 'absolute',
+            bottom: '22%',
+            width: '50%'
+          }} height="12" viewBox="0 0 100 10">
+            <path d="M0,5 Q25,0 50,5 T100,5" stroke="#2a2a2a" strokeWidth="1.5" fill="none" />
+          </svg>
+
+          {/* Bottom Star */}
+          <div style={{
+            position: 'absolute',
+            bottom: '12%',
+            fontSize: '20px',
+            color: '#2a2a2a'
+          }}>
+            ★
+          </div>
+        </div>
       </div>
     </>
   );
