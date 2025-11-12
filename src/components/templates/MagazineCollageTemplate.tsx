@@ -14,24 +14,28 @@ export default function MagazineCollageTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // PORTRAIT-ORIENTED Magazine collage - inspired by sample1.png
-  // Scattered, dynamic arrangement with varying sizes like a real vision board
+  // LANDSCAPE Magazine collage - scattered dynamic arrangement across wide canvas
+  // 8 images arranged horizontally with varying sizes for authentic collage feel
   const collagePositions = [
-    // Large feature image - top left
-    { top: 20, left: 30, width: 380, height: 280, rotate: -3, zIndex: 12 },
+    // Top left cluster
+    { top: 30, left: 30, width: 350, height: 240, rotate: -4, zIndex: 12 },
+    { top: 70, left: 400, width: 330, height: 220, rotate: 3, zIndex: 10 },
 
-    // Medium images scattered
-    { top: 40, left: 440, width: 320, height: 240, rotate: 5, zIndex: 10 },
-    { top: 320, left: 60, width: 300, height: 220, rotate: -2, zIndex: 11 },
-    { top: 300, left: 420, width: 340, height: 250, rotate: 4, zIndex: 9 },
+    // Top center-right cluster
+    { top: 20, left: 760, width: 340, height: 230, rotate: -2, zIndex: 11 },
+    { top: 80, left: 1120, width: 320, height: 210, rotate: 5, zIndex: 9 },
 
-    // Smaller accent images
-    { top: 580, left: 40, width: 280, height: 200, rotate: -4, zIndex: 13 },
-    { top: 570, left: 360, width: 300, height: 220, rotate: 3, zIndex: 8 },
+    // Middle left
+    { top: 330, left: 40, width: 360, height: 250, rotate: 2, zIndex: 13 },
 
-    // Additional scattered images
-    { top: 820, left: 70, width: 320, height: 240, rotate: -5, zIndex: 10 },
-    { top: 800, left: 430, width: 300, height: 220, rotate: 2, zIndex: 11 },
+    // Middle center-right
+    { top: 310, left: 750, width: 340, height: 230, rotate: -3, zIndex: 10 },
+
+    // Bottom left-center
+    { top: 630, left: 50, width: 350, height: 230, rotate: -5, zIndex: 11 },
+
+    // Bottom right
+    { top: 620, left: 1080, width: 330, height: 220, rotate: 4, zIndex: 12 },
   ];
 
   // Canvas rendering for download
@@ -43,18 +47,18 @@ export default function MagazineCollageTemplate({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Set canvas size - PORTRAIT orientation like sample1.png
-      canvas.width = 800;
-      canvas.height = 1100;
+      // Set canvas size - LANDSCAPE orientation (wide format)
+      canvas.width = 1500;
+      canvas.height = 900;
 
       // Draw cork board background
       ctx.fillStyle = '#d4a574';
-      ctx.fillRect(0, 0, 800, 1100);
+      ctx.fillRect(0, 0, 1500, 900);
 
       // Add texture (noise pattern)
-      for (let i = 0; i < 4000; i++) {
-        const x = Math.random() * 800;
-        const y = Math.random() * 1100;
+      for (let i = 0; i < 5000; i++) {
+        const x = Math.random() * 1500;
+        const y = Math.random() * 900;
         const brightness = Math.random() * 30 - 15;
         ctx.fillStyle = `rgba(${120 + brightness}, ${80 + brightness}, ${50 + brightness}, 0.3)`;
         ctx.fillRect(x, y, 2, 2);
@@ -175,15 +179,15 @@ export default function MagazineCollageTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={800}
-        height={1100}
+        width={1500}
+        height={900}
         style={{ display: 'none' }}
       />
 
-      {/* Visible Vision Board - PORTRAIT orientation */}
+      {/* Visible Vision Board - LANDSCAPE orientation */}
       <div
         ref={containerRef}
-        className="relative w-[800px] h-[1100px] mx-auto overflow-hidden"
+        className="relative w-[1500px] h-[900px] mx-auto overflow-hidden"
         style={{
           backgroundColor: '#d4a574',
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
