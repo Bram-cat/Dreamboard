@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface MagazineCollageTemplateProps {
-  images: string[]; // 14 images (7 DALL-E + 7 Gemini)
+  images: string[]; // 8 images (4 DALL-E + 4 Gemini)
   keywords: string[];
 }
 
@@ -14,30 +14,24 @@ export default function MagazineCollageTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Magazine collage positions - OVERLAPPING, ANGLED, DYNAMIC
-  // Like sample.png with tight clustering
+  // PORTRAIT-ORIENTED Magazine collage - inspired by sample1.png
+  // Scattered, dynamic arrangement with varying sizes like a real vision board
   const collagePositions = [
-    // Top left cluster (4 images)
-    { top: 10, left: 10, width: 320, height: 240, rotate: -4, zIndex: 10, keyword: keywords[0] },
-    { top: 40, left: 280, width: 280, height: 200, rotate: 6, zIndex: 11, keyword: "" },
-    { top: 180, left: 50, width: 260, height: 180, rotate: -2, zIndex: 9, keyword: "" },
-    { top: 160, left: 320, width: 240, height: 200, rotate: 3, zIndex: 12, keyword: keywords[1] },
+    // Large feature image - top left
+    { top: 20, left: 30, width: 380, height: 280, rotate: -3, zIndex: 12 },
 
-    // Top right cluster (3 images)
-    { top: 15, left: 900, width: 300, height: 220, rotate: 5, zIndex: 13, keyword: "" },
-    { top: 60, left: 1150, width: 260, height: 190, rotate: -3, zIndex: 11, keyword: keywords[2] },
-    { top: 200, left: 950, width: 280, height: 200, rotate: -6, zIndex: 10, keyword: "" },
+    // Medium images scattered
+    { top: 40, left: 440, width: 320, height: 240, rotate: 5, zIndex: 10 },
+    { top: 320, left: 60, width: 300, height: 220, rotate: -2, zIndex: 11 },
+    { top: 300, left: 420, width: 340, height: 250, rotate: 4, zIndex: 9 },
 
-    // Bottom left cluster (3 images)
-    { top: 480, left: 20, width: 300, height: 220, rotate: 3, zIndex: 8, keyword: "" },
-    { top: 520, left: 280, width: 270, height: 200, rotate: -4, zIndex: 9, keyword: keywords[3] },
-    { top: 560, left: 550, width: 250, height: 180, rotate: 5, zIndex: 7, keyword: "" },
+    // Smaller accent images
+    { top: 580, left: 40, width: 280, height: 200, rotate: -4, zIndex: 13 },
+    { top: 570, left: 360, width: 300, height: 220, rotate: 3, zIndex: 8 },
 
-    // Bottom right cluster (4 images)
-    { top: 490, left: 820, width: 280, height: 210, rotate: -5, zIndex: 10, keyword: "" },
-    { top: 530, left: 1060, width: 260, height: 190, rotate: 4, zIndex: 11, keyword: keywords[4] },
-    { top: 420, left: 1100, width: 240, height: 200, rotate: -2, zIndex: 9, keyword: "" },
-    { top: 560, left: 780, width: 220, height: 180, rotate: 6, zIndex: 8, keyword: "" },
+    // Additional scattered images
+    { top: 820, left: 70, width: 320, height: 240, rotate: -5, zIndex: 10 },
+    { top: 800, left: 430, width: 300, height: 220, rotate: 2, zIndex: 11 },
   ];
 
   // Canvas rendering for download
@@ -49,18 +43,18 @@ export default function MagazineCollageTemplate({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Set canvas size
-      canvas.width = 1344;
-      canvas.height = 768;
+      // Set canvas size - PORTRAIT orientation like sample1.png
+      canvas.width = 800;
+      canvas.height = 1100;
 
       // Draw cork board background
       ctx.fillStyle = '#d4a574';
-      ctx.fillRect(0, 0, 1344, 768);
+      ctx.fillRect(0, 0, 800, 1100);
 
       // Add texture (noise pattern)
-      for (let i = 0; i < 3000; i++) {
-        const x = Math.random() * 1344;
-        const y = Math.random() * 768;
+      for (let i = 0; i < 4000; i++) {
+        const x = Math.random() * 800;
+        const y = Math.random() * 1100;
         const brightness = Math.random() * 30 - 15;
         ctx.fillStyle = `rgba(${120 + brightness}, ${80 + brightness}, ${50 + brightness}, 0.3)`;
         ctx.fillRect(x, y, 2, 2);
@@ -140,80 +134,11 @@ export default function MagazineCollageTemplate({
 
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
 
-          // Draw keyword sticker if exists
-          if (pos.keyword) {
-            const stickerY = pos.height - 50;
-            const stickerW = pos.width - 40;
-
-            // Sticker background (colorful)
-            const colors = ['#ff6b9d', '#ffd93d', '#6bcf7f', '#4d9fff', '#c77dff'];
-            ctx.fillStyle = colors[idx % colors.length];
-            ctx.fillRect(20, stickerY, stickerW, 35);
-
-            // Sticker border
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(20, stickerY, stickerW, 35);
-
-            // Keyword text
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 16px Arial, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-            ctx.shadowBlur = 2;
-            ctx.fillText(pos.keyword.toUpperCase(), pos.width / 2, stickerY + 22);
-            ctx.shadowColor = 'transparent';
-          }
-
           ctx.restore();
         } catch (error) {
           console.error(`Failed to load image ${idx}:`, error);
         }
       }
-
-      // Draw center banner
-      const bannerY = 320;
-      ctx.save();
-      ctx.translate(672, bannerY);
-      ctx.rotate((-2 * Math.PI) / 180);
-
-      // Banner background
-      ctx.fillStyle = '#2d3748';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      ctx.shadowBlur = 20;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 4;
-      ctx.fillRect(-280, -60, 560, 120);
-
-      // Banner text
-      ctx.shadowColor = 'transparent';
-      ctx.fillStyle = '#ffd93d';
-      ctx.font = 'bold 52px Impact, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('MY 2025 VISION', 0, 0);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '20px Arial, sans-serif';
-      ctx.fillText('DREAM • BELIEVE • ACHIEVE', 0, 35);
-
-      ctx.restore();
-
-      // Draw decorative pins
-      const drawPin = (x: number, y: number, color: string) => {
-        ctx.save();
-        ctx.fillStyle = color;
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 3;
-        ctx.beginPath();
-        ctx.arc(x, y, 6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      };
-
-      drawPin(100, 100, '#ff6b9d');
-      drawPin(1244, 120, '#4d9fff');
-      drawPin(150, 668, '#6bcf7f');
-      drawPin(1200, 650, '#ffd93d');
     };
 
     renderToCanvas();
@@ -250,22 +175,22 @@ export default function MagazineCollageTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={1344}
-        height={768}
+        width={800}
+        height={1100}
         style={{ display: 'none' }}
       />
 
-      {/* Visible Vision Board */}
+      {/* Visible Vision Board - PORTRAIT orientation */}
       <div
         ref={containerRef}
-        className="relative w-[1344px] h-[768px] mx-auto overflow-hidden"
+        className="relative w-[800px] h-[1100px] mx-auto overflow-hidden"
         style={{
           backgroundColor: '#d4a574',
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
         }}
       >
-        {/* Collage Images */}
-        {images.slice(0, 14).map((image, idx) => {
+        {/* Collage Images - 8 total */}
+        {images.slice(0, 8).map((image, idx) => {
           const pos = collagePositions[idx];
           if (!pos) return null;
 
@@ -312,46 +237,9 @@ export default function MagazineCollageTemplate({
                 className="w-full h-full object-cover"
                 style={{ objectFit: 'cover' }}
               />
-
-              {/* Keyword sticker */}
-              {pos.keyword && (
-                <div
-                  className="absolute bottom-5 left-5 right-5 h-9 flex items-center justify-center border-2"
-                  style={{
-                    backgroundColor: ['#ff6b9d', '#ffd93d', '#6bcf7f', '#4d9fff', '#c77dff'][idx % 5],
-                    borderColor: 'rgba(0, 0, 0, 0.2)',
-                  }}
-                >
-                  <span className="text-white font-bold text-sm uppercase drop-shadow">
-                    {pos.keyword}
-                  </span>
-                </div>
-              )}
             </div>
           );
         })}
-
-        {/* Center Banner */}
-        <div
-          className="absolute bg-gray-800 shadow-2xl flex flex-col items-center justify-center"
-          style={{
-            top: '320px',
-            left: '392px',
-            width: '560px',
-            height: '120px',
-            transform: 'rotate(-2deg)',
-            zIndex: 100,
-          }}
-        >
-          <div className="text-yellow-300 text-5xl font-black tracking-wide">MY 2025 VISION</div>
-          <div className="text-white text-lg mt-2">DREAM • BELIEVE • ACHIEVE</div>
-        </div>
-
-        {/* Decorative pins */}
-        <div className="absolute w-3 h-3 rounded-full bg-pink-500 shadow-md" style={{ top: '100px', left: '100px' }} />
-        <div className="absolute w-3 h-3 rounded-full bg-blue-500 shadow-md" style={{ top: '120px', right: '100px' }} />
-        <div className="absolute w-3 h-3 rounded-full bg-green-500 shadow-md" style={{ bottom: '100px', left: '150px' }} />
-        <div className="absolute w-3 h-3 rounded-full bg-yellow-400 shadow-md" style={{ bottom: '118px', right: '144px' }} />
       </div>
     </>
   );
