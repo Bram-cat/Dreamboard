@@ -124,14 +124,7 @@ export default function MinimalScrapbookTemplate({
 
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
 
-          // Draw keyword caption if exists (handwritten style)
-          if (pos.keyword) {
-            const captionY = pos.height + 15;
-            ctx.fillStyle = '#5a5a5a';
-            ctx.font = 'italic 18px "Comic Sans MS", cursive, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(pos.keyword, pos.width / 2, captionY);
-          }
+          // Keywords removed - no captions on vision board
 
           ctx.restore();
         } catch (error) {
@@ -268,14 +261,7 @@ export default function MinimalScrapbookTemplate({
                 />
               </div>
 
-              {/* Keyword caption */}
-              {pos.keyword && (
-                <div className="absolute -bottom-6 left-0 right-0 text-center">
-                  <span className="text-gray-600 italic text-sm" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                    {pos.keyword}
-                  </span>
-                </div>
-              )}
+              {/* Keywords removed - no captions displayed */}
             </div>
           );
         })}

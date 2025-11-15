@@ -805,7 +805,7 @@ export default function Home() {
 
             {/* Display HTML Template or AI-generated collage */}
             {collageReady && images.length > 0 && (
-              <div className="relative">
+              <div className="flex flex-col items-center gap-6 w-full">
                 {selectedTemplate !== "ai" ? (
                   // Render HTML template with individual images
                   <>
@@ -835,10 +835,10 @@ export default function Home() {
                         />
                       )}
                     </div>
-                    {/* Download button for HTML templates - repositioned to bottom-right */}
+                    {/* Download button for HTML templates - centered below vision board */}
                     <button
                       onClick={handleDownload}
-                      className="download-button absolute bottom-6 right-6 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 z-50 flex items-center gap-2"
+                      className="download-button bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 flex items-center gap-2"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
