@@ -15,27 +15,27 @@ export default function MagazineCollageTemplate({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // TIGHT-FIT Magazine collage - 13 visible images properly arranged around center card
-  // MAXIMUM SIZE FRAMES to fill entire board with NO gaps
+  // Scaled to 1200px width (74% of original 1620px) for laptop screens
   const collagePositions = [
     // Top row - 6 LARGE images (overlapping, filling entire top)
-    { top: 0, left: 0, width: 320, height: 225, rotate: -3, zIndex: 20 },
-    { top: 5, left: 290, width: 320, height: 225, rotate: 2, zIndex: 21 },
-    { top: 0, left: 580, width: 320, height: 225, rotate: -2, zIndex: 22 },
-    { top: 5, left: 870, width: 320, height: 225, rotate: 3, zIndex: 23 },
-    { top: 0, left: 1160, width: 320, height: 225, rotate: -2, zIndex: 24 },
-    { top: 5, left: 1450, width: 170, height: 225, rotate: 3, zIndex: 25 },
+    { top: 0, left: 0, width: 237, height: 167, rotate: -3, zIndex: 20 },
+    { top: 4, left: 215, width: 237, height: 167, rotate: 2, zIndex: 21 },
+    { top: 0, left: 430, width: 237, height: 167, rotate: -2, zIndex: 22 },
+    { top: 4, left: 645, width: 237, height: 167, rotate: 3, zIndex: 23 },
+    { top: 0, left: 860, width: 237, height: 167, rotate: -2, zIndex: 24 },
+    { top: 4, left: 1075, width: 125, height: 167, rotate: 3, zIndex: 25 },
 
     // Middle row - 4 LARGE images around center card
-    { top: 210, left: 0, width: 320, height: 225, rotate: 2, zIndex: 26 },
-    { top: 215, left: 290, width: 260, height: 220, rotate: -3, zIndex: 27 },
-    // CENTER CARD SPACE (540x210, 280x200) - NO IMAGES HERE
-    { top: 210, left: 1070, width: 320, height: 225, rotate: 3, zIndex: 28 },
-    { top: 215, left: 1360, width: 260, height: 220, rotate: -2, zIndex: 29 },
+    { top: 156, left: 0, width: 237, height: 167, rotate: 2, zIndex: 26 },
+    { top: 160, left: 215, width: 193, height: 163, rotate: -3, zIndex: 27 },
+    // CENTER CARD SPACE (400x156, 207x148) - NO IMAGES HERE
+    { top: 156, left: 793, width: 237, height: 167, rotate: 3, zIndex: 28 },
+    { top: 160, left: 1008, width: 193, height: 163, rotate: -2, zIndex: 29 },
 
     // Bottom row - 3 MASSIVE images (fill entire bottom)
-    { top: 420, left: 0, width: 540, height: 200, rotate: -2, zIndex: 30 },
-    { top: 423, left: 540, width: 540, height: 200, rotate: 3, zIndex: 31 },
-    { top: 420, left: 1080, width: 540, height: 200, rotate: -3, zIndex: 32 },
+    { top: 312, left: 0, width: 400, height: 148, rotate: -2, zIndex: 30 },
+    { top: 314, left: 400, width: 400, height: 148, rotate: 3, zIndex: 31 },
+    { top: 312, left: 800, width: 400, height: 148, rotate: -3, zIndex: 32 },
   ];
 
   // Canvas rendering for download
@@ -47,18 +47,18 @@ export default function MagazineCollageTemplate({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Set canvas size - Compact tight-fit layout
-      canvas.width = 1620;
-      canvas.height = 620;
+      // Set canvas size - Laptop-friendly dimensions (fits 1366px screens)
+      canvas.width = 1200;
+      canvas.height = 460;
 
       // Draw cork board background
       ctx.fillStyle = '#d4a574';
-      ctx.fillRect(0, 0, 1620, 620);
+      ctx.fillRect(0, 0, 1200, 460);
 
       // Add texture (noise pattern)
-      for (let i = 0; i < 3500; i++) {
-        const x = Math.random() * 1620;
-        const y = Math.random() * 620;
+      for (let i = 0; i < 2500; i++) {
+        const x = Math.random() * 1200;
+        const y = Math.random() * 460;
         const brightness = Math.random() * 30 - 15;
         ctx.fillStyle = `rgba(${120 + brightness}, ${80 + brightness}, ${50 + brightness}, 0.3)`;
         ctx.fillRect(x, y, 2, 2);
@@ -144,11 +144,11 @@ export default function MagazineCollageTemplate({
         }
       }
 
-      // Draw center "2025 VISION BOARD" card
-      const centerX = 540;
-      const centerY = 210;
-      const centerW = 280;
-      const centerH = 200;
+      // Draw center "2025 VISION BOARD" card (scaled to 74%)
+      const centerX = 400;
+      const centerY = 156;
+      const centerW = 207;
+      const centerH = 148;
 
       ctx.save();
       ctx.translate(centerX + centerW / 2, centerY + centerH / 2);
@@ -235,15 +235,15 @@ export default function MagazineCollageTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={1620}
-        height={620}
+        width={1200}
+        height={460}
         style={{ display: 'none' }}
       />
 
-      {/* Visible Vision Board - Compact tight-fit layout */}
+      {/* Visible Vision Board - Laptop-friendly size (1200px) */}
       <div
         ref={containerRef}
-        className="relative w-[1620px] h-[620px] mx-auto overflow-hidden"
+        className="relative w-[1200px] h-[460px] mx-auto overflow-hidden"
         style={{
           backgroundColor: '#d4a574',
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
@@ -305,10 +305,10 @@ export default function MagazineCollageTemplate({
         <div
           className="absolute bg-white shadow-2xl flex flex-col items-center justify-center"
           style={{
-            top: '210px',
-            left: '540px',
-            width: '280px',
-            height: '200px',
+            top: '156px',
+            left: '400px',
+            width: '207px',
+            height: '148px',
             zIndex: 100,
           }}
         >
