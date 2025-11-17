@@ -85,11 +85,15 @@ export default function HomePage() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
                 <Link href="/create">
-                  <Button variant="primary" size="lg" className="text-lg px-10 py-5 bg-gradient-to-r from-[#474973] to-[#161b33] hover:from-[#161b33] hover:to-[#474973]">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    className="text-lg px-10 py-5 bg-gradient-to-r from-[#a69cac] via-[#474973] to-[#161b33] hover:from-[#161b33] hover:via-[#474973] hover:to-[#a69cac] shadow-lg shadow-[#474973]/30 hover:shadow-[#a69cac]/40 hover:scale-105 transition-all duration-300"
+                  >
                     Create Your Vision Board
                   </Button>
                 </Link>
-                <a href="#examples" className="text-[#a69cac] hover:text-white transition-colors text-lg">
+                <a href="#examples" className="text-[#a69cac] hover:text-white transition-colors text-lg font-medium">
                   View Examples →
                 </a>
               </div>
@@ -120,17 +124,20 @@ export default function HomePage() {
             {/* Right Preview - 40% */}
             <div className="lg:col-span-2">
               <div className="relative">
+                {/* Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#a69cac]/20 via-[#474973]/20 to-transparent rounded-3xl blur-2xl"></div>
+
                 {/* Preview Area */}
-                <div className="relative bg-gradient-to-br from-[#161b33] to-[#0d0c1d] rounded-2xl p-6 border border-[#474973]/30">
-                  <div className="aspect-video bg-[#0d0c1d] rounded-lg overflow-hidden">
+                <div className="relative bg-gradient-to-br from-[#161b33]/80 to-[#0d0c1d]/80 backdrop-blur-sm rounded-3xl p-4 border border-[#474973]/40 hover:border-[#a69cac]/60 transition-all duration-300 shadow-2xl shadow-[#474973]/20">
+                  <div className="aspect-video bg-[#0d0c1d] rounded-2xl overflow-hidden ring-1 ring-[#a69cac]/20">
                     <img
                       src="/display.png"
                       alt="AI Vision Board Preview"
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="mt-4 text-center text-sm text-[#a69cac]">
-                    AI-generated vision board
+                  <div className="mt-3 text-center text-xs text-[#a69cac]/80 font-medium tracking-wide">
+                    ✨ AI-GENERATED VISION BOARD
                   </div>
                 </div>
               </div>

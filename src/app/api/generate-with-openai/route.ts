@@ -60,6 +60,40 @@ export async function POST(request: NextRequest) {
     // Strategy: Create diverse image combinations from user uploads + lifestyle scenarios
     const combinations = [];
 
+    // CRITICAL FIX: If user provides NO images at all, generate random person lifestyle images
+    const hasAnyUploads = hasSelfie || hasDreamHouse || hasDreamCar || hasDestination;
+
+    if (!hasAnyUploads) {
+      console.log("⚠️  No user uploads detected - generating random person lifestyle images");
+
+      // Generate diverse lifestyle scenarios with random people
+      const randomPersonScenarios = [
+        "Professional lifestyle photography of a successful person at modern luxury gym, working out with determination. Show confident athletic person doing strength training. Modern gym with floor-to-ceiling windows, golden hour lighting. Aspirational fitness aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person traveling at exotic beach destination. Show happy person enjoying tropical paradise, crystal clear water and palm trees in background. Natural outdoor lighting, joyful vacation aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person in modern corner office with city skyline view. Show confident professional at desk with laptop, business attire. Large windows showing urban skyline, natural office lighting. Executive success aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person enjoying fine dining at elegant restaurant. Show sophisticated person at beautiful table setting with gourmet food. Warm ambient restaurant lighting, luxury dining aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person meditating peacefully outdoors at sunrise. Show person in lotus position on deck overlooking ocean or mountains. Soft golden morning light, tranquil wellness aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person at luxury rooftop lounge with city skyline. Show stylish person with champagne glass, celebrating success. Evening golden hour lighting, upscale celebration aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person working remotely at upscale coffee shop. Show focused person with laptop in modern cafe. Warm ambient coffee shop lighting, entrepreneurial aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional automotive photography of luxury sports car (Ferrari, Lamborghini, or Porsche) parked at scenic overlook. Golden hour lighting, beautiful landscape background. High-end aspirational automotive aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional real estate photography of stunning modern luxury mansion with pool. Show beautiful contemporary architecture, well-maintained landscaping. Golden hour lighting, upscale dream home aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person running outdoors in beautiful park at sunrise. Show energetic person jogging through scenic nature. Golden morning light, active healthy lifestyle aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person reading book in cozy modern library. Show thoughtful person surrounded by bookshelves in elegant setting. Warm natural lighting, knowledge growth aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person in creative modern art studio. Show inspired person working on creative project with art materials around. Bright natural studio lighting, creative inspiration aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person giving presentation on stage at business conference. Show confident speaker engaging audience, professional setting. Stage spotlighting, thought leadership aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person at modern tech startup office with multiple monitors. Show innovative person working on cutting-edge technology. Bright modern office lighting, tech innovation aesthetic, LANDSCAPE orientation 16:9.",
+        "Professional lifestyle photography of a successful person preparing healthy smoothie bowl in modern kitchen. Show happy person with fresh fruits and nutritious food. Bright natural kitchen lighting, wellness vitality aesthetic, LANDSCAPE orientation 16:9."
+      ];
+
+      // Add scenarios based on how many images we need
+      for (let i = 0; i < Math.min(numGeminiImages, randomPersonScenarios.length); i++) {
+        combinations.push({
+          images: [],
+          prompt: randomPersonScenarios[i]
+        });
+      }
+    }
+
     // PRIORITY 1: STANDALONE ASSETS (show the actual dream items)
     // These are important to include even without selfie
 
@@ -257,14 +291,16 @@ export async function POST(request: NextRequest) {
         // Add VERY explicit aspect ratio instruction to prompt
         const aspectRatioPrompt = `${combo.prompt}\n\n🚨 CRITICAL DIMENSIONS REQUIREMENT 🚨:\n- OUTPUT FORMAT: WIDE LANDSCAPE ONLY - NOT PORTRAIT!\n- ASPECT RATIO: 16:9 or 1.78:1 (WIDER than tall)\n- MINIMUM WIDTH: 1600px\n- ORIENTATION: HORIZONTAL/LANDSCAPE (width MUST be 1.78x greater than height)\n- DO NOT generate portrait/vertical images\n- DO NOT generate square images\n- MUST be WIDE LANDSCAPE format like a movie screen or TV\n\nExample valid dimensions:\n- 1920x1080 (16:9)\n- 1600x900 (16:9)\n- 1440x810 (16:9)`;
 
+        // If no images provided (random person generation), only send text prompt
+        const contentParts = imageParts.length > 0
+          ? [...imageParts, { text: aspectRatioPrompt }]
+          : [{ text: aspectRatioPrompt }];
+
         const response = await genai.models.generateContent({
           model: "gemini-2.5-flash-image",
           contents: [{
             role: "user",
-            parts: [
-              ...imageParts,
-              { text: aspectRatioPrompt }
-            ]
+            parts: contentParts
           }],
           config: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
         });

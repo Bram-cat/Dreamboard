@@ -11,14 +11,18 @@ export default function Navigation() {
     <nav className="fixed top-0 w-full z-50 bg-[#0d0c1d]/80 backdrop-blur-xl border-b border-[#474973]/20">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
-          {/* Logo - DB that expands on hover */}
-          <Link href="/" className="group relative overflow-hidden">
+          {/* Logo - DB that expands on hover with smooth animation */}
+          <Link href="/" className="group relative">
             <h1
-              className="text-2xl font-bold bg-gradient-to-r from-[#a69cac] to-[#474973] bg-clip-text text-transparent transition-all duration-300"
+              className="text-2xl font-bold bg-gradient-to-r from-[#a69cac] to-[#474973] bg-clip-text text-transparent"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="inline-block group-hover:hidden">DB</span>
-              <span className="hidden group-hover:inline-block">DreamBoard</span>
+              <span className="inline-block transition-all duration-500 ease-in-out group-hover:opacity-0 group-hover:w-0 overflow-hidden">
+                DB
+              </span>
+              <span className="absolute left-0 opacity-0 w-0 transition-all duration-500 ease-in-out group-hover:opacity-100 group-hover:w-auto overflow-hidden whitespace-nowrap">
+                DreamBoard
+              </span>
             </h1>
           </Link>
 
