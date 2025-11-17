@@ -1,941 +1,303 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import html2canvas from "html2canvas";
-import VisionBoardCanvas from "@/components/VisionBoardCanvas";
-import {
-  CleanGridTemplate,
-  PolaroidScatteredTemplate,
-  MagazineCollageTemplate,
-  MinimalScrapbookTemplate,
-  TemplateType,
-} from "@/components/templates";
-import { Progress } from "@/components/ui/progress";
+import Link from "next/link";
+import Navigation from "@/components/Navigation";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 
-interface GeneratedImage {
-  url: string;
-  keyword: string;
-  source?: string;
-}
-
-interface BoardElement {
-  id: string;
-  type: "person" | "lifestyle" | "quote";
-  imageUrl: string;
-  description: string;
-  size?: "small" | "medium" | "large";
-}
-
-const INSPIRATIONAL_QUOTES = [
-  "Make your dreams happen",
-  "Don't be the same, be better",
-  "Love what you do",
-  "Go create",
-  "You are your only limit",
-  "Dream big, work hard",
-  "Believe in yourself",
-  "Make it happen",
-  "Stay focused",
-  "Never give up",
-  "Success is earned",
-  "Keep pushing forward",
-  "You got this",
-  "Manifest your dreams",
-  "Take action today",
-  "Be unstoppable",
-  "Chase your vision",
-  "Create your future",
-  "Hustle in silence",
-  "Rise and grind",
-];
-
-// Categorized user uploads
-interface CategorizedUploads {
-  selfie: string | null;
-  dreamHouse: string | null;
-  dreamCar: string | null;
-  destination: string | null;
-}
-
-export default function Home() {
-  const [goals, setGoals] = useState("");
-  const [keywords, setKeywords] = useState<string[]>([]);
-  const [quotes, setQuotes] = useState<string[]>([]);
-  const [images, setImages] = useState<GeneratedImage[]>([]);
-  const [categorizedUploads, setCategorizedUploads] = useState<CategorizedUploads>({
-    selfie: null,
-    dreamHouse: null,
-    dreamCar: null,
-    destination: null
-  });
-  const [selectedStyle, setSelectedStyle] = useState<"bold" | "polaroid" | "torn" | "random">("random");
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | "ai" | "random">("ai");
-  const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState("");
-  const [step, setStep] = useState<"input" | "upload" | "preview">("input");
-  const [collageReady, setCollageReady] = useState(false);
-  const [useHtmlTemplate, setUseHtmlTemplate] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // Generation mode selection
-  const [generationMode] = useState<"component" | "single" | "openai">("openai"); // Default to OpenAI mode
-  const [boardElements, setBoardElements] = useState<BoardElement[]>([]);
-
-  const handleGenerate = async () => {
-    if (!goals.trim()) {
-      setError("Please enter your goals");
-      return;
+export default function HomePage() {
+  const features = [
+    {
+      icon: (
+        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      ),
+      title: "AI-Powered Creation",
+      description: "Advanced AI transforms your dreams into stunning visual boards in seconds"
+    },
+    {
+      icon: (
+        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+      title: "Personalized Images",
+      description: "Upload your photos to create truly personal and meaningful vision boards"
+    },
+    {
+      icon: (
+        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+        </svg>
+      ),
+      title: "Multiple Templates",
+      description: "Choose from magazine, polaroid, scrapbook, and grid layouts"
+    },
+    {
+      icon: (
+        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+      ),
+      title: "Instant Download",
+      description: "Get your vision board in 4K quality, ready to print or share"
     }
-
-    setStep("upload"); // Move to upload step
-    setCollageReady(false);
-  };
-
-  // Helper to resize image to valid aspect ratio (0.5 to 2.0 for Runway API)
-  const resizeImageToValidRatio = (file: File, category: keyof CategorizedUploads) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new window.Image();
-      img.onload = () => {
-        const aspectRatio = img.width / img.height;
-
-        // If aspect ratio is valid (0.5 to 2.0), use as-is
-        if (aspectRatio >= 0.5 && aspectRatio <= 2.0) {
-          setCategorizedUploads(prev => ({
-            ...prev,
-            [category]: e.target?.result as string
-          }));
-          return;
-        }
-
-        // Need to crop to valid ratio
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        let sourceX = 0;
-        let sourceY = 0;
-        let sourceWidth = img.width;
-        let sourceHeight = img.height;
-
-        // If too wide (> 2.0), crop to 2:1 ratio
-        if (aspectRatio > 2.0) {
-          sourceWidth = img.height * 2.0;
-          sourceX = (img.width - sourceWidth) / 2;
-          canvas.width = 1024;
-          canvas.height = 512;
-        }
-        // If too tall (< 0.5), crop to 1:2 ratio
-        else {
-          sourceHeight = img.width * 2.0;
-          sourceY = (img.height - sourceHeight) / 2;
-          canvas.width = 512;
-          canvas.height = 1024;
-        }
-
-        // Draw cropped image
-        ctx.drawImage(
-          img,
-          sourceX, sourceY, sourceWidth, sourceHeight,
-          0, 0, canvas.width, canvas.height
-        );
-
-        // Convert to data URI
-        const resizedDataUri = canvas.toDataURL('image/jpeg', 0.92);
-        setCategorizedUploads(prev => ({
-          ...prev,
-          [category]: resizedDataUri
-        }));
-
-        console.log(`Resized ${category} from ${aspectRatio.toFixed(2)} to ${(canvas.width / canvas.height).toFixed(2)} aspect ratio`);
-      };
-
-      img.src = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Handle categorized file upload
-  const handleCategorizedUpload = (category: keyof CategorizedUploads, file: File) => {
-    resizeImageToValidRatio(file, category);
-  };
-
-  const removeCategorizedImage = (category: keyof CategorizedUploads) => {
-    setCategorizedUploads(prev => ({
-      ...prev,
-      [category]: null
-    }));
-  };
-
-  const proceedToCollage = async () => {
-    setLoading(true);
-    setProgress(0);
-    setStep("preview");
-
-    try {
-      // Build categorized context from uploads
-      const uploadContext = {
-        hasSelfie: !!categorizedUploads.selfie,
-        hasDreamHouse: !!categorizedUploads.dreamHouse,
-        hasDreamCar: !!categorizedUploads.dreamCar,
-        hasDestination: !!categorizedUploads.destination
-      };
-
-      console.log("User uploads:", uploadContext);
-      console.log("Generation mode:", generationMode);
-
-      setProgress(10); // Starting generation
-
-      if (generationMode === "openai") {
-        // NEW: DALL-E 3 + Gemini Imagen workflow (individual images for HTML collage)
-        console.log("🎨 Generating individual images with DALL-E 3 + Gemini Imagen...");
-
-        // Extract keywords from goals (split by comma or use as-is)
-        const extractedKeywords = goals.split(",").map((k) => k.trim()).filter((k) => k.length > 0);
-        setKeywords(extractedKeywords);
-
-        setProgress(20); // Keywords extracted
-
-        setProgress(30); // Starting API call
-
-        const response = await fetch("/api/generate-with-openai", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            keywords: extractedKeywords,
-            categorizedUploads,
-            selectedTemplate,
-          }),
-        });
-
-        setProgress(70); // API call completed
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Image generation error:", errorData);
-          throw new Error(errorData.details || errorData.error || "Failed to generate images");
-        }
-
-        const data = await response.json();
-        setProgress(90); // Processing results
-        console.log(`✓ Generated ${data.metadata?.total_images || 0} total images`);
-        console.log(`   - Gemini images: ${data.metadata?.gemini_images || 0}`);
-        console.log(`   - DALL-E images: ${data.metadata?.dalle_images || 0}`);
-
-        // If AI-generated template, use final collage; otherwise use individual images for HTML templates
-        if (selectedTemplate === "ai") {
-          console.log(`✓ AI-generated collage created!`);
-          setImages([{ url: data.final_vision_board, keyword: "Vision Board 2025" }]);
-        } else {
-          console.log(`✓ Using template: ${selectedTemplate} with ${data.individual_images?.length} images`);
-          setImages(data.individual_images.map((url: string, idx: number) => ({
-            url,
-            keyword: extractedKeywords[idx] || `Vision ${idx + 1}`
-          })));
-
-          // Store quotes from API response
-          if (data.quotes && Array.isArray(data.quotes)) {
-            console.log(`✓ Received ${data.quotes.length} inspirational quotes`);
-            setQuotes(data.quotes);
-          }
-        }
-        setProgress(100); // Complete
-        setCollageReady(true);
-      } else if (generationMode === "component") {
-        // Component-based generation
-        console.log("🎨 Generating component-based vision board...");
-
-        const response = await fetch("/api/generate-board-elements", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            goals,
-            categorizedUploads,
-            uploadContext,
-            style: selectedStyle === "random" ? undefined : selectedStyle,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to generate board elements");
-        }
-
-        const data = await response.json();
-        console.log(`✓ Generated ${data.totalElements} elements!`);
-
-        setBoardElements(data.elements);
-        setCollageReady(true);
-      } else {
-        // OLD: Single-image collage generation
-        console.log("Generating dense magazine-style collage with 10-15+ elements...");
-        const collageResponse = await fetch("/api/collage-direct", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            goals,
-            categorizedUploads,
-            uploadContext,
-            style: selectedStyle === "random" ? undefined : selectedStyle,
-          }),
-        });
-
-        if (!collageResponse.ok) {
-          throw new Error("Failed to create vision board");
-        }
-
-        const collageData = await collageResponse.json();
-        console.log("✓ Vision board created successfully!");
-
-        // Display the final collage
-        const finalCollageImage = {
-          url: collageData.collageUrl,
-          keyword: "Vision Board 2025",
-        };
-
-        setImages([finalCollageImage]);
-        setCollageReady(true);
-      }
-
-      console.log("Vision board ready!");
-    } catch (err) {
-      console.error("Failed to generate vision board:", err);
-      setError(err instanceof Error ? err.message : "Failed to generate vision board");
-    }
-
-    setLoading(false);
-  };
-
-  const createCollage = async () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Canvas size
-    const canvasWidth = 1200;
-    const canvasHeight = 1600;
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-
-    // Gradient background
-    const gradient = ctx.createLinearGradient(0, 0, canvasWidth, canvasHeight);
-    gradient.addColorStop(0, "#fef3c7");
-    gradient.addColorStop(1, "#fce7f3");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-    // Use only AI generated images (final collage from Runway)
-    const allImages = images.map((img) => img.url);
-
-    // Polaroid positions (scattered, overlapping layout)
-    const polaroidSize = 200; // Smaller size to fit more
-    const polaroidPadding = 15;
-    const imageSize = polaroidSize - polaroidPadding * 2;
-
-    const positions: { x: number; y: number; rotation: number; hasQuote: boolean }[] = [];
-    const cols = 5; // More columns
-    const rows = Math.ceil(allImages.length / cols);
-
-    // Generate scattered positions
-    for (let i = 0; i < allImages.length; i++) {
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      const baseX = 100 + col * (canvasWidth - 200) / cols;
-      const baseY = 150 + row * (canvasHeight - 300) / rows;
-
-      positions.push({
-        x: baseX + (Math.random() - 0.5) * 80,
-        y: baseY + (Math.random() - 0.5) * 80,
-        rotation: (Math.random() - 0.5) * 0.3,
-        hasQuote: Math.random() > 0.7
-      });
-    }
-
-    // Draw each polaroid
-    const drawPromises = allImages.map((imgSrc, index) => {
-      return new Promise<void>((resolve) => {
-        const img = new Image();
-        // Don't set crossOrigin for data URLs (user uploads)
-        if (!imgSrc.startsWith("data:")) {
-          img.crossOrigin = "anonymous";
-        }
-
-        img.onload = () => {
-          const pos = positions[index];
-
-          ctx.save();
-          ctx.translate(pos.x + polaroidSize / 2, pos.y + polaroidSize / 2);
-          ctx.rotate(pos.rotation);
-
-          // Polaroid shadow
-          ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
-          ctx.shadowBlur = 15;
-          ctx.shadowOffsetX = 5;
-          ctx.shadowOffsetY = 5;
-
-          // Polaroid white frame
-          ctx.fillStyle = "white";
-          ctx.fillRect(-polaroidSize / 2, -polaroidSize / 2, polaroidSize, polaroidSize + 40);
-
-          ctx.shadowColor = "transparent";
-
-          // Draw image
-          ctx.drawImage(
-            img,
-            -polaroidSize / 2 + polaroidPadding,
-            -polaroidSize / 2 + polaroidPadding,
-            imageSize,
-            imageSize
-          );
-
-          // Add quote overlay if selected
-          if (pos.hasQuote) {
-            const quote = INSPIRATIONAL_QUOTES[Math.floor(Math.random() * INSPIRATIONAL_QUOTES.length)];
-
-            ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-            ctx.fillRect(
-              -polaroidSize / 2 + polaroidPadding,
-              -polaroidSize / 2 + polaroidPadding,
-              imageSize,
-              imageSize
-            );
-
-            ctx.fillStyle = "white";
-            ctx.font = "bold 18px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-
-            // Word wrap for quote
-            const words = quote.split(" ");
-            const lines: string[] = [];
-            let currentLine = words[0];
-
-            for (let i = 1; i < words.length; i++) {
-              const testLine = currentLine + " " + words[i];
-              if (ctx.measureText(testLine).width > imageSize - 20) {
-                lines.push(currentLine);
-                currentLine = words[i];
-              } else {
-                currentLine = testLine;
-              }
-            }
-            lines.push(currentLine);
-
-            lines.forEach((line, i) => {
-              ctx.fillText(line, 0, -20 + i * 24);
-            });
-          }
-
-          ctx.restore();
-          resolve();
-        };
-
-        img.onerror = () => resolve();
-        img.src = imgSrc;
-      });
-    });
-
-    await Promise.all(drawPromises);
-
-    // Add title
-    ctx.fillStyle = "#1f2937";
-    ctx.font = "bold 56px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("MY VISION BOARD", canvasWidth / 2, 80);
-
-    ctx.font = "italic 28px Arial";
-    ctx.fillText("✨ 2024 Goals ✨", canvasWidth / 2, canvasHeight - 50);
-
-    setCollageReady(true);
-  };
-
-  // Create collage when user proceeds to preview
-  useEffect(() => {
-    if (step === "preview" && !collageReady && images.length > 0) {
-      createCollage();
-    }
-  }, [step, collageReady, images]);
-
-  const handleDownload = async () => {
-    if (!collageReady || images.length === 0) return;
-
-    try {
-      // Check if the template has its own download function (for canvas-based templates)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (typeof (window as any).downloadVisionBoard === 'function') {
-        // Use the template's built-in canvas download (CleanGridTemplate, etc.)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (window as any).downloadVisionBoard();
-        return;
-      }
-
-      // Fallback to html2canvas for templates without canvas download
-      const boardElement = document.querySelector('.vision-board-template') as HTMLElement;
-      if (!boardElement) {
-        setError("Could not find board to download");
-        return;
-      }
-
-      // Hide the download button temporarily
-      const downloadBtn = document.querySelector('.download-button') as HTMLElement;
-      if (downloadBtn) downloadBtn.style.display = 'none';
-
-      // Capture the board with html2canvas
-      const canvas = await html2canvas(boardElement, {
-        scale: 2, // Higher quality
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null,
-      });
-
-      // Show the button again
-      if (downloadBtn) downloadBtn.style.display = 'flex';
-
-      // Convert canvas to blob and download
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const link = document.createElement("a");
-          link.download = "my-vision-board-2025.png";
-          link.href = URL.createObjectURL(blob);
-          link.click();
-          URL.revokeObjectURL(link.href);
-        }
-      });
-    } catch (error) {
-      console.error("Download error:", error);
-      setError("Failed to download board");
-    }
-  };
-
+  ];
+
+  const steps = [
+    { number: "01", title: "Set Your Goals", description: "Tell us what you want to achieve in 2025" },
+    { number: "02", title: "Upload Photos", description: "Add your selfie and dream items (optional)" },
+    { number: "03", title: "Choose Template", description: "Pick your favorite layout style" },
+    { number: "04", title: "Generate & Download", description: "Get your personalized vision board instantly" }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-purple-900 mb-3">
-            DreamBoard AI ✨
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Turn your dreams into a visual vision board
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-[#0D0C1D] via-[#1A1A2E] to-[#0D0C1D]">
+      <Navigation />
 
-        {/* Step 1: Input Goals */}
-        {step === "input" && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-            <label
-              htmlFor="goals"
-              className="block text-gray-700 font-medium mb-3 text-lg"
-            >
-              What are your goals?
-            </label>
-            <input
-              id="goals"
-              type="text"
-              value={goals}
-              onChange={(e) => setGoals(e.target.value)}
-              placeholder="travel, dream car, luxury home, fitness, success"
-              className="w-full px-4 py-3 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 text-gray-800 mb-4"
-              disabled={loading}
-            />
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+        {/* Animated gradient orbs */}
+        <div className="absolute top-20 left-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
-            {/* Info about the generation method */}
-            <div className="mb-6 p-4 bg-purple-50 border-2 border-purple-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="text-2xl">✨</div>
-                <h3 className="font-bold text-purple-900">Clean Vision Board Design</h3>
-              </div>
-              <p className="text-sm text-gray-700">
-                Uses Gemini AI to edit YOUR uploads into dream scenarios (you at your dream house, driving your dream car, at your destination). Generates additional lifestyle images with DALL-E 3. Final magazine-style collage matches sample1.png with bold text overlays.
-              </p>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-block mb-6 px-6 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full border border-purple-500/30">
+              <span className="text-sm font-semibold bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+                ✨ Powered by Advanced AI Technology
+              </span>
             </div>
 
-            <button
-              onClick={handleGenerate}
-              disabled={loading}
-              className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+            <h1
+              className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 leading-tight"
+              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
             >
-              {loading ? "Generating inspiration..." : "Generate Images"}
-            </button>
-            {error && (
-              <p className="mt-3 text-red-600 text-sm text-center">{error}</p>
-            )}
-          </div>
-        )}
+              <span className="bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent">
+                MANIFEST
+              </span>
+              <br />
+              <span className="text-white">YOUR DREAMS</span>
+              <br />
+              <span className="bg-gradient-to-r from-[#9D4EDD] via-[#7209B7] to-[#560BAD] bg-clip-text text-transparent">
+                IN 2025
+              </span>
+            </h1>
 
-        {/* Step 2: Upload Your Images (Categorized) */}
-        {step === "upload" && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-            <h2 className="text-2xl font-bold text-purple-900 mb-4">
-              Add Your Personal Touch
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Upload images to personalize your vision board. All uploads are optional!
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-12 leading-relaxed">
+              Transform your goals into stunning AI-powered vision boards.
+              <br />
+              Upload your photos, set your intentions, and watch the magic happen.
             </p>
 
-            {/* Categorized Upload Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {/* Selfie Upload */}
-              <div className="border-2 border-dashed border-purple-300 rounded-lg p-6 hover:border-purple-500 transition-colors">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">📸</div>
-                  <h3 className="font-bold text-gray-800 mb-2">Your Selfie</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    We&apos;ll show YOU achieving your goals
-                  </p>
-                  {categorizedUploads.selfie ? (
-                    <div className="relative">
-                      <img src={categorizedUploads.selfie} alt="Selfie" className="w-full h-32 object-cover rounded-lg mb-2" />
-                      <button onClick={() => removeCategorizedImage('selfie')} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6">×</button>
-                    </div>
-                  ) : (
-                    <label className="block">
-                      <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleCategorizedUpload('selfie', e.target.files[0])} className="hidden" />
-                      <span className="block w-full bg-purple-100 hover:bg-purple-200 text-purple-700 font-semibold py-2 px-4 rounded cursor-pointer">Upload Selfie</span>
-                    </label>
-                  )}
-                </div>
-              </div>
-
-              {/* Dream House Upload */}
-              <div className="border-2 border-dashed border-pink-300 rounded-lg p-6 hover:border-pink-500 transition-colors">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">🏠</div>
-                  <h3 className="font-bold text-gray-800 mb-2">Dream House</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Show you AT your dream home
-                  </p>
-                  {categorizedUploads.dreamHouse ? (
-                    <div className="relative">
-                      <img src={categorizedUploads.dreamHouse} alt="Dream House" className="w-full h-32 object-cover rounded-lg mb-2" />
-                      <button onClick={() => removeCategorizedImage('dreamHouse')} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6">×</button>
-                    </div>
-                  ) : (
-                    <label className="block">
-                      <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleCategorizedUpload('dreamHouse', e.target.files[0])} className="hidden" />
-                      <span className="block w-full bg-pink-100 hover:bg-pink-200 text-pink-700 font-semibold py-2 px-4 rounded cursor-pointer">Upload House</span>
-                    </label>
-                  )}
-                </div>
-              </div>
-
-              {/* Dream Car Upload */}
-              <div className="border-2 border-dashed border-blue-300 rounded-lg p-6 hover:border-blue-500 transition-colors">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">🚗</div>
-                  <h3 className="font-bold text-gray-800 mb-2">Dream Car</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Show you DRIVING your dream car
-                  </p>
-                  {categorizedUploads.dreamCar ? (
-                    <div className="relative">
-                      <img src={categorizedUploads.dreamCar} alt="Dream Car" className="w-full h-32 object-cover rounded-lg mb-2" />
-                      <button onClick={() => removeCategorizedImage('dreamCar')} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6">×</button>
-                    </div>
-                  ) : (
-                    <label className="block">
-                      <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleCategorizedUpload('dreamCar', e.target.files[0])} className="hidden" />
-                      <span className="block w-full bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold py-2 px-4 rounded cursor-pointer">Upload Car</span>
-                    </label>
-                  )}
-                </div>
-              </div>
-
-              {/* Dream Destination Upload */}
-              <div className="border-2 border-dashed border-green-300 rounded-lg p-6 hover:border-green-500 transition-colors">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">✈️</div>
-                  <h3 className="font-bold text-gray-800 mb-2">Dream Destination</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Show you AT your dream location
-                  </p>
-                  {categorizedUploads.destination ? (
-                    <div className="relative">
-                      <img src={categorizedUploads.destination} alt="Destination" className="w-full h-32 object-cover rounded-lg mb-2" />
-                      <button onClick={() => removeCategorizedImage('destination')} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6">×</button>
-                    </div>
-                  ) : (
-                    <label className="block">
-                      <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleCategorizedUpload('destination', e.target.files[0])} className="hidden" />
-                      <span className="block w-full bg-green-100 hover:bg-green-200 text-green-700 font-semibold py-2 px-4 rounded cursor-pointer">Upload Destination</span>
-                    </label>
-                  )}
-                </div>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Button variant="primary" size="lg" className="min-w-[200px]">
+                <Link href="/create" className="flex items-center gap-2">
+                  Create Free Board
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </Link>
+              </Button>
+              <Button variant="outline" size="lg" className="min-w-[200px]">
+                <Link href="/about">Learn More</Link>
+              </Button>
             </div>
 
-            {/* Template Selection */}
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 mb-6">
-              <h3 className="font-bold text-gray-800 mb-3 text-center">Choose Your Vision Board Template</h3>
-              <p className="text-xs text-gray-600 mb-4 text-center">Professional Canva-inspired frame styles</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                <button
-                  onClick={() => { setSelectedTemplate("ai"); setUseHtmlTemplate(false); }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedTemplate === "ai"
-                      ? "border-purple-600 bg-purple-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-purple-400"
-                  }`}
-                >
-                  <div className="text-2xl mb-2">🤖</div>
-                  <div className="font-bold text-sm">AI Generated</div>
-                  <div className="text-xs text-gray-600">Gemini creates unique collage</div>
-                </button>
-
-                <button
-                  onClick={() => { setSelectedTemplate("polaroid"); setUseHtmlTemplate(true); }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedTemplate === "polaroid"
-                      ? "border-blue-600 bg-blue-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-blue-400"
-                  }`}
-                >
-                  <div className="text-2xl mb-2">📸</div>
-                  <div className="font-bold text-sm">Polaroid</div>
-                  <div className="text-xs text-gray-600">Vintage scattered style</div>
-                </button>
-
-                <button
-                  onClick={() => { setSelectedTemplate("grid"); setUseHtmlTemplate(true); }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedTemplate === "grid"
-                      ? "border-indigo-600 bg-indigo-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-indigo-400"
-                  }`}
-                >
-                  <div className="text-2xl mb-2">📊</div>
-                  <div className="font-bold text-sm">Clean Grid</div>
-                  <div className="text-xs text-gray-600">Modern minimal design</div>
-                </button>
-
-                <button
-                  onClick={() => { setSelectedTemplate("magazine"); setUseHtmlTemplate(true); }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedTemplate === "magazine"
-                      ? "border-pink-600 bg-pink-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-pink-400"
-                  }`}
-                >
-                  <div className="text-2xl mb-2">📰</div>
-                  <div className="font-bold text-sm">Magazine</div>
-                  <div className="text-xs text-gray-600">Dynamic collage</div>
-                </button>
-
-                <button
-                  onClick={() => { setSelectedTemplate("scrapbook"); setUseHtmlTemplate(true); }}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    selectedTemplate === "scrapbook"
-                      ? "border-amber-600 bg-amber-100 shadow-lg"
-                      : "border-gray-300 bg-white hover:border-amber-400"
-                  }`}
-                >
-                  <div className="text-2xl mb-2">✂️</div>
-                  <div className="font-bold text-sm">Scrapbook</div>
-                  <div className="text-xs text-gray-600">Handmade pastel</div>
-                </button>
+            <div className="mt-12 flex items-center justify-center gap-8 text-sm text-gray-400">
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✓</span> No credit card required
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-4">
-              <button
-                onClick={() => {
-                  setStep("input");
-                  setImages([]);
-                }}
-                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-              >
-                ← Back
-              </button>
-              <button
-                onClick={proceedToCollage}
-                disabled={loading}
-                className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
-              >
-                {loading ? "🤖 AI Creating Your Board..." : "✨ Generate AI Vision Board →"}
-              </button>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✓</span> Free forever plan
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✓</span> Instant results
+              </div>
             </div>
           </div>
-        )}
 
-        {/* Step 3: Final Vision Board Collage */}
-        {step === "preview" && (
-          <div className="space-y-6">
-            {/* Back Button - ALWAYS VISIBLE at Top Left */}
-            <button
-              onClick={() => {
-                setStep("input");
-                setImages([]);
-                setBoardElements([]);
-                setCategorizedUploads({
-                  selfie: null,
-                  dreamHouse: null,
-                  dreamCar: null,
-                  destination: null
-                });
-                setCollageReady(false);
-                setGoals("");
-                setSelectedTemplate("ai");
-              }}
-              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md border-2 border-gray-200 mb-4"
+          {/* Preview/Demo Section */}
+          <div className="max-w-5xl mx-auto">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+              <div className="relative bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-3xl p-2 border-2 border-purple-500/30">
+                <div className="aspect-video bg-[#0D0C1D] rounded-2xl flex items-center justify-center overflow-hidden">
+                  <div className="text-center p-12">
+                    <div className="text-8xl mb-4">🎨</div>
+                    <p className="text-xl text-gray-400">Your Vision Board Preview</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-6 bg-[#0D0C1D]/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2
+              className="text-5xl md:text-6xl font-bold mb-6"
+              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Start
-            </button>
+              <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+                POWERFUL FEATURES
+              </span>
+            </h2>
+            <p className="text-xl text-gray-400">Everything you need to bring your dreams to life</p>
+          </div>
 
-            {/* Display component-based vision board */}
-            {collageReady && generationMode === "component" && boardElements.length > 0 && (
-              <VisionBoardCanvas
-                elements={boardElements}
-                onElementClick={(id) => console.log("Element clicked:", id)}
-                onDownload={handleDownload}
-              />
-            )}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <Card key={index} hover>
+                <div className="text-purple-400 mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* Display HTML Template or AI-generated collage */}
-            {collageReady && images.length > 0 && (
-              <div className="flex flex-col items-center gap-6 w-full">
-                {selectedTemplate !== "ai" ? (
-                  // Render HTML template with individual images
-                  <>
-                    <div className="vision-board-template">
-                      {selectedTemplate === "grid" && (
-                        <CleanGridTemplate
-                          images={images.map((img) => img.url)}
-                          keywords={keywords}
-                        />
-                      )}
-                      {selectedTemplate === "polaroid" && (
-                        <PolaroidScatteredTemplate
-                          images={images.map((img) => img.url)}
-                          quotes={quotes}
-                        />
-                      )}
-                      {selectedTemplate === "magazine" && (
-                        <MagazineCollageTemplate
-                          images={images.map((img) => img.url)}
-                          keywords={keywords}
-                        />
-                      )}
-                      {selectedTemplate === "scrapbook" && (
-                        <MinimalScrapbookTemplate
-                          images={images.map((img) => img.url)}
-                          keywords={keywords}
-                        />
-                      )}
-                    </div>
-                    {/* Download button for HTML templates - centered below vision board */}
-                    <button
-                      onClick={handleDownload}
-                      className="download-button bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 flex items-center gap-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                      Download Vision Board
-                    </button>
-                  </>
-                ) : (
-                  // Render AI-generated Gemini collage
-                  <>
-                    <div className="vision-board-template">
-                      <img
-                        src={images[0].url}
-                        alt="Your Vision Board 2025"
-                        className="w-full h-auto rounded-lg shadow-2xl"
-                      />
-                    </div>
-                    <button
-                      onClick={handleDownload}
-                      className="download-button absolute bottom-6 right-6 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 flex items-center gap-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                      Download Vision Board
-                    </button>
-                  </>
+      {/* How It Works */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2
+              className="text-5xl md:text-6xl font-bold mb-6"
+              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+            >
+              <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+                HOW IT WORKS
+              </span>
+            </h2>
+            <p className="text-xl text-gray-400">Four simple steps to your dream vision board</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {steps.map((step, index) => (
+              <div key={index} className="relative">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] text-white text-2xl font-bold mb-6">
+                    {step.number}
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
+                  <p className="text-gray-400">{step.description}</p>
+                </div>
+                {index < steps.length - 1 && (
+                  <div className="hidden lg:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-purple-500/50 to-transparent"></div>
                 )}
               </div>
-            )}
-
-            {/* Loading state with progress bar */}
-            {!collageReady && (
-              <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
-                <div className="space-y-6">
-                  {/* Progress bar */}
-                  <div className="space-y-3">
-                    <p className="text-purple-600 font-bold text-xl flex items-center justify-center gap-2">
-                      <svg className="w-6 h-6 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
-                      </svg>
-                      Creating your personalized vision board...
-                    </p>
-
-                    {/* Progress Bar Component */}
-                    <div className="w-full max-w-xl mx-auto">
-                      <Progress value={progress} className="h-3" />
-                      <p className="text-sm text-purple-600 font-medium mt-2">{progress}%</p>
-                    </div>
-                  </div>
-
-                  {/* Preview placeholder with shimmer effect */}
-                  <div className="relative h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-40 animate-shimmer"></div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="space-y-2">
-                      <p className="text-purple-500 text-sm">🎨 Step 1/3: Using Gemini AI to edit YOUR images into dream scenarios</p>
-                      <p className="text-purple-500 text-sm">✨ Step 2/3: Generating lifestyle images with DALL-E 3</p>
-                      <p className="text-purple-500 text-sm">🖼️ Step 3/3: Composing final collage with bold text overlays</p>
-                    </div>
-                    <p className="text-gray-500 text-xs mt-4">
-                      ⏱️ Takes ~2 minutes (scenario editing + lifestyle images + final composition)
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            {collageReady && (
-              <div className="flex gap-4 justify-center">
-                <button
-                  onClick={() => {
-                    setStep("input");
-                    setImages([]);
-                    setBoardElements([]);
-                    setCategorizedUploads({
-                      selfie: null,
-                      dreamHouse: null,
-                      dreamCar: null,
-                      destination: null
-                    });
-                    setCollageReady(false);
-                    setGoals("");
-                    // Don't reset generation mode - keep user's preference
-                  }}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
-                >
-                  🔄 Create New Board
-                </button>
-              </div>
-            )}
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      </section>
+
+      {/* Social Proof */}
+      <section className="py-20 px-6 bg-[#0D0C1D]/50">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+            <div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent mb-2">
+                10K+
+              </div>
+              <div className="text-gray-400">Vision Boards Created</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent mb-2">
+                99%
+              </div>
+              <div className="text-gray-400">Satisfaction Rate</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent mb-2">
+                4.9★
+              </div>
+              <div className="text-gray-400">Average Rating</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent mb-2">
+                24/7
+              </div>
+              <div className="text-gray-400">AI Availability</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="relative overflow-hidden rounded-3xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#7209B7] via-[#9D4EDD] to-[#C77DFF]"></div>
+            <div className="relative p-12 md:p-16 text-center">
+              <h2
+                className="text-4xl md:text-6xl font-bold text-white mb-6"
+                style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+              >
+                START MANIFESTING TODAY
+              </h2>
+              <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
+                Join thousands who are turning their dreams into reality with AI-powered vision boards
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button variant="secondary" size="lg" className="bg-white text-[#7209B7] hover:bg-gray-100">
+                  <Link href="/create">Create Your First Board Free</Link>
+                </Button>
+                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+                  <Link href="/pricing">View Pricing</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-purple-500/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 className="font-bold text-white mb-4">Product</h3>
+              <ul className="space-y-2">
+                <li><Link href="/create" className="text-gray-400 hover:text-white transition">Create Board</Link></li>
+                <li><Link href="/pricing" className="text-gray-400 hover:text-white transition">Pricing</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white transition">Templates</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-white mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li><Link href="/about" className="text-gray-400 hover:text-white transition">About</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white transition">Blog</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white transition">Careers</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-white mb-4">Resources</h3>
+              <ul className="space-y-2">
+                <li><Link href="#" className="text-gray-400 hover:text-white transition">Help Center</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white transition">Documentation</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white transition">API</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-white mb-4">Legal</h3>
+              <ul className="space-y-2">
+                <li><Link href="#" className="text-gray-400 hover:text-white transition">Privacy</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white transition">Terms</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white transition">Security</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="pt-8 border-t border-purple-500/10 text-center text-gray-400">
+            <p>&copy; 2025 Dreamboard AI. All rights reserved. Manifest your dreams.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
