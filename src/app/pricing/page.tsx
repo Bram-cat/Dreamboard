@@ -63,7 +63,7 @@ export default function PricingPage() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1
             className="text-6xl md:text-8xl font-bold mb-6 leading-tight"
-            style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+            style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
           >
             <span className="bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent">
               SIMPLE
@@ -143,7 +143,7 @@ export default function PricingPage() {
                   <div className="text-center mb-10">
                     <h3
                       className="text-4xl font-bold text-white mb-3"
-                      style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+                      style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
                     >
                       {plan.name}
                     </h3>
@@ -204,7 +204,7 @@ export default function PricingPage() {
           <div className="text-center mb-16">
             <h2
               className="text-5xl md:text-6xl font-bold mb-6"
-              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 FREQUENTLY ASKED
@@ -256,7 +256,7 @@ export default function PricingPage() {
             <div className="relative p-16 text-center">
               <h2
                 className="text-5xl md:text-7xl font-bold text-white mb-6"
-                style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+                style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
                 READY TO MANIFEST<br />YOUR DREAMS?
               </h2>
@@ -285,7 +285,7 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="text-lg font-bold text-white mb-4" style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}>
+              <h3 className="text-lg font-bold text-white mb-4" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
                 DREAMBOARD
               </h3>
               <p className="text-gray-400 text-sm leading-relaxed">

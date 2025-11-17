@@ -529,7 +529,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <h1
               className="text-6xl md:text-8xl font-bold mb-6"
-              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               <span className="bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 CREATE YOUR
@@ -587,7 +587,7 @@ export default function Home() {
           <Card className="max-w-3xl mx-auto">
             <h2
               className="text-3xl font-bold text-white mb-6"
-              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 STEP 1: SET YOUR GOALS
@@ -652,7 +652,7 @@ export default function Home() {
             <Card className="mb-8">
               <h2
                 className="text-3xl font-bold text-white mb-4"
-                style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+                style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
                 <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                   STEP 2: PERSONALIZE
@@ -759,7 +759,7 @@ export default function Home() {
             <Card className="mb-8">
               <h3
                 className="text-2xl font-bold text-white mb-3 text-center"
-                style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+                style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
                 <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                   CHOOSE YOUR TEMPLATE
@@ -872,7 +872,9 @@ export default function Home() {
         {step === "preview" && (
           <div className="space-y-6">
             {/* Back Button - ALWAYS VISIBLE at Top Left */}
-            <button
+            <Button
+              variant="outline"
+              size="md"
               onClick={() => {
                 setStep("input");
                 setImages([]);
@@ -887,13 +889,13 @@ export default function Home() {
                 setGoals("");
                 setSelectedTemplate("ai");
               }}
-              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md border-2 border-gray-200 mb-4"
+              className="mb-6"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back to Start
-            </button>
+            </Button>
 
             {/* Display component-based vision board */}
             {collageReady && generationMode === "component" && boardElements.length > 0 && (
@@ -937,15 +939,16 @@ export default function Home() {
                       )}
                     </div>
                     {/* Download button for HTML templates - centered below vision board */}
-                    <button
+                    <Button
                       onClick={handleDownload}
-                      className="download-button bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 flex items-center gap-2"
+                      size="lg"
+                      className="download-button"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                       Download Vision Board
-                    </button>
+                    </Button>
                   </>
                 ) : (
                   // Render AI-generated Gemini collage
@@ -957,15 +960,17 @@ export default function Home() {
                         className="w-full h-auto rounded-lg shadow-2xl"
                       />
                     </div>
-                    <button
+                    {/* Download button for AI template - centered below vision board */}
+                    <Button
                       onClick={handleDownload}
-                      className="download-button absolute bottom-6 right-6 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-2xl hover:scale-105 flex items-center gap-2"
+                      size="lg"
+                      className="download-button"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                       Download Vision Board
-                    </button>
+                    </Button>
                   </>
                 )}
               </div>
@@ -973,47 +978,60 @@ export default function Home() {
 
             {/* Loading state with progress bar */}
             {!collageReady && (
-              <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+              <Card className="max-w-4xl mx-auto">
                 <div className="space-y-6">
                   {/* Progress bar */}
                   <div className="space-y-3">
-                    <p className="text-purple-600 font-bold text-xl flex items-center justify-center gap-2">
-                      <svg className="w-6 h-6 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                    <h3
+                      className="text-2xl font-bold text-white flex items-center justify-center gap-2"
+                      style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
+                    >
+                      <svg className="w-6 h-6 animate-pulse text-purple-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
                       </svg>
-                      Creating your personalized vision board...
-                    </p>
+                      CREATING YOUR VISION BOARD
+                    </h3>
 
                     {/* Progress Bar Component */}
                     <div className="w-full max-w-xl mx-auto">
                       <Progress value={progress} className="h-3" />
-                      <p className="text-sm text-purple-600 font-medium mt-2">{progress}%</p>
+                      <p className="text-lg text-purple-300 font-semibold mt-3" style={{ fontFamily: "'Switzer', sans-serif" }}>
+                        {progress}% Complete
+                      </p>
                     </div>
                   </div>
 
                   {/* Preview placeholder with shimmer effect */}
-                  <div className="relative h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-40 animate-shimmer"></div>
+                  <div className="relative h-96 bg-gradient-to-br from-purple-900/20 to-violet-900/20 rounded-xl overflow-hidden border border-purple-500/20">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/10 to-transparent opacity-40 animate-shimmer"></div>
                   </div>
 
                   <div className="space-y-3">
-                    <div className="space-y-2">
-                      <p className="text-purple-500 text-sm">🎨 Step 1/3: Using Gemini AI to edit YOUR images into dream scenarios</p>
-                      <p className="text-purple-500 text-sm">✨ Step 2/3: Generating lifestyle images with DALL-E 3</p>
-                      <p className="text-purple-500 text-sm">🖼️ Step 3/3: Composing final collage with bold text overlays</p>
+                    <div className="space-y-3">
+                      <p className="text-purple-300 text-base" style={{ fontFamily: "'Switzer', sans-serif" }}>
+                        🎨 Step 1/3: Using Gemini AI to edit YOUR images into dream scenarios
+                      </p>
+                      <p className="text-purple-300 text-base" style={{ fontFamily: "'Switzer', sans-serif" }}>
+                        ✨ Step 2/3: Generating lifestyle images with DALL-E 3
+                      </p>
+                      <p className="text-purple-300 text-base" style={{ fontFamily: "'Switzer', sans-serif" }}>
+                        🖼️ Step 3/3: Composing final collage with text overlays
+                      </p>
                     </div>
-                    <p className="text-gray-500 text-xs mt-4">
+                    <p className="text-gray-400 text-sm mt-4" style={{ fontFamily: "'Switzer', sans-serif" }}>
                       ⏱️ Takes ~2 minutes (scenario editing + lifestyle images + final composition)
                     </p>
                   </div>
                 </div>
-              </div>
+              </Card>
             )}
 
             {/* Action Buttons */}
             {collageReady && (
               <div className="flex gap-4 justify-center">
-                <button
+                <Button
+                  variant="secondary"
+                  size="lg"
                   onClick={() => {
                     setStep("input");
                     setImages([]);
@@ -1028,10 +1046,9 @@ export default function Home() {
                     setGoals("");
                     // Don't reset generation mode - keep user's preference
                   }}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
                 >
                   🔄 Create New Board
-                </button>
+                </Button>
               </div>
             )}
           </div>

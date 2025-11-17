@@ -72,7 +72,7 @@ export default function HomePage() {
 
             <h1
               className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 leading-tight"
-              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               <span className="bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 MANIFEST
@@ -118,15 +118,51 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Preview/Demo Section */}
-          <div className="max-w-5xl mx-auto">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-              <div className="relative bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-3xl p-2 border-2 border-purple-500/30">
-                <div className="aspect-video bg-[#0D0C1D] rounded-2xl flex items-center justify-center overflow-hidden">
-                  <div className="text-center p-12">
-                    <div className="text-8xl mb-4">🎨</div>
-                    <p className="text-xl text-gray-400">Your Vision Board Preview</p>
+        </div>
+      </section>
+
+      {/* Vision Board Showcase Section - Lattice-inspired */}
+      <section className="py-20 px-6 bg-[#0D0C1D]/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Display 1 */}
+            <div className="relative group overflow-hidden rounded-3xl">
+              <img
+                src="/display.png"
+                alt="Vision Board Example 1"
+                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </div>
+
+            {/* Display 2 */}
+            <div className="relative group overflow-hidden rounded-3xl">
+              <img
+                src="/display2.png"
+                alt="Vision Board Example 2"
+                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </div>
+
+            {/* Display 3 with Testimonial Overlay */}
+            <div className="relative group overflow-hidden rounded-3xl">
+              <img
+                src="/display3.png"
+                alt="Vision Board Example 3"
+                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0D0C1D]/95 via-[#1A1A2E]/90 to-[#16213E]/95 flex items-center justify-center p-8">
+                <div className="text-center">
+                  <div className="text-6xl mb-6">✨</div>
+                  <blockquote className="text-lg text-gray-200 mb-6 leading-relaxed" style={{ fontFamily: "'Switzer', sans-serif" }}>
+                    &quot;We use Dreamboard to visualize our goals and manifest success. Creating vision boards has never been easier.&quot;
+                  </blockquote>
+                  <div>
+                    <p className="font-bold text-white text-lg" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
+                      SARAH JOHNSON
+                    </p>
+                    <p className="text-purple-300 text-sm">CEO, Vision Consulting</p>
                   </div>
                 </div>
               </div>
@@ -141,7 +177,7 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <h2
               className="text-5xl md:text-6xl font-bold mb-6"
-              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 POWERFUL FEATURES
@@ -168,7 +204,7 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <h2
               className="text-5xl md:text-6xl font-bold mb-6"
-              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 HOW IT WORKS
@@ -236,7 +272,7 @@ export default function HomePage() {
             <div className="relative p-12 md:p-16 text-center">
               <h2
                 className="text-4xl md:text-6xl font-bold text-white mb-6"
-                style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+                style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
                 START MANIFESTING TODAY
               </h2>

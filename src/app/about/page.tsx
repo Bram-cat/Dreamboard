@@ -45,7 +45,7 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto text-center">
           <h1
             className="text-6xl md:text-8xl font-bold mb-8"
-            style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+            style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
           >
             <span className="bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent">
               OUR MISSION
@@ -65,7 +65,7 @@ export default function AboutPage() {
             <div>
               <h2
                 className="text-4xl md:text-5xl font-bold mb-6"
-                style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+                style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
                 <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                   THE STORY BEHIND DREAMBOARD
@@ -106,7 +106,7 @@ export default function AboutPage() {
           <div className="text-center mb-16">
             <h2
               className="text-5xl md:text-6xl font-bold mb-6"
-              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 OUR VALUES
@@ -133,7 +133,7 @@ export default function AboutPage() {
           <div className="text-center mb-16">
             <h2
               className="text-5xl md:text-6xl font-bold mb-6"
-              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 OUR JOURNEY
@@ -169,7 +169,7 @@ export default function AboutPage() {
             <div className="relative p-12 md:p-16 text-center">
               <h2
                 className="text-4xl md:text-6xl font-bold text-white mb-6"
-                style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+                style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
                 JOIN OUR COMMUNITY
               </h2>

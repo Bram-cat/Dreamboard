@@ -2,16 +2,16 @@
 
 /* Custom Fonts */
 @font-face {
-  font-family: 'Supreme';
-  src: url('/fonts/Supreme-Regular.woff2') format('woff2');
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Bespoke Stencil';
-  src: url('/fonts/BespokeStencil-Bold.woff2') format('woff2');
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -37,14 +37,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Supreme', system-ui, -apple-system, sans-serif;
-  --font-display: 'Bespoke Stencil', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Switzer', system-ui, -apple-system, sans-serif;
+  --font-display: 'Switzer', system-ui, -apple-system, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Supreme', system-ui, -apple-system, sans-serif;
+  font-family: 'Switzer', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

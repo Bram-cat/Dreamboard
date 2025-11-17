@@ -53,7 +53,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span className="text-4xl">✨</span>
-            <h1 className="text-2xl font-bold" style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}>
+            <h1 className="text-2xl font-bold" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
               <span className="bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 DREAMBOARD
               </span>
@@ -79,7 +79,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto text-center">
           <h1
             className="text-6xl md:text-8xl font-bold mb-6 leading-tight"
-            style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+            style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
           >
             <span className="bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent">
               MANIFEST YOUR
@@ -132,7 +132,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <h2
             className="text-5xl md:text-6xl font-bold text-center mb-4"
-            style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+            style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
           >
             <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
               POWERFUL FEATURES
@@ -162,7 +162,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <h2
             className="text-5xl md:text-6xl font-bold text-center mb-4"
-            style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+            style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
           >
             <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
               BEAUTIFUL TEMPLATES
@@ -198,7 +198,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] rounded-3xl p-12">
           <h2
             className="text-4xl md:text-5xl font-bold mb-6"
-            style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+            style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
           >
             START YOUR JOURNEY TODAY
           </h2>

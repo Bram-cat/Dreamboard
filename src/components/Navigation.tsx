@@ -19,7 +19,7 @@ export default function Navigation() {
             </div>
             <h1
               className="text-2xl font-bold bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent"
-              style={{ fontFamily: "'Bespoke Stencil', sans-serif" }}
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               DREAMBOARD
             </h1>
