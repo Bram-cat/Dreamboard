@@ -53,60 +53,111 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0D0C1D] via-[#1A1A2E] to-[#0D0C1D]">
+    <div className="min-h-screen bg-gradient-to-b from-[#0d0c1d] via-[#161b33] to-[#0d0c1d]">
       <Navigation />
 
-      {/* Hero Section - Clean & Simple */}
+      {/* Hero Section - Modern Split Layout */}
       <section className="relative pt-32 pb-20 px-6 overflow-hidden">
         {/* Subtle Background */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-1/4 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-1/4 w-96 h-96 bg-[#474973]/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-[#a69cac]/10 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="max-w-4xl mx-auto relative z-10 text-center">
-          <h1
-            className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
-            style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
-          >
-            <span className="text-white">Create Your</span>
-            <br />
-            <span className="bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent">
-              2025 Vision Board
-            </span>
-          </h1>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-5 gap-12 items-center">
+            {/* Left Content - 60% */}
+            <div className="lg:col-span-3 text-center lg:text-left">
+              <h1
+                className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+                style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
+              >
+                <span className="text-white">Transform Your Images into</span>
+                <br />
+                <span className="bg-gradient-to-r from-[#a69cac] via-[#474973] to-[#161b33] bg-clip-text text-transparent">
+                  AI Vision Boards
+                </span>
+              </h1>
 
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-            AI-powered vision boards in minutes. Set your goals, upload photos, download your board.
-          </p>
+              <p className="text-lg md:text-xl text-[#a69cac] max-w-2xl mx-auto lg:mx-0 mb-10 leading-relaxed">
+                Upload your photos and let our AI create beautiful, inspirational vision boards tailored to your style
+              </p>
 
-          <Link href="/create">
-            <Button variant="primary" size="lg" className="text-lg px-10 py-5">
-              Create Free Board
-            </Button>
-          </Link>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
+                <Link href="/create">
+                  <Button variant="primary" size="lg" className="text-lg px-10 py-5 bg-gradient-to-r from-[#474973] to-[#161b33] hover:from-[#161b33] hover:to-[#474973]">
+                    Create Your Vision Board
+                  </Button>
+                </Link>
+                <a href="#examples" className="text-[#a69cac] hover:text-white transition-colors text-lg">
+                  View Examples →
+                </a>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="mt-10 flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-[#a69cac]">
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  No credit card required
+                </span>
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Secure processing
+                </span>
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Free to use
+                </span>
+              </div>
+            </div>
+
+            {/* Right Preview - 40% */}
+            <div className="lg:col-span-2">
+              <div className="relative">
+                {/* Preview Area */}
+                <div className="relative bg-gradient-to-br from-[#161b33] to-[#0d0c1d] rounded-2xl p-6 border border-[#474973]/30">
+                  <div className="aspect-video bg-[#0d0c1d] rounded-lg overflow-hidden">
+                    <img
+                      src="/display.png"
+                      alt="AI Vision Board Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="mt-4 text-center text-sm text-[#a69cac]">
+                    AI-generated vision board
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Bento Box Gallery - Examples */}
-      <section className="py-20 px-6">
+      <section id="examples" className="py-20 px-6 bg-[#0d0c1d]/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2
               className="text-3xl md:text-4xl font-bold mb-3"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#a69cac] to-[#474973] bg-clip-text text-transparent">
                 Examples
               </span>
             </h2>
-            <p className="text-gray-400">Vision boards created with AI</p>
+            <p className="text-[#a69cac]">Vision boards created with AI</p>
           </div>
 
-          {/* Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Large - Spans 2 columns and 2 rows */}
-            <div className="md:col-span-2 md:row-span-2 relative group overflow-hidden rounded-2xl border border-purple-500/20 hover:border-purple-400/40 transition-all">
+          {/* Bento Grid - Asymmetric Layout */}
+          <div className="grid grid-cols-12 gap-4 auto-rows-[200px]">
+            {/* Top Left - Tall */}
+            <div className="col-span-12 md:col-span-4 md:row-span-2 relative group overflow-hidden rounded-2xl border border-[#474973]/30 hover:border-[#a69cac]/60 transition-all">
               <img
                 src="/display.png"
                 alt="Vision Board Example"
@@ -114,8 +165,8 @@ export default function HomePage() {
               />
             </div>
 
-            {/* Top Right */}
-            <div className="md:col-span-2 relative group overflow-hidden rounded-2xl border border-purple-500/20 hover:border-purple-400/40 transition-all">
+            {/* Top Right - Wide */}
+            <div className="col-span-12 md:col-span-8 relative group overflow-hidden rounded-2xl border border-[#474973]/30 hover:border-[#a69cac]/60 transition-all">
               <img
                 src="/display2.png"
                 alt="Vision Board Example"
@@ -123,8 +174,8 @@ export default function HomePage() {
               />
             </div>
 
-            {/* Middle Right */}
-            <div className="relative group overflow-hidden rounded-2xl border border-purple-500/20 hover:border-purple-400/40 transition-all">
+            {/* Middle Left */}
+            <div className="col-span-6 md:col-span-3 relative group overflow-hidden rounded-2xl border border-[#474973]/30 hover:border-[#a69cac]/60 transition-all">
               <img
                 src="/display3.png"
                 alt="Vision Board Example"
@@ -132,10 +183,19 @@ export default function HomePage() {
               />
             </div>
 
-            {/* Bottom Right */}
-            <div className="relative group overflow-hidden rounded-2xl border border-purple-500/20 hover:border-purple-400/40 transition-all">
+            {/* Middle Right - Large */}
+            <div className="col-span-6 md:col-span-5 md:row-span-2 relative group overflow-hidden rounded-2xl border border-[#474973]/30 hover:border-[#a69cac]/60 transition-all">
               <img
                 src="/display4.png"
+                alt="Vision Board Example"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+
+            {/* Bottom Left */}
+            <div className="col-span-12 md:col-span-7 relative group overflow-hidden rounded-2xl border border-[#474973]/30 hover:border-[#a69cac]/60 transition-all">
+              <img
+                src="/display.png"
                 alt="Vision Board Example"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
@@ -145,18 +205,18 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6 bg-[#0D0C1D]/50">
+      <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
               className="text-4xl md:text-5xl font-bold mb-4"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#a69cac] to-[#474973] bg-clip-text text-transparent">
                 Everything You Need
               </span>
             </h2>
-            <p className="text-lg text-gray-400">Simple, powerful tools to create your perfect vision board</p>
+            <p className="text-lg text-[#a69cac]">Simple, powerful tools to create your perfect vision board</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -172,32 +232,32 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-[#0d0c1d]/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
               className="text-4xl md:text-5xl font-bold mb-4"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#a69cac] to-[#474973] bg-clip-text text-transparent">
                 How It Works
               </span>
             </h2>
-            <p className="text-lg text-gray-400">Four simple steps to your dream vision board</p>
+            <p className="text-lg text-[#a69cac]">Four simple steps to your dream vision board</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
               <div key={index} className="relative">
                 <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] text-white text-xl font-bold mb-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-[#474973] to-[#161b33] text-white text-xl font-bold mb-4">
                     {step.number}
                   </div>
                   <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                  <p className="text-gray-400 text-sm">{step.description}</p>
+                  <p className="text-[#a69cac] text-sm">{step.description}</p>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-purple-500/50 to-transparent"></div>
+                  <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-[#474973]/50 to-transparent"></div>
                 )}
               </div>
             ))}
@@ -208,27 +268,27 @@ export default function HomePage() {
       {/* CTA Section - Better Visibility */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1A1A2E] to-[#16213E] border-2 border-purple-500/30 p-12 md:p-16">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#161b33] to-[#0d0c1d] border-2 border-[#474973]/40 p-12 md:p-16">
             <div className="relative z-10 text-center">
               <h2
                 className="text-4xl md:text-5xl font-bold mb-6"
                 style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
-                <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#a69cac] to-[#474973] bg-clip-text text-transparent">
                   Ready to Start?
                 </span>
               </h2>
-              <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-xl mx-auto">
+              <p className="text-lg md:text-xl text-[#a69cac] mb-10 max-w-xl mx-auto">
                 Create your vision board in minutes. No credit card required.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link href="/create">
-                  <Button variant="primary" size="lg" className="min-w-[200px]">
+                  <Button variant="primary" size="lg" className="min-w-[200px] bg-gradient-to-r from-[#474973] to-[#161b33] hover:from-[#161b33] hover:to-[#474973]">
                     Create Free Board
                   </Button>
                 </Link>
                 <Link href="/pricing">
-                  <Button variant="outline" size="lg" className="border-2 border-purple-400/60 text-white hover:bg-purple-500/10 min-w-[200px]">
+                  <Button variant="outline" size="lg" className="border-2 border-[#474973] text-white hover:bg-[#474973]/20 min-w-[200px]">
                     View Pricing
                   </Button>
                 </Link>
@@ -239,27 +299,22 @@ export default function HomePage() {
       </section>
 
       {/* Footer - Personal & Simple */}
-      <footer className="bg-[#0D0C1D] border-t border-purple-500/10">
+      <footer className="bg-[#0d0c1d] border-t border-[#474973]/20">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-white" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
-                Dreamboard
+            <div>
+              <h3 className="text-lg font-bold bg-gradient-to-r from-[#a69cac] to-[#474973] bg-clip-text text-transparent" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
+                DreamBoard
               </h3>
             </div>
 
             <div className="flex items-center gap-6 text-sm">
-              <Link href="/create" className="text-gray-400 hover:text-white transition-colors">Create</Link>
-              <Link href="/pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</Link>
-              <Link href="/about" className="text-gray-400 hover:text-white transition-colors">About</Link>
+              <Link href="/create" className="text-[#a69cac] hover:text-white transition-colors">Create</Link>
+              <Link href="/pricing" className="text-[#a69cac] hover:text-white transition-colors">Pricing</Link>
+              <Link href="/about" className="text-[#a69cac] hover:text-white transition-colors">About</Link>
             </div>
 
-            <p className="text-gray-500 text-sm">
+            <p className="text-[#a69cac] text-sm">
               Built with AI • 2025
             </p>
           </div>

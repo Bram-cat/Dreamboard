@@ -8,21 +8,17 @@ export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-[#0D0C1D]/80 backdrop-blur-xl border-b border-purple-500/10">
+    <nav className="fixed top-0 w-full z-50 bg-[#0d0c1d]/80 backdrop-blur-xl border-b border-[#474973]/20">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-            </div>
+          {/* Logo - DB that expands on hover */}
+          <Link href="/" className="group relative overflow-hidden">
             <h1
-              className="text-2xl font-bold bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent"
+              className="text-2xl font-bold bg-gradient-to-r from-[#a69cac] to-[#474973] bg-clip-text text-transparent transition-all duration-300"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              DREAMBOARD
+              <span className="inline-block group-hover:hidden">DB</span>
+              <span className="hidden group-hover:inline-block">DreamBoard</span>
             </h1>
           </Link>
 
