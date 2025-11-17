@@ -13,9 +13,10 @@ export default function Navigation() {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] blur-lg opacity-50 group-hover:opacity-100 transition-opacity"></div>
-              <span className="relative text-4xl">✨</span>
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center group-hover:scale-110 transition-transform">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
             </div>
             <h1
               className="text-2xl font-bold bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent"
