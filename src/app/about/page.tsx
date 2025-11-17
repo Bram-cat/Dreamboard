@@ -82,7 +82,7 @@ export default function AboutPage() {
                   anyone to create professional, personalized vision boards in minutes.
                 </p>
                 <p>
-                  Today, we're proud to serve thousands of dreamers worldwide, helping them visualize
+                  Today, we&apos;re proud to serve thousands of dreamers worldwide, helping them visualize
                   and achieve their goals for 2025 and beyond.
                 </p>
               </div>
