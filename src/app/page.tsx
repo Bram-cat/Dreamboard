@@ -53,15 +53,15 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#22223B] via-[#4A4E69] to-[#22223B]">
+    <div className="min-h-screen bg-[#F2E9E4]">
       <Navigation />
 
       {/* Hero Section - Catchy Phrase Design */}
       <section className="relative pt-32 pb-20 px-6 overflow-hidden">
         {/* Subtle Background */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-1/4 w-96 h-96 bg-[#9A8C98]/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-[#C9ADA7]/10 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-1/4 w-96 h-96 bg-[#9A8C98]/30 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-[#C9ADA7]/20 rounded-full blur-3xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
@@ -72,14 +72,14 @@ export default function HomePage() {
                 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
                 style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
-                <span className="text-[#F2E9E4]">Turn Dreams Into</span>
+                <span className="text-[#22223B]">Turn Dreams Into</span>
                 <br />
-                <span className="bg-gradient-to-r from-[#9A8C98] via-[#C9ADA7] to-[#F2E9E4] bg-clip-text text-transparent">
+                <span className="text-[#9A8C98]">
                   Reality
                 </span>
               </h1>
 
-              <p className="text-xl md:text-2xl text-[#C9ADA7] max-w-3xl mx-auto mb-12 leading-relaxed">
+              <p className="text-xl md:text-2xl text-[#4A4E69] max-w-3xl mx-auto mb-12 leading-relaxed">
                 Create stunning AI-powered vision boards that bring your goals to life
               </p>
 
@@ -89,7 +89,7 @@ export default function HomePage() {
                   <Button
                     variant="primary"
                     size="lg"
-                    className="text-lg px-12 py-6 bg-gradient-to-r from-[#9A8C98] to-[#C9ADA7] hover:from-[#C9ADA7] hover:to-[#F2E9E4] text-[#22223B] font-bold shadow-2xl shadow-[#9A8C98]/40 hover:shadow-[#C9ADA7]/60 hover:scale-105 transition-all duration-500"
+                    className="text-lg px-12 py-6 bg-[#9A8C98] hover:bg-[#C9ADA7] text-white font-bold shadow-2xl hover:shadow-xl hover:scale-105 transition-all duration-300"
                   >
                     Create Your Vision Board
                   </Button>
@@ -98,7 +98,7 @@ export default function HomePage() {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="text-lg px-12 py-6 border-2 border-[#9A8C98] text-[#C9ADA7] hover:bg-[#9A8C98]/10 hover:text-[#F2E9E4] hover:border-[#C9ADA7] font-semibold transition-all duration-300"
+                    className="text-lg px-12 py-6 border-2 border-[#9A8C98] text-[#22223B] hover:bg-[#9A8C98] hover:text-white font-semibold transition-all duration-300"
                   >
                     View Examples
                   </Button>
@@ -107,7 +107,7 @@ export default function HomePage() {
             </div>
 
             {/* Trust Indicators */}
-            <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-[#C9ADA7]">
+            <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-[#4A4E69]">
               <span className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-[#9A8C98]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -132,24 +132,24 @@ export default function HomePage() {
       </section>
 
       {/* Bento Box Gallery - Examples */}
-      <section id="examples" className="py-20 px-6 bg-[#22223B]/50">
+      <section id="examples" className="py-20 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2
               className="text-3xl md:text-4xl font-bold mb-3"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="bg-gradient-to-r from-[#9A8C98] to-[#C9ADA7] bg-clip-text text-transparent">
+              <span className="text-[#9A8C98]">
                 Examples
               </span>
             </h2>
-            <p className="text-[#C9ADA7]">Vision boards created with AI</p>
+            <p className="text-[#4A4E69]">Vision boards created with AI</p>
           </div>
 
           {/* Bento Grid - Asymmetric Layout */}
           <div className="grid grid-cols-12 gap-4 auto-rows-[200px]">
             {/* Top Left - Tall */}
-            <div className="col-span-12 md:col-span-4 md:row-span-2 relative group overflow-hidden rounded-2xl border border-[#4A4E69]/30 hover:border-[#9A8C98]/60 transition-all">
+            <div className="col-span-12 md:col-span-4 md:row-span-2 relative group overflow-hidden rounded-2xl border border-[#C9ADA7]/40 hover:border-[#9A8C98] transition-all">
               <img
                 src="/display.png"
                 alt="Vision Board Example"
@@ -158,7 +158,7 @@ export default function HomePage() {
             </div>
 
             {/* Top Right - Wide */}
-            <div className="col-span-12 md:col-span-8 relative group overflow-hidden rounded-2xl border border-[#4A4E69]/30 hover:border-[#9A8C98]/60 transition-all">
+            <div className="col-span-12 md:col-span-8 relative group overflow-hidden rounded-2xl border border-[#C9ADA7]/40 hover:border-[#9A8C98] transition-all">
               <img
                 src="/display2.png"
                 alt="Vision Board Example"
@@ -167,7 +167,7 @@ export default function HomePage() {
             </div>
 
             {/* Middle Left */}
-            <div className="col-span-6 md:col-span-3 relative group overflow-hidden rounded-2xl border border-[#4A4E69]/30 hover:border-[#9A8C98]/60 transition-all">
+            <div className="col-span-6 md:col-span-3 relative group overflow-hidden rounded-2xl border border-[#C9ADA7]/40 hover:border-[#9A8C98] transition-all">
               <img
                 src="/display3.png"
                 alt="Vision Board Example"
@@ -176,7 +176,7 @@ export default function HomePage() {
             </div>
 
             {/* Middle Right - Large */}
-            <div className="col-span-6 md:col-span-5 md:row-span-2 relative group overflow-hidden rounded-2xl border border-[#4A4E69]/30 hover:border-[#9A8C98]/60 transition-all">
+            <div className="col-span-6 md:col-span-5 md:row-span-2 relative group overflow-hidden rounded-2xl border border-[#C9ADA7]/40 hover:border-[#9A8C98] transition-all">
               <img
                 src="/display4.png"
                 alt="Vision Board Example"
@@ -185,7 +185,7 @@ export default function HomePage() {
             </div>
 
             {/* Bottom Left */}
-            <div className="col-span-12 md:col-span-7 relative group overflow-hidden rounded-2xl border border-[#4A4E69]/30 hover:border-[#9A8C98]/60 transition-all">
+            <div className="col-span-12 md:col-span-7 relative group overflow-hidden rounded-2xl border border-[#C9ADA7]/40 hover:border-[#9A8C98] transition-all">
               <img
                 src="/display.png"
                 alt="Vision Board Example"
@@ -197,26 +197,26 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-[#F2E9E4]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
               className="text-4xl md:text-5xl font-bold mb-4"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="bg-gradient-to-r from-[#9A8C98] to-[#C9ADA7] bg-clip-text text-transparent">
+              <span className="text-[#9A8C98]">
                 Everything You Need
               </span>
             </h2>
-            <p className="text-lg text-[#C9ADA7]">Simple, powerful tools to create your perfect vision board</p>
+            <p className="text-lg text-[#4A4E69]">Simple, powerful tools to create your perfect vision board</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <Card key={index} hover>
                 <div className="text-[#9A8C98] mb-4">{feature.icon}</div>
-                <h3 className="text-lg font-bold text-[#F2E9E4] mb-2">{feature.title}</h3>
-                <p className="text-[#C9ADA7] text-sm leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg font-bold text-[#22223B] mb-2">{feature.title}</h3>
+                <p className="text-[#4A4E69] text-sm leading-relaxed">{feature.description}</p>
               </Card>
             ))}
           </div>
@@ -224,32 +224,32 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-6 bg-[#22223B]/50">
+      <section className="py-20 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
               className="text-4xl md:text-5xl font-bold mb-4"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="bg-gradient-to-r from-[#9A8C98] to-[#C9ADA7] bg-clip-text text-transparent">
+              <span className="text-[#9A8C98]">
                 How It Works
               </span>
             </h2>
-            <p className="text-lg text-[#C9ADA7]">Four simple steps to your dream vision board</p>
+            <p className="text-lg text-[#4A4E69]">Four simple steps to your dream vision board</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
               <div key={index} className="relative">
                 <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-[#9A8C98] to-[#C9ADA7] text-[#22223B] text-xl font-bold mb-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#9A8C98] text-white text-xl font-bold mb-4">
                     {step.number}
                   </div>
-                  <h3 className="text-lg font-bold text-[#F2E9E4] mb-2">{step.title}</h3>
-                  <p className="text-[#C9ADA7] text-sm">{step.description}</p>
+                  <h3 className="text-lg font-bold text-[#22223B] mb-2">{step.title}</h3>
+                  <p className="text-[#4A4E69] text-sm">{step.description}</p>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-[#9A8C98]/50 to-transparent"></div>
+                  <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-[#C9ADA7]/30"></div>
                 )}
               </div>
             ))}
@@ -258,29 +258,29 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section - Better Visibility */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 bg-[#F2E9E4]">
         <div className="max-w-4xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#4A4E69] to-[#22223B] border-2 border-[#9A8C98]/40 p-12 md:p-16">
+          <div className="relative overflow-hidden rounded-3xl bg-[#9A8C98] border-2 border-[#C9ADA7] p-12 md:p-16">
             <div className="relative z-10 text-center">
               <h2
                 className="text-4xl md:text-5xl font-bold mb-6"
                 style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
-                <span className="bg-gradient-to-r from-[#9A8C98] to-[#C9ADA7] bg-clip-text text-transparent">
+                <span className="text-white">
                   Ready to Start?
                 </span>
               </h2>
-              <p className="text-lg md:text-xl text-[#C9ADA7] mb-10 max-w-xl mx-auto">
+              <p className="text-lg md:text-xl text-white/90 mb-10 max-w-xl mx-auto">
                 Create your vision board in minutes. No credit card required.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link href="/create">
-                  <Button variant="primary" size="lg" className="min-w-[200px] bg-gradient-to-r from-[#9A8C98] to-[#C9ADA7] hover:from-[#C9ADA7] hover:to-[#F2E9E4] text-[#22223B] font-bold shadow-xl">
+                  <Button variant="primary" size="lg" className="min-w-[200px] bg-white hover:bg-[#F2E9E4] text-[#9A8C98] font-bold shadow-xl">
                     Create Free Board
                   </Button>
                 </Link>
                 <Link href="/pricing">
-                  <Button variant="outline" size="lg" className="border-2 border-[#9A8C98] text-[#C9ADA7] hover:bg-[#9A8C98]/20 hover:text-[#F2E9E4] min-w-[200px]">
+                  <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white/10 min-w-[200px]">
                     View Pricing
                   </Button>
                 </Link>
@@ -291,22 +291,22 @@ export default function HomePage() {
       </section>
 
       {/* Footer - Personal & Simple */}
-      <footer className="bg-[#22223B] border-t border-[#4A4E69]/30">
+      <footer className="bg-white border-t border-[#C9ADA7]/30">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
-              <h3 className="text-lg font-bold bg-gradient-to-r from-[#9A8C98] to-[#C9ADA7] bg-clip-text text-transparent" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
+              <h3 className="text-lg font-bold text-[#9A8C98]" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
                 DreamBoard
               </h3>
             </div>
 
             <div className="flex items-center gap-6 text-sm">
-              <Link href="/create" className="text-[#C9ADA7] hover:text-[#F2E9E4] transition-colors">Create</Link>
-              <Link href="/pricing" className="text-[#C9ADA7] hover:text-[#F2E9E4] transition-colors">Pricing</Link>
-              <Link href="/about" className="text-[#C9ADA7] hover:text-[#F2E9E4] transition-colors">About</Link>
+              <Link href="/create" className="text-[#4A4E69] hover:text-[#9A8C98] transition-colors">Create</Link>
+              <Link href="/pricing" className="text-[#4A4E69] hover:text-[#9A8C98] transition-colors">Pricing</Link>
+              <Link href="/about" className="text-[#4A4E69] hover:text-[#9A8C98] transition-colors">About</Link>
             </div>
 
-            <p className="text-[#C9ADA7] text-sm">
+            <p className="text-[#4A4E69] text-sm">
               Built with AI • 2025
             </p>
           </div>
