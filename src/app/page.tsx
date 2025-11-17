@@ -53,7 +53,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F2E9E4]">
+    <div className="min-h-screen bg-[#22223B]">
       <Navigation />
 
       {/* Hero Section - Catchy Phrase Design */}
@@ -72,14 +72,14 @@ export default function HomePage() {
                 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
                 style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
-                <span className="text-[#22223B]">Turn Dreams Into</span>
+                <span className="text-[#F2E9E4]">Turn Dreams Into</span>
                 <br />
                 <span className="text-[#9A8C98]">
                   Reality
                 </span>
               </h1>
 
-              <p className="text-xl md:text-2xl text-[#4A4E69] max-w-3xl mx-auto mb-12 leading-relaxed">
+              <p className="text-xl md:text-2xl text-[#C9ADA7] max-w-3xl mx-auto mb-12 leading-relaxed">
                 Create stunning AI-powered vision boards that bring your goals to life
               </p>
 
@@ -98,7 +98,7 @@ export default function HomePage() {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="text-lg px-12 py-6 border-2 border-[#9A8C98] text-[#22223B] hover:bg-[#9A8C98] hover:text-white font-semibold transition-all duration-300"
+                    className="text-lg px-12 py-6 border-2 border-[#9A8C98] text-[#F2E9E4] hover:bg-[#9A8C98] hover:text-white font-semibold transition-all duration-300"
                   >
                     View Examples
                   </Button>
@@ -107,7 +107,7 @@ export default function HomePage() {
             </div>
 
             {/* Trust Indicators */}
-            <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-[#4A4E69]">
+            <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-[#C9ADA7]">
               <span className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-[#9A8C98]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -132,18 +132,18 @@ export default function HomePage() {
       </section>
 
       {/* Bento Box Gallery - Examples */}
-      <section id="examples" className="py-20 px-6 bg-white">
+      <section id="examples" className="py-20 px-6 bg-[#4A4E69]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2
               className="text-3xl md:text-4xl font-bold mb-3"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="text-[#9A8C98]">
+              <span className="text-[#F2E9E4]">
                 Examples
               </span>
             </h2>
-            <p className="text-[#4A4E69]">Vision boards created with AI</p>
+            <p className="text-[#C9ADA7]">Vision boards created with AI</p>
           </div>
 
           {/* Bento Grid - Asymmetric Layout */}
@@ -197,26 +197,26 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6 bg-[#F2E9E4]">
+      <section className="py-20 px-6 bg-[#22223B]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
               className="text-4xl md:text-5xl font-bold mb-4"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="text-[#9A8C98]">
+              <span className="text-[#F2E9E4]">
                 Everything You Need
               </span>
             </h2>
-            <p className="text-lg text-[#4A4E69]">Simple, powerful tools to create your perfect vision board</p>
+            <p className="text-lg text-[#C9ADA7]">Simple, powerful tools to create your perfect vision board</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <Card key={index} hover>
                 <div className="text-[#9A8C98] mb-4">{feature.icon}</div>
-                <h3 className="text-lg font-bold text-[#22223B] mb-2">{feature.title}</h3>
-                <p className="text-[#4A4E69] text-sm leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg font-bold text-[#F2E9E4] mb-2">{feature.title}</h3>
+                <p className="text-[#C9ADA7] text-sm leading-relaxed">{feature.description}</p>
               </Card>
             ))}
           </div>
@@ -224,18 +224,18 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-20 px-6 bg-[#4A4E69]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
               className="text-4xl md:text-5xl font-bold mb-4"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="text-[#9A8C98]">
+              <span className="text-[#F2E9E4]">
                 How It Works
               </span>
             </h2>
-            <p className="text-lg text-[#4A4E69]">Four simple steps to your dream vision board</p>
+            <p className="text-lg text-[#C9ADA7]">Four simple steps to your dream vision board</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -245,8 +245,8 @@ export default function HomePage() {
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#9A8C98] text-white text-xl font-bold mb-4">
                     {step.number}
                   </div>
-                  <h3 className="text-lg font-bold text-[#22223B] mb-2">{step.title}</h3>
-                  <p className="text-[#4A4E69] text-sm">{step.description}</p>
+                  <h3 className="text-lg font-bold text-[#F2E9E4] mb-2">{step.title}</h3>
+                  <p className="text-[#C9ADA7] text-sm">{step.description}</p>
                 </div>
                 {index < steps.length - 1 && (
                   <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-[#C9ADA7]/30"></div>
@@ -258,7 +258,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section - Better Visibility */}
-      <section className="py-24 px-6 bg-[#F2E9E4]">
+      <section className="py-24 px-6 bg-[#22223B]">
         <div className="max-w-4xl mx-auto">
           <div className="relative overflow-hidden rounded-3xl bg-[#9A8C98] border-2 border-[#C9ADA7] p-12 md:p-16">
             <div className="relative z-10 text-center">
@@ -291,22 +291,22 @@ export default function HomePage() {
       </section>
 
       {/* Footer - Personal & Simple */}
-      <footer className="bg-white border-t border-[#C9ADA7]/30">
+      <footer className="bg-[#22223B] border-t border-[#4A4E69]/30">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
-              <h3 className="text-lg font-bold text-[#9A8C98]" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
+              <h3 className="text-lg font-bold text-[#F2E9E4]" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
                 DreamBoard
               </h3>
             </div>
 
             <div className="flex items-center gap-6 text-sm">
-              <Link href="/create" className="text-[#4A4E69] hover:text-[#9A8C98] transition-colors">Create</Link>
-              <Link href="/pricing" className="text-[#4A4E69] hover:text-[#9A8C98] transition-colors">Pricing</Link>
-              <Link href="/about" className="text-[#4A4E69] hover:text-[#9A8C98] transition-colors">About</Link>
+              <Link href="/create" className="text-[#C9ADA7] hover:text-[#F2E9E4] transition-colors">Create</Link>
+              <Link href="/pricing" className="text-[#C9ADA7] hover:text-[#F2E9E4] transition-colors">Pricing</Link>
+              <Link href="/about" className="text-[#C9ADA7] hover:text-[#F2E9E4] transition-colors">About</Link>
             </div>
 
-            <p className="text-[#4A4E69] text-sm">
+            <p className="text-[#C9ADA7] text-sm">
               Built with AI • 2025
             </p>
           </div>
