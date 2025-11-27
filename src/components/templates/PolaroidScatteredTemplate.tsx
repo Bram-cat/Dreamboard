@@ -214,7 +214,90 @@ export default function PolaroidScatteredTemplate({
 
       ctx.restore();
 
-      // NO QUOTES - Focus on frame arrangement only
+      // Add decorative elements in empty spaces
+      // Heart shapes in various sizes and colors
+      const drawHeart = (x: number, y: number, size: number, color: string, rotation: number = 0) => {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(0, size / 4);
+        ctx.bezierCurveTo(-size / 2, -size / 4, -size, size / 8, -size / 2, size);
+        ctx.bezierCurveTo(0, size * 1.2, 0, size * 1.2, 0, size * 1.2);
+        ctx.bezierCurveTo(0, size * 1.2, 0, size * 1.2, size / 2, size);
+        ctx.bezierCurveTo(size, size / 8, size / 2, -size / 4, 0, size / 4);
+        ctx.fill();
+        ctx.restore();
+      };
+
+      // Sparkles/Stars
+      const drawSparkle = (x: number, y: number, size: number, color: string = '#FFD700') => {
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.font = `${size}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('✨', x, y);
+        ctx.restore();
+      };
+
+      // Draw decorative elements in empty spaces
+      // Top right area
+      drawHeart(1100, 100, 20, '#FFB3D9', 15);
+      drawSparkle(1150, 80, 24);
+      drawHeart(1120, 50, 15, '#FFE5EC', -10);
+
+      // Top left corner
+      drawSparkle(50, 100, 20);
+      drawHeart(80, 120, 18, '#E0F4FF', 25);
+
+      // Middle left
+      drawHeart(60, 280, 22, '#F3E5F5', -15);
+      drawSparkle(30, 320, 26);
+
+      // Middle right area
+      drawHeart(1150, 280, 25, '#FFF3E0', 20);
+      drawSparkle(1120, 320, 22);
+      drawHeart(1170, 250, 16, '#FCE4EC', -5);
+
+      // Bottom areas
+      drawHeart(150, 480, 20, '#E8F5E9', 10);
+      drawSparkle(100, 500, 24);
+      drawHeart(900, 490, 18, '#FFECB3', -12);
+      drawSparkle(950, 510, 20);
+
+      // Emoji decorations
+      ctx.font = '28px Arial';
+      ctx.textAlign = 'center';
+
+      // Top area emojis
+      ctx.fillText('💫', 920, 40);
+      ctx.fillText('🌟', 250, 35);
+
+      // Side emojis
+      ctx.fillText('💖', 1170, 180);
+      ctx.fillText('✨', 20, 240);
+
+      // Bottom emojis
+      ctx.fillText('🎯', 720, 515);
+      ctx.fillText('💝', 1100, 500);
+
+      // Small decorative circles
+      const drawCircle = (x: number, y: number, radius: number, color: string) => {
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      };
+
+      // Scattered small circles for confetti effect
+      drawCircle(350, 200, 5, '#FFE5EC');
+      drawCircle(650, 100, 4, '#E0F4FF');
+      drawCircle(1050, 420, 5, '#FFF3E0');
+      drawCircle(180, 420, 4, '#F3E5F5');
     };
 
     renderToCanvas();
@@ -324,7 +407,45 @@ export default function PolaroidScatteredTemplate({
           );
         })}
 
-        {/* NO QUOTES - Focus on frame arrangement only */}
+        {/* Decorative Elements - Hearts, Emojis, and Effects */}
+
+        {/* Top right area decorations */}
+        <div style={{ position: 'absolute', top: '100px', left: '1100px', fontSize: '40px', transform: 'rotate(15deg)' }}>💖</div>
+        <div style={{ position: 'absolute', top: '80px', left: '1150px', fontSize: '32px' }}>✨</div>
+        <div style={{ position: 'absolute', top: '50px', left: '1120px', fontSize: '28px', transform: 'rotate(-10deg)' }}>💗</div>
+
+        {/* Top left corner */}
+        <div style={{ position: 'absolute', top: '100px', left: '50px', fontSize: '28px' }}>✨</div>
+        <div style={{ position: 'absolute', top: '120px', left: '80px', fontSize: '36px', transform: 'rotate(25deg)' }}>💙</div>
+
+        {/* Top center emojis */}
+        <div style={{ position: 'absolute', top: '35px', left: '250px', fontSize: '32px' }}>🌟</div>
+        <div style={{ position: 'absolute', top: '40px', left: '920px', fontSize: '30px' }}>💫</div>
+
+        {/* Middle left */}
+        <div style={{ position: 'absolute', top: '280px', left: '60px', fontSize: '38px', transform: 'rotate(-15deg)' }}>💜</div>
+        <div style={{ position: 'absolute', top: '320px', left: '30px', fontSize: '34px' }}>✨</div>
+        <div style={{ position: 'absolute', top: '240px', left: '20px', fontSize: '30px' }}>✨</div>
+
+        {/* Middle right area */}
+        <div style={{ position: 'absolute', top: '280px', left: '1150px', fontSize: '42px', transform: 'rotate(20deg)' }}>🧡</div>
+        <div style={{ position: 'absolute', top: '320px', left: '1120px', fontSize: '32px' }}>✨</div>
+        <div style={{ position: 'absolute', top: '250px', left: '1170px', fontSize: '30px', transform: 'rotate(-5deg)' }}>💕</div>
+        <div style={{ position: 'absolute', top: '180px', left: '1170px', fontSize: '34px' }}>💖</div>
+
+        {/* Bottom areas */}
+        <div style={{ position: 'absolute', top: '480px', left: '150px', fontSize: '36px', transform: 'rotate(10deg)' }}>💚</div>
+        <div style={{ position: 'absolute', top: '500px', left: '100px', fontSize: '32px' }}>✨</div>
+        <div style={{ position: 'absolute', top: '490px', left: '900px', fontSize: '34px', transform: 'rotate(-12deg)' }}>💛</div>
+        <div style={{ position: 'absolute', top: '510px', left: '950px', fontSize: '28px' }}>✨</div>
+        <div style={{ position: 'absolute', top: '515px', left: '720px', fontSize: '32px' }}>🎯</div>
+        <div style={{ position: 'absolute', top: '500px', left: '1100px', fontSize: '36px' }}>💝</div>
+
+        {/* Confetti circles */}
+        <div style={{ position: 'absolute', top: '200px', left: '350px', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#FFE5EC' }}></div>
+        <div style={{ position: 'absolute', top: '100px', left: '650px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#E0F4FF' }}></div>
+        <div style={{ position: 'absolute', top: '420px', left: '1050px', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#FFF3E0' }}></div>
+        <div style={{ position: 'absolute', top: '420px', left: '180px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#F3E5F5' }}></div>
 
         {/* Center Card - Properly sized and centered */}
         <div
