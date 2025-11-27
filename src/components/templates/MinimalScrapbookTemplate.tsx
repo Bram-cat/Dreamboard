@@ -14,31 +14,31 @@ export default function MinimalScrapbookTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Minimal scrapbook positions - GENTLE ROTATIONS, PASTEL THEME
-  // Mix of different sizes, organized but casual
+  // Minimal scrapbook positions - GENTLE ROTATIONS, IMPROVED PASTEL THEME
+  // Mix of different sizes, organized but casual - softer, more harmonious colors
   const scrapbookPositions = [
-    // Top row (large focus images)
-    { top: 30, left: 30, width: 380, height: 280, rotate: -1.5, border: '#ffc9e5', keyword: keywords[0] },
-    { top: 30, left: 450, width: 420, height: 280, rotate: 1, border: '#c9e5ff', keyword: "" },
-    { top: 30, left: 910, width: 400, height: 280, rotate: -0.8, border: '#fffcc9', keyword: keywords[1] },
+    // Top row (large focus images) - warm pastels
+    { top: 30, left: 30, width: 380, height: 280, rotate: -1.5, border: '#fde4e9', keyword: keywords[0] },
+    { top: 30, left: 450, width: 420, height: 280, rotate: 1, border: '#e3f2fd', keyword: "" },
+    { top: 30, left: 910, width: 400, height: 280, rotate: -0.8, border: '#fff9e6', keyword: keywords[1] },
 
-    // Middle row (medium + small mix)
-    { top: 340, left: 30, width: 280, height: 200, rotate: 1.2, border: '#d4ffc9', keyword: "" },
-    { top: 340, left: 340, width: 240, height: 200, rotate: -1, border: '#ffd9c9', keyword: keywords[2] },
+    // Middle row (medium + small mix) - cool pastels
+    { top: 340, left: 30, width: 280, height: 200, rotate: 1.2, border: '#e8f5e9', keyword: "" },
+    { top: 340, left: 340, width: 240, height: 200, rotate: -1, border: '#ffe8d9', keyword: keywords[2] },
     // CENTER SPACE
-    { top: 340, left: 1030, width: 280, height: 200, rotate: 0.9, border: '#e5c9ff', keyword: "" },
+    { top: 340, left: 1030, width: 280, height: 200, rotate: 0.9, border: '#f3e5f5', keyword: "" },
 
-    // Bottom row (varied sizes)
-    { top: 570, left: 30, width: 320, height: 170, rotate: -1.3, border: '#c9fff9', keyword: "" },
-    { top: 570, left: 380, width: 260, height: 170, rotate: 1.5, border: '#ffc9c9', keyword: keywords[3] },
-    { top: 570, left: 670, width: 300, height: 170, rotate: -0.6, border: '#f9ffc9', keyword: "" },
-    { top: 570, left: 1000, width: 310, height: 170, rotate: 1.1, border: '#ccd9ff', keyword: keywords[4] },
+    // Bottom row (varied sizes) - mixed pastels
+    { top: 570, left: 30, width: 320, height: 170, rotate: -1.3, border: '#e0f7fa', keyword: "" },
+    { top: 570, left: 380, width: 260, height: 170, rotate: 1.5, border: '#fce4ec', keyword: keywords[3] },
+    { top: 570, left: 670, width: 300, height: 170, rotate: -0.6, border: '#f9fbe7', keyword: "" },
+    { top: 570, left: 1000, width: 310, height: 170, rotate: 1.1, border: '#e8eaf6', keyword: keywords[4] },
 
-    // Accent small images
-    { top: 350, left: 610, width: 180, height: 130, rotate: 2, border: '#ffeac9', keyword: "" },
-    { top: 350, left: 820, width: 180, height: 130, rotate: -1.8, border: '#ffc9de', keyword: "" },
-    { top: 490, left: 660, width: 160, height: 120, rotate: 1.5, border: '#d9c9ff', keyword: "" },
-    { top: 490, left: 850, width: 160, height: 120, rotate: -1.2, border: '#c9ffe5', keyword: "" },
+    // Accent small images - complementary pastels
+    { top: 350, left: 610, width: 180, height: 130, rotate: 2, border: '#fff3e0', keyword: "" },
+    { top: 350, left: 820, width: 180, height: 130, rotate: -1.8, border: '#fce4ec', keyword: "" },
+    { top: 490, left: 660, width: 160, height: 120, rotate: 1.5, border: '#ede7f6', keyword: "" },
+    { top: 490, left: 850, width: 160, height: 120, rotate: -1.2, border: '#e0f2f1', keyword: "" },
   ];
 
   // Canvas rendering for download
@@ -104,25 +104,34 @@ export default function MinimalScrapbookTemplate({
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(borderWidth / 2, borderWidth / 2, pos.width - borderWidth, pos.height - borderWidth);
 
-          // Draw image
+          // Draw image with proper scaling to cover the frame
           const padding = borderWidth;
           const imgRatio = img.width / img.height;
           const boxRatio = (pos.width - padding * 2) / (pos.height - padding * 2);
           let drawWidth, drawHeight, drawX, drawY;
 
+          // Always fill the frame completely (cover mode)
           if (imgRatio > boxRatio) {
-            drawHeight = pos.height - padding * 2;
-            drawWidth = drawHeight * imgRatio;
-            drawX = padding - (drawWidth - (pos.width - padding * 2)) / 2;
-            drawY = padding;
-          } else {
+            // Image is wider - match width
             drawWidth = pos.width - padding * 2;
             drawHeight = drawWidth / imgRatio;
             drawX = padding;
-            drawY = padding - (drawHeight - (pos.height - padding * 2)) / 2;
+            drawY = padding + (pos.height - padding * 2 - drawHeight) / 2;
+          } else {
+            // Image is taller - match height
+            drawHeight = pos.height - padding * 2;
+            drawWidth = drawHeight * imgRatio;
+            drawX = padding + (pos.width - padding * 2 - drawWidth) / 2;
+            drawY = padding;
           }
 
+          // Clip to ensure image doesn't overflow
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(padding, padding, pos.width - padding * 2, pos.height - padding * 2);
+          ctx.clip();
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+          ctx.restore();
 
           // Keywords removed - no captions on vision board
 

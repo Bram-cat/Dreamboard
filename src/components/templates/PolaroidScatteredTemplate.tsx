@@ -84,28 +84,35 @@ export default function PolaroidScatteredTemplate({
           ctx.translate(centerX, centerY);
           ctx.rotate((pos.rotation * Math.PI) / 180);
 
-          // Draw white polaroid frame (larger than image)
+          // Draw vintage cream-toned polaroid frame (larger than image)
           const frameWidth = pos.width + 40;
           const frameHeight = pos.height + 60; // Extra space at bottom for label
-          ctx.fillStyle = '#ffffff';
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+          ctx.fillStyle = '#faf8f3';
+          ctx.shadowColor = 'rgba(60, 50, 40, 0.25)';
           ctx.shadowBlur = 15;
           ctx.shadowOffsetX = 5;
           ctx.shadowOffsetY = 5;
           ctx.fillRect(-frameWidth / 2, -frameHeight / 2, frameWidth, frameHeight);
           ctx.shadowColor = 'transparent';
 
-          // Draw image inside polaroid frame
+          // Draw image inside polaroid frame with proper cover scaling
           const imgRatio = img.width / img.height;
           const boxRatio = pos.width / pos.height;
-          let drawWidth, drawHeight;
+          let drawWidth, drawHeight, offsetX, offsetY;
 
+          // Fill the frame completely (cover mode)
           if (imgRatio > boxRatio) {
+            // Image is wider - fit to height
             drawHeight = pos.height;
             drawWidth = drawHeight * imgRatio;
+            offsetX = -(drawWidth - pos.width) / 2;
+            offsetY = 0;
           } else {
+            // Image is taller - fit to width
             drawWidth = pos.width;
             drawHeight = drawWidth / imgRatio;
+            offsetX = 0;
+            offsetY = -(drawHeight - pos.height) / 2;
           }
 
           // Center image within frame
@@ -116,7 +123,7 @@ export default function PolaroidScatteredTemplate({
           ctx.beginPath();
           ctx.rect(imgX, imgY, pos.width, pos.height);
           ctx.clip();
-          ctx.drawImage(img, imgX - (drawWidth - pos.width) / 2, imgY - (drawHeight - pos.height) / 2, drawWidth, drawHeight);
+          ctx.drawImage(img, imgX + offsetX, imgY + offsetY, drawWidth, drawHeight);
           ctx.restore();
 
           // Draw label if exists (handwritten style)
@@ -259,11 +266,12 @@ export default function PolaroidScatteredTemplate({
                 transformOrigin: 'center center',
               }}
             >
-              {/* White Polaroid Frame */}
+              {/* Vintage Cream Polaroid Frame */}
               <div
-                className="w-full h-full bg-white relative"
+                className="w-full h-full relative"
                 style={{
-                  boxShadow: '5px 5px 15px rgba(0, 0, 0, 0.3)',
+                  backgroundColor: '#faf8f3',
+                  boxShadow: '5px 5px 15px rgba(60, 50, 40, 0.25)',
                   padding: '2% 2% 6% 2%', // Extra padding at bottom
                 }}
               >

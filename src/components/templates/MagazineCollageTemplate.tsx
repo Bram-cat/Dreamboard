@@ -92,9 +92,9 @@ export default function MagazineCollageTemplate({
           ctx.rotate((pos.rotate * Math.PI) / 180);
           ctx.translate(-(pos.width / 2), -(pos.height / 2));
 
-          // Draw white photo border with shadow
-          ctx.fillStyle = '#ffffff';
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+          // Draw warm cream-toned photo border to complement cork background
+          ctx.fillStyle = '#fffef9';
+          ctx.shadowColor = 'rgba(80, 60, 40, 0.35)';
           ctx.shadowBlur = 15;
           ctx.shadowOffsetX = 3;
           ctx.shadowOffsetY = 3;
@@ -257,7 +257,7 @@ export default function MagazineCollageTemplate({
           return (
             <div
               key={idx}
-              className="absolute bg-white shadow-xl"
+              className="absolute shadow-xl"
               style={{
                 top: `${pos.top}px`,
                 left: `${pos.left}px`,
@@ -266,6 +266,8 @@ export default function MagazineCollageTemplate({
                 transform: `rotate(${pos.rotate}deg)`,
                 zIndex: pos.zIndex,
                 padding: '12px',
+                backgroundColor: '#fffef9',
+                boxShadow: '3px 3px 15px rgba(80, 60, 40, 0.35)',
               }}
             >
               {/* Tape decoration */}

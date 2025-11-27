@@ -74,9 +74,9 @@ export default function CleanGridTemplate({
 
           ctx.save();
 
-          // Draw white card with subtle shadow
-          ctx.fillStyle = '#ffffff';
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+          // Draw soft blue-tinted card to complement gradient background
+          ctx.fillStyle = '#f0f4f8';
+          ctx.shadowColor = 'rgba(99, 102, 241, 0.15)';
           ctx.shadowBlur = 20;
           ctx.shadowOffsetX = 0;
           ctx.shadowOffsetY = 2;
@@ -100,13 +100,26 @@ export default function CleanGridTemplate({
           // Clip for rounded corners
           ctx.clip();
 
-          // Images are pre-processed to exact 435x240 dimensions
-          // Draw them to completely fill the frame
-          ctx.drawImage(
-            img,
-            0, 0, img.width, img.height,  // Source rectangle (entire image)
-            pos.left, pos.top, pos.width, pos.height  // Destination rectangle (frame)
-          );
+          // Calculate proper aspect ratio for image scaling
+          const imgRatio = img.width / img.height;
+          const boxRatio = pos.width / pos.height;
+          let drawWidth, drawHeight, drawX, drawY;
+
+          if (imgRatio > boxRatio) {
+            // Image is wider - fit height
+            drawHeight = pos.height;
+            drawWidth = drawHeight * imgRatio;
+            drawX = pos.left - (drawWidth - pos.width) / 2;
+            drawY = pos.top;
+          } else {
+            // Image is taller - fit width
+            drawWidth = pos.width;
+            drawHeight = drawWidth / imgRatio;
+            drawX = pos.left;
+            drawY = pos.top - (drawHeight - pos.height) / 2;
+          }
+
+          ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
 
           // Draw keyword label at bottom if exists
           if (pos.keyword) {
@@ -228,7 +241,7 @@ export default function CleanGridTemplate({
           return (
             <div
               key={idx}
-              className="absolute bg-white shadow-lg"
+              className="absolute shadow-lg"
               style={{
                 top: `${pos.top}px`,
                 left: `${pos.left}px`,
@@ -236,6 +249,8 @@ export default function CleanGridTemplate({
                 height: `${pos.height}px`,
                 borderRadius: '12px',
                 overflow: 'hidden',
+                backgroundColor: '#f0f4f8',
+                boxShadow: '0 2px 20px rgba(99, 102, 241, 0.15)',
               }}
             >
               {/* Image */}
