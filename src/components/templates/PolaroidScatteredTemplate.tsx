@@ -14,6 +14,44 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Pool of inspirational quotes
+  const quotePool = [
+    "DREAM\nBIG",
+    "MAKE IT\nHAPPEN",
+    "BELIEVE",
+    "YOU GOT\nTHIS",
+    "HUSTLE",
+    "NEVER\nGIVE UP",
+    "FOCUS",
+    "STAY\nSTRONG",
+    "BE\nFEARLESS",
+    "RISE\nABOVE",
+    "KEEP\nGOING",
+    "PUSH\nHARDER",
+    "TAKE\nACTION",
+    "STAY\nHUNGRY",
+    "WORK\nHARD",
+    "DREAM\nBOLD",
+    "BE\nGREAT",
+    "THINK\nBIG",
+    "STAY\nFOCUSED",
+    "GRIND\nDAILY",
+    "LEVEL\nUP",
+    "NO\nLIMITS",
+    "STAY\nPOSITIVE",
+    "CHASE\nDREAMS",
+    "MAKE\nMOVES",
+  ];
+
+  // Randomly select 7 quotes from the pool
+  const getRandomQuotes = () => {
+    const shuffled = [...quotePool].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 7);
+  };
+
+  // Use useMemo to maintain same quotes on re-renders
+  const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
+
   // Vibrant colored Polaroid frames - each with unique pastel color
   const frameColors = [
     '#FFE5EC', // soft pink
@@ -214,90 +252,48 @@ export default function PolaroidScatteredTemplate({
 
       ctx.restore();
 
-      // Add decorative elements in empty spaces
-      // Heart shapes in various sizes and colors
-      const drawHeart = (x: number, y: number, size: number, color: string, rotation: number = 0) => {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate((rotation * Math.PI) / 180);
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.moveTo(0, size / 4);
-        ctx.bezierCurveTo(-size / 2, -size / 4, -size, size / 8, -size / 2, size);
-        ctx.bezierCurveTo(0, size * 1.2, 0, size * 1.2, 0, size * 1.2);
-        ctx.bezierCurveTo(0, size * 1.2, 0, size * 1.2, size / 2, size);
-        ctx.bezierCurveTo(size, size / 8, size / 2, -size / 4, 0, size / 4);
-        ctx.fill();
-        ctx.restore();
-      };
+      // Add inspirational quotes in empty spaces - using random quotes from pool
+      const quotePositions = [
+        { x: 100, y: 80, size: 28, color: '#7209B7', rotation: -8 },
+        { x: 1090, y: 100, size: 24, color: '#9D4EDD', rotation: 5 },
+        { x: 50, y: 280, size: 32, color: '#C77DFF', rotation: -6 },
+        { x: 1100, y: 280, size: 26, color: '#7209B7', rotation: 7 },
+        { x: 120, y: 500, size: 30, color: '#9D4EDD', rotation: -5 },
+        { x: 1070, y: 490, size: 24, color: '#C77DFF', rotation: 6 },
+        { x: 750, y: 30, size: 28, color: '#7209B7', rotation: -3 },
+      ];
 
-      // Sparkles/Stars
-      const drawSparkle = (x: number, y: number, size: number, color: string = '#FFD700') => {
+      const inspirationalQuotes = quotePositions.map((pos, index) => ({
+        text: selectedQuotes[index],
+        ...pos
+      }));
+
+      // Draw each quote
+      inspirationalQuotes.forEach(quote => {
         ctx.save();
-        ctx.fillStyle = color;
-        ctx.font = `${size}px Arial`;
+        ctx.translate(quote.x, quote.y);
+        ctx.rotate((quote.rotation * Math.PI) / 180);
+
+        // Draw text with shadow for better visibility
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+
+        ctx.fillStyle = quote.color;
+        ctx.font = `bold ${quote.size}px Arial, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('✨', x, y);
+
+        // Handle multi-line text
+        const lines = quote.text.split('\n');
+        lines.forEach((line, index) => {
+          const yOffset = (index - (lines.length - 1) / 2) * (quote.size + 4);
+          ctx.fillText(line, 0, yOffset);
+        });
+
         ctx.restore();
-      };
-
-      // Draw decorative elements in empty spaces
-      // Top right area
-      drawHeart(1100, 100, 20, '#FFB3D9', 15);
-      drawSparkle(1150, 80, 24);
-      drawHeart(1120, 50, 15, '#FFE5EC', -10);
-
-      // Top left corner
-      drawSparkle(50, 100, 20);
-      drawHeart(80, 120, 18, '#E0F4FF', 25);
-
-      // Middle left
-      drawHeart(60, 280, 22, '#F3E5F5', -15);
-      drawSparkle(30, 320, 26);
-
-      // Middle right area
-      drawHeart(1150, 280, 25, '#FFF3E0', 20);
-      drawSparkle(1120, 320, 22);
-      drawHeart(1170, 250, 16, '#FCE4EC', -5);
-
-      // Bottom areas
-      drawHeart(150, 480, 20, '#E8F5E9', 10);
-      drawSparkle(100, 500, 24);
-      drawHeart(900, 490, 18, '#FFECB3', -12);
-      drawSparkle(950, 510, 20);
-
-      // Emoji decorations
-      ctx.font = '28px Arial';
-      ctx.textAlign = 'center';
-
-      // Top area emojis
-      ctx.fillText('💫', 920, 40);
-      ctx.fillText('🌟', 250, 35);
-
-      // Side emojis
-      ctx.fillText('💖', 1170, 180);
-      ctx.fillText('✨', 20, 240);
-
-      // Bottom emojis
-      ctx.fillText('🎯', 720, 515);
-      ctx.fillText('💝', 1100, 500);
-
-      // Small decorative circles
-      const drawCircle = (x: number, y: number, radius: number, color: string) => {
-        ctx.save();
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      };
-
-      // Scattered small circles for confetti effect
-      drawCircle(350, 200, 5, '#FFE5EC');
-      drawCircle(650, 100, 4, '#E0F4FF');
-      drawCircle(1050, 420, 5, '#FFF3E0');
-      drawCircle(180, 420, 4, '#F3E5F5');
+      });
     };
 
     renderToCanvas();
@@ -407,45 +403,109 @@ export default function PolaroidScatteredTemplate({
           );
         })}
 
-        {/* Decorative Elements - Hearts, Emojis, and Effects */}
+        {/* Inspirational Quotes in Empty Spaces - Random from pool */}
 
-        {/* Top right area decorations */}
-        <div style={{ position: 'absolute', top: '100px', left: '1100px', fontSize: '40px', transform: 'rotate(15deg)' }}>💖</div>
-        <div style={{ position: 'absolute', top: '80px', left: '1150px', fontSize: '32px' }}>✨</div>
-        <div style={{ position: 'absolute', top: '50px', left: '1120px', fontSize: '28px', transform: 'rotate(-10deg)' }}>💗</div>
+        {/* Top left */}
+        <div style={{
+          position: 'absolute',
+          top: '60px',
+          left: '70px',
+          transform: 'rotate(-8deg)',
+          fontFamily: 'Arial, sans-serif',
+          fontWeight: 'bold',
+          fontSize: '28px',
+          color: '#7209B7',
+          textAlign: 'center',
+          lineHeight: '1.2',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+        }} dangerouslySetInnerHTML={{ __html: selectedQuotes[0].replace('\n', '<br/>') }} />
 
-        {/* Top left corner */}
-        <div style={{ position: 'absolute', top: '100px', left: '50px', fontSize: '28px' }}>✨</div>
-        <div style={{ position: 'absolute', top: '120px', left: '80px', fontSize: '36px', transform: 'rotate(25deg)' }}>💙</div>
+        {/* Top right */}
+        <div style={{
+          position: 'absolute',
+          top: '85px',
+          left: '1070px',
+          transform: 'rotate(5deg)',
+          fontFamily: 'Arial, sans-serif',
+          fontWeight: 'bold',
+          fontSize: '24px',
+          color: '#9D4EDD',
+          textAlign: 'center',
+          lineHeight: '1.2',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+        }} dangerouslySetInnerHTML={{ __html: selectedQuotes[1].replace('\n', '<br/>') }} />
 
-        {/* Top center emojis */}
-        <div style={{ position: 'absolute', top: '35px', left: '250px', fontSize: '32px' }}>🌟</div>
-        <div style={{ position: 'absolute', top: '40px', left: '920px', fontSize: '30px' }}>💫</div>
+        {/* Top center */}
+        <div style={{
+          position: 'absolute',
+          top: '15px',
+          left: '730px',
+          transform: 'rotate(-3deg)',
+          fontFamily: 'Arial, sans-serif',
+          fontWeight: 'bold',
+          fontSize: '28px',
+          color: '#7209B7',
+          textAlign: 'center',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+        }} dangerouslySetInnerHTML={{ __html: selectedQuotes[6].replace('\n', '<br/>') }} />
 
         {/* Middle left */}
-        <div style={{ position: 'absolute', top: '280px', left: '60px', fontSize: '38px', transform: 'rotate(-15deg)' }}>💜</div>
-        <div style={{ position: 'absolute', top: '320px', left: '30px', fontSize: '34px' }}>✨</div>
-        <div style={{ position: 'absolute', top: '240px', left: '20px', fontSize: '30px' }}>✨</div>
+        <div style={{
+          position: 'absolute',
+          top: '265px',
+          left: '35px',
+          transform: 'rotate(-6deg)',
+          fontFamily: 'Arial, sans-serif',
+          fontWeight: 'bold',
+          fontSize: '32px',
+          color: '#C77DFF',
+          textAlign: 'center',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+        }} dangerouslySetInnerHTML={{ __html: selectedQuotes[2].replace('\n', '<br/>') }} />
 
-        {/* Middle right area */}
-        <div style={{ position: 'absolute', top: '280px', left: '1150px', fontSize: '42px', transform: 'rotate(20deg)' }}>🧡</div>
-        <div style={{ position: 'absolute', top: '320px', left: '1120px', fontSize: '32px' }}>✨</div>
-        <div style={{ position: 'absolute', top: '250px', left: '1170px', fontSize: '30px', transform: 'rotate(-5deg)' }}>💕</div>
-        <div style={{ position: 'absolute', top: '180px', left: '1170px', fontSize: '34px' }}>💖</div>
+        {/* Middle right */}
+        <div style={{
+          position: 'absolute',
+          top: '265px',
+          left: '1080px',
+          transform: 'rotate(7deg)',
+          fontFamily: 'Arial, sans-serif',
+          fontWeight: 'bold',
+          fontSize: '26px',
+          color: '#7209B7',
+          textAlign: 'center',
+          lineHeight: '1.2',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+        }} dangerouslySetInnerHTML={{ __html: selectedQuotes[3].replace('\n', '<br/>') }} />
 
-        {/* Bottom areas */}
-        <div style={{ position: 'absolute', top: '480px', left: '150px', fontSize: '36px', transform: 'rotate(10deg)' }}>💚</div>
-        <div style={{ position: 'absolute', top: '500px', left: '100px', fontSize: '32px' }}>✨</div>
-        <div style={{ position: 'absolute', top: '490px', left: '900px', fontSize: '34px', transform: 'rotate(-12deg)' }}>💛</div>
-        <div style={{ position: 'absolute', top: '510px', left: '950px', fontSize: '28px' }}>✨</div>
-        <div style={{ position: 'absolute', top: '515px', left: '720px', fontSize: '32px' }}>🎯</div>
-        <div style={{ position: 'absolute', top: '500px', left: '1100px', fontSize: '36px' }}>💝</div>
+        {/* Bottom left */}
+        <div style={{
+          position: 'absolute',
+          top: '485px',
+          left: '105px',
+          transform: 'rotate(-5deg)',
+          fontFamily: 'Arial, sans-serif',
+          fontWeight: 'bold',
+          fontSize: '30px',
+          color: '#9D4EDD',
+          textAlign: 'center',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+        }} dangerouslySetInnerHTML={{ __html: selectedQuotes[4].replace('\n', '<br/>') }} />
 
-        {/* Confetti circles */}
-        <div style={{ position: 'absolute', top: '200px', left: '350px', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#FFE5EC' }}></div>
-        <div style={{ position: 'absolute', top: '100px', left: '650px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#E0F4FF' }}></div>
-        <div style={{ position: 'absolute', top: '420px', left: '1050px', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#FFF3E0' }}></div>
-        <div style={{ position: 'absolute', top: '420px', left: '180px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#F3E5F5' }}></div>
+        {/* Bottom right */}
+        <div style={{
+          position: 'absolute',
+          top: '475px',
+          left: '1050px',
+          transform: 'rotate(6deg)',
+          fontFamily: 'Arial, sans-serif',
+          fontWeight: 'bold',
+          fontSize: '24px',
+          color: '#C77DFF',
+          textAlign: 'center',
+          lineHeight: '1.2',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+        }} dangerouslySetInnerHTML={{ __html: selectedQuotes[5].replace('\n', '<br/>') }} />
 
         {/* Center Card - Properly sized and centered */}
         <div
