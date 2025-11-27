@@ -976,54 +976,26 @@ export default function Home() {
               </div>
             )}
 
-            {/* Loading state with progress bar */}
+            {/* Loading state with simple spinner */}
             {!collageReady && (
-              <Card className="max-w-4xl mx-auto">
-                <div className="space-y-6">
-                  {/* Progress bar */}
-                  <div className="space-y-3">
-                    <h3
-                      className="text-2xl font-bold text-white flex items-center justify-center gap-2"
-                      style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
-                    >
-                      <svg className="w-6 h-6 animate-pulse text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
-                      </svg>
-                      CREATING YOUR VISION BOARD
-                    </h3>
-
-                    {/* Progress Bar Component */}
-                    <div className="w-full max-w-xl mx-auto">
-                      <Progress value={progress} className="h-3" />
-                      <p className="text-lg text-purple-300 font-semibold mt-3" style={{ fontFamily: "'Switzer', sans-serif" }}>
-                        {progress}% Complete
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Preview placeholder with shimmer effect */}
-                  <div className="relative h-96 bg-gradient-to-br from-purple-900/20 to-violet-900/20 rounded-xl overflow-hidden border border-purple-500/20">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/10 to-transparent opacity-40 animate-shimmer"></div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="space-y-3">
-                      <p className="text-purple-300 text-base" style={{ fontFamily: "'Switzer', sans-serif" }}>
-                        🎨 Step 1/3: Using Gemini AI to edit YOUR images into dream scenarios
-                      </p>
-                      <p className="text-purple-300 text-base" style={{ fontFamily: "'Switzer', sans-serif" }}>
-                        ✨ Step 2/3: Generating lifestyle images with DALL-E 3
-                      </p>
-                      <p className="text-purple-300 text-base" style={{ fontFamily: "'Switzer', sans-serif" }}>
-                        🖼️ Step 3/3: Composing final collage with text overlays
-                      </p>
-                    </div>
-                    <p className="text-gray-400 text-sm mt-4" style={{ fontFamily: "'Switzer', sans-serif" }}>
-                      ⏱️ Takes ~2 minutes (scenario editing + lifestyle images + final composition)
-                    </p>
-                  </div>
+              <div className="flex flex-col items-center justify-center min-h-[500px] space-y-6">
+                {/* Simple Infinite Spinner */}
+                <div className="relative w-24 h-24">
+                  <div className="absolute inset-0 border-8 border-purple-500/20 rounded-full"></div>
+                  <div className="absolute inset-0 border-8 border-transparent border-t-purple-500 rounded-full animate-spin"></div>
                 </div>
-              </Card>
+
+                <h3
+                  className="text-2xl font-bold text-white text-center"
+                  style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
+                >
+                  Creating Your Vision Board...
+                </h3>
+
+                <p className="text-gray-400 text-center max-w-md">
+                  Our AI is generating your personalized vision board
+                </p>
+              </div>
             )}
 
             {/* Action Buttons */}

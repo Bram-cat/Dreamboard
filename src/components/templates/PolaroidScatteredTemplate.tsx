@@ -14,30 +14,49 @@ export default function PolaroidScatteredTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Polaroid scrapbook layout - 15 images scattered like sample2.png
+  // Vibrant colored Polaroid frames - each with unique pastel color
+  const frameColors = [
+    '#FFE5EC', // soft pink
+    '#E0F4FF', // sky blue
+    '#FFF8E1', // cream yellow
+    '#E8F5E9', // mint green
+    '#F3E5F5', // lavender
+    '#FFF3E0', // peach
+    '#FCE4EC', // rose
+    '#E1F5FE', // light blue
+    '#FFF9C4', // light yellow
+    '#F1F8E9', // pale green
+    '#EDE7F6', // pale purple
+    '#FFE0B2', // light orange
+    '#F8BBD0', // pink
+    '#B2EBF2', // cyan
+    '#FFECB3', // amber
+  ];
+
+  // Polaroid scrapbook layout - 15 images scattered with vibrant colors
   // Scaled to 1200px width for laptop screens
   const gridPositions = [
     // Top scattered row - 5 frames
-    { top: 5, left: 5, width: 200, height: 160, rotation: -8, label: "" },
-    { top: 10, left: 215, width: 195, height: 155, rotation: 5, label: "" },
-    { top: 8, left: 420, width: 190, height: 150, rotation: -3, label: "" },
-    { top: 12, left: 620, width: 200, height: 160, rotation: 7, label: "" },
-    { top: 6, left: 830, width: 195, height: 155, rotation: -5, label: "" },
-    { top: 10, left: 1035, width: 160, height: 130, rotation: 4, label: "" },
+    { top: 5, left: 5, width: 200, height: 160, rotation: -8, label: "", frameColor: frameColors[0] },
+    { top: 10, left: 215, width: 195, height: 155, rotation: 5, label: "", frameColor: frameColors[1] },
+    { top: 8, left: 420, width: 190, height: 150, rotation: -3, label: "", frameColor: frameColors[2] },
+    { top: 12, left: 620, width: 200, height: 160, rotation: 7, label: "", frameColor: frameColors[3] },
+    { top: 6, left: 830, width: 195, height: 155, rotation: -5, label: "", frameColor: frameColors[4] },
+    { top: 10, left: 1035, width: 160, height: 130, rotation: 4, label: "", frameColor: frameColors[5] },
 
     // Middle scattered row - 4 frames (around center card)
-    { top: 185, left: 8, width: 190, height: 150, rotation: 6, label: "" },
-    { top: 190, left: 208, width: 185, height: 145, rotation: -4, label: "" },
+    { top: 185, left: 8, width: 190, height: 150, rotation: 6, label: "", frameColor: frameColors[6] },
+    { top: 190, left: 208, width: 185, height: 145, rotation: -4, label: "", frameColor: frameColors[7] },
     // CENTER CARD SPACE (400x200, 240x180)
-    { top: 188, left: 825, width: 190, height: 150, rotation: 5, label: "" },
-    { top: 192, left: 1025, width: 170, height: 135, rotation: -6, label: "" },
+    { top: 188, left: 825, width: 190, height: 150, rotation: 5, label: "", frameColor: frameColors[8] },
+    { top: 192, left: 1025, width: 170, height: 135, rotation: -6, label: "", frameColor: frameColors[9] },
 
     // Bottom scattered row - 5 frames
-    { top: 360, left: 10, width: 195, height: 155, rotation: -7, label: "" },
-    { top: 365, left: 215, width: 190, height: 150, rotation: 6, label: "" },
-    { top: 362, left: 415, width: 185, height: 145, rotation: -4, label: "" },
-    { top: 368, left: 610, width: 200, height: 160, rotation: 5, label: "" },
-    { top: 363, left: 1020, width: 175, height: 140, rotation: -8, label: "" },
+    { top: 360, left: 10, width: 195, height: 155, rotation: -7, label: "", frameColor: frameColors[10] },
+    { top: 365, left: 215, width: 190, height: 150, rotation: 6, label: "", frameColor: frameColors[11] },
+    { top: 362, left: 415, width: 185, height: 145, rotation: -4, label: "", frameColor: frameColors[12] },
+    { top: 368, left: 610, width: 200, height: 160, rotation: 5, label: "", frameColor: frameColors[13] },
+    { top: 363, left: 1020, width: 175, height: 140, rotation: -8, label: "", frameColor: frameColors[14] },
   ];
 
   // Canvas rendering for download
@@ -84,10 +103,10 @@ export default function PolaroidScatteredTemplate({
           ctx.translate(centerX, centerY);
           ctx.rotate((pos.rotation * Math.PI) / 180);
 
-          // Draw vintage cream-toned polaroid frame (larger than image)
+          // Draw vibrant colored polaroid frame (larger than image)
           const frameWidth = pos.width + 40;
           const frameHeight = pos.height + 60; // Extra space at bottom for label
-          ctx.fillStyle = '#faf8f3';
+          ctx.fillStyle = pos.frameColor || '#faf8f3';
           ctx.shadowColor = 'rgba(60, 50, 40, 0.25)';
           ctx.shadowBlur = 15;
           ctx.shadowOffsetX = 5;
@@ -266,11 +285,11 @@ export default function PolaroidScatteredTemplate({
                 transformOrigin: 'center center',
               }}
             >
-              {/* Vintage Cream Polaroid Frame */}
+              {/* Vibrant Colored Polaroid Frame */}
               <div
                 className="w-full h-full relative"
                 style={{
-                  backgroundColor: '#faf8f3',
+                  backgroundColor: pos.frameColor || '#faf8f3',
                   boxShadow: '5px 5px 15px rgba(60, 50, 40, 0.25)',
                   padding: '2% 2% 6% 2%', // Extra padding at bottom
                 }}
