@@ -14,6 +14,44 @@ export default function MagazineCollageTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Pool of inspirational quotes
+  const quotePool = [
+    "DREAM\nBIG",
+    "MAKE IT\nHAPPEN",
+    "BELIEVE",
+    "YOU GOT\nTHIS",
+    "HUSTLE",
+    "NEVER\nGIVE UP",
+    "FOCUS",
+    "STAY\nSTRONG",
+    "BE\nFEARLESS",
+    "RISE\nABOVE",
+    "KEEP\nGOING",
+    "PUSH\nHARDER",
+    "TAKE\nACTION",
+    "STAY\nHUNGRY",
+    "WORK\nHARD",
+    "DREAM\nBOLD",
+    "BE\nGREAT",
+    "THINK\nBIG",
+    "STAY\nFOCUSED",
+    "GRIND\nDAILY",
+    "LEVEL\nUP",
+    "NO\nLIMITS",
+    "STAY\nPOSITIVE",
+    "CHASE\nDREAMS",
+    "MAKE\nMOVES",
+  ];
+
+  // Randomly select 4 quotes from the pool
+  const getRandomQuotes = () => {
+    const shuffled = [...quotePool].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 4);
+  };
+
+  // Use useMemo to maintain same quotes on re-renders
+  const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
+
   // TIGHT-FIT Magazine collage - 13 visible images properly arranged around center card
   // Scaled to 1200px width (74% of original 1620px) for laptop screens
   const collagePositions = [
@@ -143,6 +181,73 @@ export default function MagazineCollageTemplate({
           console.error(`Failed to load image ${idx}:`, error);
         }
       }
+
+      // Add inspirational quotes in containers - positioned in empty corners
+      const quotePositions = [
+        { x: 1150, y: 85, size: 14, rotation: 3, width: 90, height: 65, radius: 6 }, // Top right corner
+        { x: 1150, y: 240, size: 14, rotation: -3, width: 90, height: 65, radius: 6 }, // Middle right
+        { x: 50, y: 390, size: 14, rotation: 2, width: 90, height: 65, radius: 6 }, // Bottom left corner
+        { x: 1150, y: 390, size: 14, rotation: -2, width: 90, height: 65, radius: 6 }, // Bottom right corner
+      ];
+
+      const inspirationalQuotes = quotePositions.map((pos, index) => ({
+        text: selectedQuotes[index],
+        ...pos,
+      }));
+
+      // Draw each quote container with rounded corners
+      inspirationalQuotes.forEach((quote) => {
+        ctx.save();
+        ctx.translate(quote.x, quote.y);
+        ctx.rotate((quote.rotation * Math.PI) / 180);
+
+        // Draw rounded rectangle for white container with black border
+        const x = -quote.width / 2;
+        const y = -quote.height / 2;
+        const radius = quote.radius;
+
+        // Create rounded rectangle path
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + quote.width - radius, y);
+        ctx.quadraticCurveTo(x + quote.width, y, x + quote.width, y + radius);
+        ctx.lineTo(x + quote.width, y + quote.height - radius);
+        ctx.quadraticCurveTo(x + quote.width, y + quote.height, x + quote.width - radius, y + quote.height);
+        ctx.lineTo(x + radius, y + quote.height);
+        ctx.quadraticCurveTo(x, y + quote.height, x, y + quote.height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+
+        // Fill white background with shadow
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+        ctx.fill();
+
+        // Draw black border
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 2;
+        ctx.shadowColor = "transparent";
+        ctx.stroke();
+
+        // Draw text in black using Telma font
+        ctx.fillStyle = "#000000";
+        ctx.font = `bold ${quote.size}px Arial, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Handle multi-line text
+        const lines = quote.text.split("\n");
+        lines.forEach((line, index) => {
+          const yOffset = (index - (lines.length - 1) / 2) * (quote.size + 3);
+          ctx.fillText(line, 0, yOffset);
+        });
+
+        ctx.restore();
+      });
 
       // Draw center "2025 VISION BOARD" card (scaled to 74%)
       const centerX = 400;
@@ -302,6 +407,148 @@ export default function MagazineCollageTemplate({
             </div>
           );
         })}
+
+        {/* Inspirational Quotes in Containers - Positioned in corners */}
+
+        {/* Quote 1 - Top right corner */}
+        <div
+          style={{
+            position: "absolute",
+            top: "85px",
+            left: "1150px",
+            width: "90px",
+            height: "65px",
+            transform: "rotate(3deg)",
+            backgroundColor: "#ffffff",
+            border: "2px solid #000000",
+            borderRadius: "6px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "6px",
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "14px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[0].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 2 - Middle right */}
+        <div
+          style={{
+            position: "absolute",
+            top: "240px",
+            left: "1150px",
+            width: "90px",
+            height: "65px",
+            transform: "rotate(-3deg)",
+            backgroundColor: "#ffffff",
+            border: "2px solid #000000",
+            borderRadius: "6px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "6px",
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "14px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[1].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 3 - Bottom left corner */}
+        <div
+          style={{
+            position: "absolute",
+            top: "390px",
+            left: "50px",
+            width: "90px",
+            height: "65px",
+            transform: "rotate(2deg)",
+            backgroundColor: "#ffffff",
+            border: "2px solid #000000",
+            borderRadius: "6px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "6px",
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "14px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[2].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 4 - Bottom right corner */}
+        <div
+          style={{
+            position: "absolute",
+            top: "390px",
+            left: "1150px",
+            width: "90px",
+            height: "65px",
+            transform: "rotate(-2deg)",
+            backgroundColor: "#ffffff",
+            border: "2px solid #000000",
+            borderRadius: "6px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "6px",
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "14px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[3].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
 
         {/* Center "2025 VISION BOARD" Card */}
         <div

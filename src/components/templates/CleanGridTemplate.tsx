@@ -14,6 +14,44 @@ export default function CleanGridTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Pool of inspirational quotes
+  const quotePool = [
+    "DREAM\nBIG",
+    "MAKE IT\nHAPPEN",
+    "BELIEVE",
+    "YOU GOT\nTHIS",
+    "HUSTLE",
+    "NEVER\nGIVE UP",
+    "FOCUS",
+    "STAY\nSTRONG",
+    "BE\nFEARLESS",
+    "RISE\nABOVE",
+    "KEEP\nGOING",
+    "PUSH\nHARDER",
+    "TAKE\nACTION",
+    "STAY\nHUNGRY",
+    "WORK\nHARD",
+    "DREAM\nBOLD",
+    "BE\nGREAT",
+    "THINK\nBIG",
+    "STAY\nFOCUSED",
+    "GRIND\nDAILY",
+    "LEVEL\nUP",
+    "NO\nLIMITS",
+    "STAY\nPOSITIVE",
+    "CHASE\nDREAMS",
+    "MAKE\nMOVES",
+  ];
+
+  // Randomly select 5 quotes from the pool
+  const getRandomQuotes = () => {
+    const shuffled = [...quotePool].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 5);
+  };
+
+  // Use useMemo to maintain same quotes on re-renders
+  const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
+
   // Simple 3x3 grid layout - 8 images with minimal gaps and larger sizes
   const gridPositions = [
     // Top row - 3 images (minimal gaps: 10px)
@@ -145,6 +183,74 @@ export default function CleanGridTemplate({
           console.error(`Failed to load image ${idx}:`, error);
         }
       }
+
+      // Add inspirational quotes in containers - between grid gaps
+      const quotePositions = [
+        { x: 445, y: 130, size: 16, rotation: 0, width: 100, height: 70, radius: 8 }, // Top center gap
+        { x: 890, y: 130, size: 16, rotation: 0, width: 100, height: 70, radius: 8 }, // Top right gap
+        { x: 445, y: 380, size: 16, rotation: 0, width: 100, height: 70, radius: 8 }, // Middle left gap
+        { x: 890, y: 380, size: 16, rotation: 0, width: 100, height: 70, radius: 8 }, // Middle right gap
+        { x: 890, y: 630, size: 16, rotation: 0, width: 100, height: 70, radius: 8 }, // Bottom right gap
+      ];
+
+      const inspirationalQuotes = quotePositions.map((pos, index) => ({
+        text: selectedQuotes[index],
+        ...pos,
+      }));
+
+      // Draw each quote container with rounded corners
+      inspirationalQuotes.forEach((quote) => {
+        ctx.save();
+        ctx.translate(quote.x, quote.y);
+        ctx.rotate((quote.rotation * Math.PI) / 180);
+
+        // Draw rounded rectangle for white container with black border
+        const x = -quote.width / 2;
+        const y = -quote.height / 2;
+        const radius = quote.radius;
+
+        // Create rounded rectangle path
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + quote.width - radius, y);
+        ctx.quadraticCurveTo(x + quote.width, y, x + quote.width, y + radius);
+        ctx.lineTo(x + quote.width, y + quote.height - radius);
+        ctx.quadraticCurveTo(x + quote.width, y + quote.height, x + quote.width - radius, y + quote.height);
+        ctx.lineTo(x + radius, y + quote.height);
+        ctx.quadraticCurveTo(x, y + quote.height, x, y + quote.height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+
+        // Fill white background with shadow
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+        ctx.fill();
+
+        // Draw black border
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 3;
+        ctx.shadowColor = "transparent";
+        ctx.stroke();
+
+        // Draw text in black using Telma font
+        ctx.fillStyle = "#000000";
+        ctx.font = `bold ${quote.size}px Arial, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Handle multi-line text
+        const lines = quote.text.split("\n");
+        lines.forEach((line, index) => {
+          const yOffset = (index - (lines.length - 1) / 2) * (quote.size + 4);
+          ctx.fillText(line, 0, yOffset);
+        });
+
+        ctx.restore();
+      });
 
       // Draw center card - Larger, more prominent size
       const centerX = 500;
@@ -283,6 +389,183 @@ export default function CleanGridTemplate({
           );
         })}
 
+        {/* Inspirational Quotes in Containers - Between grid gaps */}
+
+        {/* Quote 1 - Top center gap */}
+        <div
+          style={{
+            position: "absolute",
+            top: "130px",
+            left: "445px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(0deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[0].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 2 - Top right gap */}
+        <div
+          style={{
+            position: "absolute",
+            top: "130px",
+            left: "890px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(0deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[1].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 3 - Middle left gap */}
+        <div
+          style={{
+            position: "absolute",
+            top: "380px",
+            left: "445px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(0deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[2].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 4 - Middle right gap */}
+        <div
+          style={{
+            position: "absolute",
+            top: "380px",
+            left: "890px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(0deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[3].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 5 - Bottom right gap */}
+        <div
+          style={{
+            position: "absolute",
+            top: "630px",
+            left: "890px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(0deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[4].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
         {/* Center Card - Larger, more prominent */}
         <div
           className="absolute bg-indigo-500 shadow-2xl flex flex-col items-center justify-center"
@@ -292,6 +575,7 @@ export default function CleanGridTemplate({
             width: '345px',
             height: '180px',
             borderRadius: '16px',
+            zIndex: 20,
           }}
         >
           <div className="text-white text-6xl font-bold mb-2">2025</div>

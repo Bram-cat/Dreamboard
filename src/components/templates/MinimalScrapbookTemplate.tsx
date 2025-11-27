@@ -14,6 +14,44 @@ export default function MinimalScrapbookTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Pool of inspirational quotes
+  const quotePool = [
+    "DREAM\nBIG",
+    "MAKE IT\nHAPPEN",
+    "BELIEVE",
+    "YOU GOT\nTHIS",
+    "HUSTLE",
+    "NEVER\nGIVE UP",
+    "FOCUS",
+    "STAY\nSTRONG",
+    "BE\nFEARLESS",
+    "RISE\nABOVE",
+    "KEEP\nGOING",
+    "PUSH\nHARDER",
+    "TAKE\nACTION",
+    "STAY\nHUNGRY",
+    "WORK\nHARD",
+    "DREAM\nBOLD",
+    "BE\nGREAT",
+    "THINK\nBIG",
+    "STAY\nFOCUSED",
+    "GRIND\nDAILY",
+    "LEVEL\nUP",
+    "NO\nLIMITS",
+    "STAY\nPOSITIVE",
+    "CHASE\nDREAMS",
+    "MAKE\nMOVES",
+  ];
+
+  // Randomly select 6 quotes from the pool
+  const getRandomQuotes = () => {
+    const shuffled = [...quotePool].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 6);
+  };
+
+  // Use useMemo to maintain same quotes on re-renders
+  const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
+
   // Minimal scrapbook positions - GENTLE ROTATIONS, IMPROVED PASTEL THEME
   // Mix of different sizes, organized but casual - softer, more harmonious colors
   const scrapbookPositions = [
@@ -140,6 +178,75 @@ export default function MinimalScrapbookTemplate({
           console.error(`Failed to load image ${idx}:`, error);
         }
       }
+
+      // Add inspirational quotes in containers - positioned in empty spaces
+      const quotePositions = [
+        { x: 1250, y: 160, size: 16, rotation: 2, width: 100, height: 70, radius: 8 }, // Right side top
+        { x: 1250, y: 500, size: 16, rotation: -2, width: 100, height: 70, radius: 8 }, // Right side middle
+        { x: 1250, y: 660, size: 16, rotation: 1, width: 100, height: 70, radius: 8 }, // Right side bottom
+        { x: 50, y: 330, size: 16, rotation: -1, width: 100, height: 70, radius: 8 }, // Left side middle
+        { x: 50, y: 580, size: 16, rotation: 2, width: 100, height: 70, radius: 8 }, // Left side lower
+        { x: 650, y: 530, size: 16, rotation: -2, width: 100, height: 70, radius: 8 }, // Bottom center
+      ];
+
+      const inspirationalQuotes = quotePositions.map((pos, index) => ({
+        text: selectedQuotes[index],
+        ...pos,
+      }));
+
+      // Draw each quote container with rounded corners
+      inspirationalQuotes.forEach((quote) => {
+        ctx.save();
+        ctx.translate(quote.x, quote.y);
+        ctx.rotate((quote.rotation * Math.PI) / 180);
+
+        // Draw rounded rectangle for white container with black border
+        const x = -quote.width / 2;
+        const y = -quote.height / 2;
+        const radius = quote.radius;
+
+        // Create rounded rectangle path
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + quote.width - radius, y);
+        ctx.quadraticCurveTo(x + quote.width, y, x + quote.width, y + radius);
+        ctx.lineTo(x + quote.width, y + quote.height - radius);
+        ctx.quadraticCurveTo(x + quote.width, y + quote.height, x + quote.width - radius, y + quote.height);
+        ctx.lineTo(x + radius, y + quote.height);
+        ctx.quadraticCurveTo(x, y + quote.height, x, y + quote.height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+
+        // Fill white background with shadow
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+        ctx.fill();
+
+        // Draw black border
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 3;
+        ctx.shadowColor = "transparent";
+        ctx.stroke();
+
+        // Draw text in black using Telma font
+        ctx.fillStyle = "#000000";
+        ctx.font = `bold ${quote.size}px Arial, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Handle multi-line text
+        const lines = quote.text.split("\n");
+        lines.forEach((line, index) => {
+          const yOffset = (index - (lines.length - 1) / 2) * (quote.size + 4);
+          ctx.fillText(line, 0, yOffset);
+        });
+
+        ctx.restore();
+      });
 
       // Draw center handwritten title
       const centerX = 600;
@@ -274,6 +381,218 @@ export default function MinimalScrapbookTemplate({
             </div>
           );
         })}
+
+        {/* Inspirational Quotes in Containers - Positioned in empty spaces */}
+
+        {/* Quote 1 - Right side top */}
+        <div
+          style={{
+            position: "absolute",
+            top: "160px",
+            left: "1250px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(2deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[0].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 2 - Right side middle */}
+        <div
+          style={{
+            position: "absolute",
+            top: "500px",
+            left: "1250px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(-2deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[1].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 3 - Right side bottom */}
+        <div
+          style={{
+            position: "absolute",
+            top: "660px",
+            left: "1250px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(1deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[2].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 4 - Left side middle */}
+        <div
+          style={{
+            position: "absolute",
+            top: "330px",
+            left: "50px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(-1deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[3].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 5 - Left side lower */}
+        <div
+          style={{
+            position: "absolute",
+            top: "580px",
+            left: "50px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(2deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[4].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 6 - Bottom center */}
+        <div
+          style={{
+            position: "absolute",
+            top: "530px",
+            left: "650px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(-2deg)",
+            backgroundColor: "#ffffff",
+            border: "3px solid #000000",
+            borderRadius: "8px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[5].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
 
         {/* Center Title */}
         <div
