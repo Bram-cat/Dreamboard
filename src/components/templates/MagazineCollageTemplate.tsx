@@ -200,12 +200,12 @@ export default function MagazineCollageTemplate({
         }
       }
 
-      // Add inspirational quotes in containers - positioned in empty corners
+      // Add inspirational quotes in containers - positioned between images with transparent backgrounds
       const quotePositions = [
-        { x: 1150, y: 85, size: 14, rotation: 3, width: 90, height: 65, radius: 6 }, // Top right corner
-        { x: 1150, y: 240, size: 14, rotation: -3, width: 90, height: 65, radius: 6 }, // Middle right
-        { x: 50, y: 390, size: 14, rotation: 2, width: 90, height: 65, radius: 6 }, // Bottom left corner
-        { x: 1150, y: 390, size: 14, rotation: -2, width: 90, height: 65, radius: 6 }, // Bottom right corner
+        { x: 600, y: 230, size: 15, rotation: -2, width: 95, height: 70, radius: 8, transparent: true }, // Center area (red marked zone)
+        { x: 215, y: 140, size: 14, rotation: 3, width: 90, height: 65, radius: 6, transparent: false }, // Between top-left and middle-left
+        { x: 1030, y: 140, size: 14, rotation: -3, width: 90, height: 65, radius: 6, transparent: false }, // Between top-right and middle-right
+        { x: 600, y: 380, size: 14, rotation: 2, width: 90, height: 65, radius: 6, transparent: false }, // Between middle and bottom center
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -237,19 +237,25 @@ export default function MagazineCollageTemplate({
         ctx.quadraticCurveTo(x, y, x + radius, y);
         ctx.closePath();
 
-        // Fill white background with shadow
-        ctx.fillStyle = "#ffffff";
-        ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetX = 3;
-        ctx.shadowOffsetY = 3;
-        ctx.fill();
+        // Fill background - transparent for center quote, white for others
+        if (quote.transparent) {
+          // Transparent background - no fill, no border
+          ctx.shadowColor = "transparent";
+        } else {
+          // White background with shadow and border
+          ctx.fillStyle = "#ffffff";
+          ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+          ctx.shadowBlur = 8;
+          ctx.shadowOffsetX = 3;
+          ctx.shadowOffsetY = 3;
+          ctx.fill();
 
-        // Draw black border
-        ctx.strokeStyle = "#000000";
-        ctx.lineWidth = 2;
-        ctx.shadowColor = "transparent";
-        ctx.stroke();
+          // Draw black border
+          ctx.strokeStyle = "#000000";
+          ctx.lineWidth = 2;
+          ctx.shadowColor = "transparent";
+          ctx.stroke();
+        }
 
         // Draw text in black using Telma font
         ctx.fillStyle = "#000000";
@@ -426,21 +432,19 @@ export default function MagazineCollageTemplate({
           );
         })}
 
-        {/* Inspirational Quotes in Containers - Positioned in corners */}
+        {/* Inspirational Quotes in Containers - Positioned between images */}
 
-        {/* Quote 1 - Top right corner */}
+        {/* Quote 1 - Center area (transparent background) - Red marked zone */}
         <div
           style={{
             position: "absolute",
-            top: "85px",
-            left: "1150px",
-            width: "90px",
-            height: "65px",
-            transform: "rotate(3deg)",
-            backgroundColor: "#ffffff",
-            border: "2px solid #000000",
-            borderRadius: "6px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            top: "195px",
+            left: "555px",
+            width: "95px",
+            height: "70px",
+            transform: "rotate(-2deg)",
+            backgroundColor: "transparent",
+            border: "none",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -452,7 +456,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "14px",
+              fontSize: "15px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -463,15 +467,15 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 2 - Middle right */}
+        {/* Quote 2 - Between top-left and middle-left */}
         <div
           style={{
             position: "absolute",
-            top: "240px",
-            left: "1150px",
+            top: "107px",
+            left: "170px",
             width: "90px",
             height: "65px",
-            transform: "rotate(-3deg)",
+            transform: "rotate(3deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
             borderRadius: "6px",
@@ -498,15 +502,15 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 3 - Bottom left corner */}
+        {/* Quote 3 - Between top-right and middle-right */}
         <div
           style={{
             position: "absolute",
-            top: "390px",
-            left: "50px",
+            top: "107px",
+            left: "985px",
             width: "90px",
             height: "65px",
-            transform: "rotate(2deg)",
+            transform: "rotate(-3deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
             borderRadius: "6px",
@@ -533,15 +537,15 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 4 - Bottom right corner */}
+        {/* Quote 4 - Between middle and bottom center */}
         <div
           style={{
             position: "absolute",
-            top: "390px",
-            left: "1150px",
+            top: "347px",
+            left: "555px",
             width: "90px",
             height: "65px",
-            transform: "rotate(-2deg)",
+            transform: "rotate(2deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
             borderRadius: "6px",
