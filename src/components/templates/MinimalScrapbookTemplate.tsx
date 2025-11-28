@@ -95,18 +95,18 @@ export default function MinimalScrapbookTemplate({
         console.error('Failed to load Telma font:', error);
       }
 
-      // Set canvas size
-      canvas.width = 1344;
-      canvas.height = 768;
+      // Set canvas size - increased to fit all images better
+      canvas.width = 1400;
+      canvas.height = 800;
 
       // Draw cream background
       ctx.fillStyle = '#fffef7';
-      ctx.fillRect(0, 0, 1344, 768);
+      ctx.fillRect(0, 0, 1400, 800);
 
       // Subtle texture
       for (let i = 0; i < 1500; i++) {
-        const x = Math.random() * 1344;
-        const y = Math.random() * 768;
+        const x = Math.random() * 1400;
+        const y = Math.random() * 800;
         ctx.fillStyle = `rgba(240, 235, 220, ${Math.random() * 0.3})`;
         ctx.fillRect(x, y, 1, 1);
       }
@@ -255,9 +255,9 @@ export default function MinimalScrapbookTemplate({
         ctx.restore();
       });
 
-      // Draw center handwritten title
-      const centerX = 600;
-      const centerY = 370;
+      // Draw center handwritten title - moved more to the right between images
+      const centerX = 680;
+      const centerY = 400;
 
       ctx.save();
       ctx.translate(centerX, centerY);
@@ -317,9 +317,9 @@ export default function MinimalScrapbookTemplate({
       };
 
       drawWashiTape(0, 0, 200, '#ffc9e5');
-      drawWashiTape(1144, 0, 200, '#c9e5ff');
-      drawWashiTape(0, 748, 200, '#fffcc9');
-      drawWashiTape(1144, 748, 200, '#d4ffc9');
+      drawWashiTape(1200, 0, 200, '#c9e5ff');
+      drawWashiTape(0, 780, 200, '#fffcc9');
+      drawWashiTape(1200, 780, 200, '#d4ffc9');
     };
 
     renderToCanvas();
@@ -356,15 +356,15 @@ export default function MinimalScrapbookTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={1344}
-        height={768}
+        width={1400}
+        height={800}
         style={{ display: 'none' }}
       />
 
       {/* Visible Vision Board */}
       <div
         ref={containerRef}
-        className="relative w-[1344px] h-[768px] mx-auto overflow-hidden"
+        className="relative w-[1400px] h-[800px] mx-auto overflow-hidden"
         style={{
           backgroundColor: '#fffef7',
         }}
@@ -622,12 +622,12 @@ export default function MinimalScrapbookTemplate({
           />
         </div>
 
-        {/* Center Title - Semi-transparent background */}
+        {/* Center Title - Semi-transparent background, moved more to the right */}
         <div
           className="absolute flex flex-col items-center justify-center rounded-lg"
           style={{
-            top: '320px',
-            left: '475px',
+            top: '355px',
+            left: '555px',
             width: '250px',
             height: '90px',
             transform: 'rotate(-1deg)',
