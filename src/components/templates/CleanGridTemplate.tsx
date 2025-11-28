@@ -147,19 +147,20 @@ export default function CleanGridTemplate({
           // Clip for rounded corners
           ctx.clip();
 
-          // Calculate proper aspect ratio for image scaling
+          // Calculate proper aspect ratio for image scaling (cover mode)
           const imgRatio = img.width / img.height;
           const boxRatio = pos.width / pos.height;
           let drawWidth, drawHeight, drawX, drawY;
 
+          // Always fill the frame completely (cover mode - image fills entire space)
           if (imgRatio > boxRatio) {
-            // Image is wider - fit height
+            // Image is wider - match height, let width overflow
             drawHeight = pos.height;
             drawWidth = drawHeight * imgRatio;
             drawX = pos.left - (drawWidth - pos.width) / 2;
             drawY = pos.top;
           } else {
-            // Image is taller - fit width
+            // Image is taller - match width, let height overflow
             drawWidth = pos.width;
             drawHeight = drawWidth / imgRatio;
             drawX = pos.left;
@@ -193,13 +194,13 @@ export default function CleanGridTemplate({
         }
       }
 
-      // Add inspirational quotes in containers - between grid gaps
+      // Add inspirational quotes in containers - between grid gaps with varied colors
       const quotePositions = [
-        { x: 445, y: 130, size: 16, rotation: 0, width: 100, height: 70, radius: 8 }, // Top center gap
-        { x: 890, y: 130, size: 16, rotation: 0, width: 100, height: 70, radius: 8 }, // Top right gap
-        { x: 445, y: 380, size: 16, rotation: 0, width: 100, height: 70, radius: 8 }, // Middle left gap
-        { x: 890, y: 380, size: 16, rotation: 0, width: 100, height: 70, radius: 8 }, // Middle right gap
-        { x: 890, y: 630, size: 16, rotation: 0, width: 100, height: 70, radius: 8 }, // Bottom right gap
+        { x: 445, y: 130, size: 16, rotation: 0, width: 100, height: 70, radius: 8, bgColor: '#6366f1', textColor: '#ffffff', borderColor: '#4f46e5' }, // Indigo - Top center gap
+        { x: 890, y: 130, size: 16, rotation: 0, width: 100, height: 70, radius: 8, bgColor: '#f59e0b', textColor: '#ffffff', borderColor: '#d97706' }, // Amber - Top right gap
+        { x: 445, y: 380, size: 16, rotation: 0, width: 100, height: 70, radius: 8, bgColor: '#10b981', textColor: '#ffffff', borderColor: '#059669' }, // Emerald - Middle left gap
+        { x: 890, y: 380, size: 16, rotation: 0, width: 100, height: 70, radius: 8, bgColor: '#ec4899', textColor: '#ffffff', borderColor: '#db2777' }, // Pink - Middle right gap
+        { x: 890, y: 630, size: 16, rotation: 0, width: 100, height: 70, radius: 8, bgColor: '#8b5cf6', textColor: '#ffffff', borderColor: '#7c3aed' }, // Purple - Bottom right gap
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -231,22 +232,22 @@ export default function CleanGridTemplate({
         ctx.quadraticCurveTo(x, y, x + radius, y);
         ctx.closePath();
 
-        // Fill white background with shadow
-        ctx.fillStyle = "#ffffff";
-        ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetX = 3;
-        ctx.shadowOffsetY = 3;
+        // Fill colored background with shadow
+        ctx.fillStyle = quote.bgColor;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.2)";
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 4;
+        ctx.shadowOffsetY = 4;
         ctx.fill();
 
-        // Draw black border
-        ctx.strokeStyle = "#000000";
+        // Draw darker border
+        ctx.strokeStyle = quote.borderColor;
         ctx.lineWidth = 3;
         ctx.shadowColor = "transparent";
         ctx.stroke();
 
-        // Draw text in black using Telma font
-        ctx.fillStyle = "#000000";
+        // Draw text in white using Telma font
+        ctx.fillStyle = quote.textColor;
         ctx.font = `bold ${quote.size}px Telma, Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -400,7 +401,7 @@ export default function CleanGridTemplate({
 
         {/* Inspirational Quotes in Containers - Between grid gaps */}
 
-        {/* Quote 1 - Top center gap */}
+        {/* Quote 1 - Top center gap - Indigo */}
         <div
           style={{
             position: "absolute",
@@ -409,10 +410,10 @@ export default function CleanGridTemplate({
             width: "100px",
             height: "70px",
             transform: "rotate(0deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
+            backgroundColor: "#6366f1",
+            border: "3px solid #4f46e5",
             borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -425,7 +426,7 @@ export default function CleanGridTemplate({
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
               fontSize: "16px",
-              color: "#000000",
+              color: "#ffffff",
               textAlign: "center",
               lineHeight: "1.2",
             }}
@@ -435,7 +436,7 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* Quote 2 - Top right gap */}
+        {/* Quote 2 - Top right gap - Amber */}
         <div
           style={{
             position: "absolute",
@@ -444,10 +445,10 @@ export default function CleanGridTemplate({
             width: "100px",
             height: "70px",
             transform: "rotate(0deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
+            backgroundColor: "#f59e0b",
+            border: "3px solid #d97706",
             borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -460,7 +461,7 @@ export default function CleanGridTemplate({
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
               fontSize: "16px",
-              color: "#000000",
+              color: "#ffffff",
               textAlign: "center",
               lineHeight: "1.2",
             }}
@@ -470,7 +471,7 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* Quote 3 - Middle left gap */}
+        {/* Quote 3 - Middle left gap - Emerald */}
         <div
           style={{
             position: "absolute",
@@ -479,10 +480,10 @@ export default function CleanGridTemplate({
             width: "100px",
             height: "70px",
             transform: "rotate(0deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
+            backgroundColor: "#10b981",
+            border: "3px solid #059669",
             borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -495,7 +496,7 @@ export default function CleanGridTemplate({
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
               fontSize: "16px",
-              color: "#000000",
+              color: "#ffffff",
               textAlign: "center",
               lineHeight: "1.2",
             }}
@@ -505,7 +506,7 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* Quote 4 - Middle right gap */}
+        {/* Quote 4 - Middle right gap - Pink */}
         <div
           style={{
             position: "absolute",
@@ -514,10 +515,10 @@ export default function CleanGridTemplate({
             width: "100px",
             height: "70px",
             transform: "rotate(0deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
+            backgroundColor: "#ec4899",
+            border: "3px solid #db2777",
             borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -530,7 +531,7 @@ export default function CleanGridTemplate({
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
               fontSize: "16px",
-              color: "#000000",
+              color: "#ffffff",
               textAlign: "center",
               lineHeight: "1.2",
             }}
@@ -540,7 +541,7 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* Quote 5 - Bottom right gap */}
+        {/* Quote 5 - Bottom right gap - Purple */}
         <div
           style={{
             position: "absolute",
@@ -549,10 +550,10 @@ export default function CleanGridTemplate({
             width: "100px",
             height: "70px",
             transform: "rotate(0deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
+            backgroundColor: "#8b5cf6",
+            border: "3px solid #7c3aed",
             borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -565,7 +566,7 @@ export default function CleanGridTemplate({
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
               fontSize: "16px",
-              color: "#000000",
+              color: "#ffffff",
               textAlign: "center",
               lineHeight: "1.2",
             }}
