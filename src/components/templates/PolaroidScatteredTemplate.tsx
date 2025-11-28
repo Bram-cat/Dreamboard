@@ -226,6 +226,15 @@ export default function PolaroidScatteredTemplate({
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
+      // Load Telma font for canvas
+      const telmaFont = new FontFace('Telma', 'url(/fonts/Telma-Bold.woff2)');
+      try {
+        await telmaFont.load();
+        document.fonts.add(telmaFont);
+      } catch (error) {
+        console.error('Failed to load Telma font:', error);
+      }
+
       // Set canvas size - Laptop-friendly dimensions (1200x540)
       canvas.width = 1200;
       canvas.height = 540;
@@ -445,7 +454,7 @@ export default function PolaroidScatteredTemplate({
 
         // Draw text in black using Telma font
         ctx.fillStyle = "#000000";
-        ctx.font = `bold ${quote.size}px Arial, sans-serif`; // Will be replaced with Telma in DOM
+        ctx.font = `bold ${quote.size}px Telma, Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 

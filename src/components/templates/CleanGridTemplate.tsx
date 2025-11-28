@@ -79,6 +79,15 @@ export default function CleanGridTemplate({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
+      // Load Telma font for canvas
+      const telmaFont = new FontFace('Telma', 'url(/fonts/Telma-Bold.woff2)');
+      try {
+        await telmaFont.load();
+        document.fonts.add(telmaFont);
+      } catch (error) {
+        console.error('Failed to load Telma font:', error);
+      }
+
       // Set canvas size (3x3 grid optimized)
       canvas.width = 1345;
       canvas.height = 760;
@@ -238,7 +247,7 @@ export default function CleanGridTemplate({
 
         // Draw text in black using Telma font
         ctx.fillStyle = "#000000";
-        ctx.font = `bold ${quote.size}px Arial, sans-serif`;
+        ctx.font = `bold ${quote.size}px Telma, Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 

@@ -85,6 +85,15 @@ export default function MagazineCollageTemplate({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
+      // Load Telma font for canvas
+      const telmaFont = new FontFace('Telma', 'url(/fonts/Telma-Bold.woff2)');
+      try {
+        await telmaFont.load();
+        document.fonts.add(telmaFont);
+      } catch (error) {
+        console.error('Failed to load Telma font:', error);
+      }
+
       // Set canvas size - Laptop-friendly dimensions (fits 1366px screens)
       canvas.width = 1200;
       canvas.height = 460;
@@ -235,7 +244,7 @@ export default function MagazineCollageTemplate({
 
         // Draw text in black using Telma font
         ctx.fillStyle = "#000000";
-        ctx.font = `bold ${quote.size}px Arial, sans-serif`;
+        ctx.font = `bold ${quote.size}px Telma, Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 

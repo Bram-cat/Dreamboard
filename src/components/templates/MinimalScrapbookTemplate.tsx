@@ -88,6 +88,15 @@ export default function MinimalScrapbookTemplate({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
+      // Load Telma font for canvas
+      const telmaFont = new FontFace('Telma', 'url(/fonts/Telma-Bold.woff2)');
+      try {
+        await telmaFont.load();
+        document.fonts.add(telmaFont);
+      } catch (error) {
+        console.error('Failed to load Telma font:', error);
+      }
+
       // Set canvas size
       canvas.width = 1344;
       canvas.height = 768;
@@ -142,25 +151,25 @@ export default function MinimalScrapbookTemplate({
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(borderWidth / 2, borderWidth / 2, pos.width - borderWidth, pos.height - borderWidth);
 
-          // Draw image with proper scaling to cover the frame
+          // Draw image with proper scaling to cover the frame (true cover mode)
           const padding = borderWidth;
           const imgRatio = img.width / img.height;
           const boxRatio = (pos.width - padding * 2) / (pos.height - padding * 2);
           let drawWidth, drawHeight, drawX, drawY;
 
-          // Always fill the frame completely (cover mode)
+          // Always fill the frame completely (cover mode - image fills entire space)
           if (imgRatio > boxRatio) {
-            // Image is wider - match width
+            // Image is wider - match height, let width overflow
+            drawHeight = pos.height - padding * 2;
+            drawWidth = drawHeight * imgRatio;
+            drawX = padding - (drawWidth - (pos.width - padding * 2)) / 2;
+            drawY = padding;
+          } else {
+            // Image is taller - match width, let height overflow
             drawWidth = pos.width - padding * 2;
             drawHeight = drawWidth / imgRatio;
             drawX = padding;
-            drawY = padding + (pos.height - padding * 2 - drawHeight) / 2;
-          } else {
-            // Image is taller - match height
-            drawHeight = pos.height - padding * 2;
-            drawWidth = drawHeight * imgRatio;
-            drawX = padding + (pos.width - padding * 2 - drawWidth) / 2;
-            drawY = padding;
+            drawY = padding - (drawHeight - (pos.height - padding * 2)) / 2;
           }
 
           // Clip to ensure image doesn't overflow
@@ -234,7 +243,7 @@ export default function MinimalScrapbookTemplate({
 
         // Draw text in black using Telma font
         ctx.fillStyle = "#000000";
-        ctx.font = `bold ${quote.size}px Arial, sans-serif`;
+        ctx.font = `bold ${quote.size}px Telma, Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
