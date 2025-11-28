@@ -273,59 +273,124 @@ export default function MagazineCollageTemplate({
         ctx.restore();
       });
 
-      // Draw center "2025 VISION BOARD" card (scaled to 74%)
+      // Draw center "2025 VISION BOARD" card - Improved styling
       const centerX = 400;
       const centerY = 156;
       const centerW = 207;
       const centerH = 148;
+      const borderRadius = 8;
 
       ctx.save();
       ctx.translate(centerX + centerW / 2, centerY + centerH / 2);
       ctx.rotate(0); // No rotation for center card
 
-      // White background card
+      // White background card with rounded corners
+      const x = -centerW / 2;
+      const y = -centerH / 2;
+
+      ctx.beginPath();
+      ctx.moveTo(x + borderRadius, y);
+      ctx.lineTo(x + centerW - borderRadius, y);
+      ctx.quadraticCurveTo(x + centerW, y, x + centerW, y + borderRadius);
+      ctx.lineTo(x + centerW, y + centerH - borderRadius);
+      ctx.quadraticCurveTo(x + centerW, y + centerH, x + centerW - borderRadius, y + centerH);
+      ctx.lineTo(x + borderRadius, y + centerH);
+      ctx.quadraticCurveTo(x, y + centerH, x, y + centerH - borderRadius);
+      ctx.lineTo(x, y + borderRadius);
+      ctx.quadraticCurveTo(x, y, x + borderRadius, y);
+      ctx.closePath();
+
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
       ctx.shadowBlur = 20;
       ctx.shadowOffsetX = 4;
       ctx.shadowOffsetY = 4;
-      ctx.fillRect(-centerW / 2, -centerH / 2, centerW, centerH);
+      ctx.fill();
       ctx.shadowColor = 'transparent';
 
-      // Purple border
-      ctx.strokeStyle = '#8b5cf6';
-      ctx.lineWidth = 5;
-      ctx.strokeRect(-centerW / 2 + 12, -centerH / 2 + 12, centerW - 24, centerH - 24);
+      // Gradient border (purple to pink)
+      const gradient = ctx.createLinearGradient(x, y, x + centerW, y + centerH);
+      gradient.addColorStop(0, '#8b5cf6');
+      gradient.addColorStop(1, '#ec4899');
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x + 10, y + 10, centerW - 20, centerH - 20);
 
-      // Decorative stars at top
-      ctx.fillStyle = '#2a2a2a';
-      ctx.font = '20px Arial';
+      // "2025" text with gradient effect (simulated with solid color)
+      ctx.fillStyle = '#8b5cf6';
+      ctx.font = 'bold 52px Arial, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('★', -50, -65);
-      ctx.fillText('★', 50, -65);
-
-      // "2025" text
-      ctx.fillStyle = '#2a2a2a';
-      ctx.font = 'bold 48px Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('2025', 0, -15);
+      ctx.fillText('2025', 0, -10);
 
       // "VISION BOARD" text
-      ctx.font = 'italic 18px "Brush Script MT", cursive, Georgia';
+      ctx.fillStyle = '#4a5568';
+      ctx.font = 'italic 600 16px Georgia, serif';
       ctx.fillText('VISION BOARD', 0, 15);
 
-      // Wavy line decoration
-      ctx.strokeStyle = '#2a2a2a';
-      ctx.lineWidth = 1.5;
+      // Decorative underline with gradient
+      const underlineGradient = ctx.createLinearGradient(-60, 0, 60, 0);
+      underlineGradient.addColorStop(0, 'rgba(139, 92, 246, 0)');
+      underlineGradient.addColorStop(0.3, '#8b5cf6');
+      underlineGradient.addColorStop(0.7, '#ec4899');
+      underlineGradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
+
+      ctx.fillStyle = underlineGradient;
+      ctx.fillRect(-60, 54, 120, 2);
+
+      ctx.restore();
+
+      // Draw transparent quote next to Vision Board card
+      const quoteX = 630;
+      const quoteY = 185;
+      const quoteW = 100;
+      const quoteH = 70;
+      const quoteRadius = 6;
+
+      ctx.save();
+      ctx.translate(quoteX + quoteW / 2, quoteY + quoteH / 2);
+      ctx.rotate((3 * Math.PI) / 180); // 3 degree rotation
+
+      const qx = -quoteW / 2;
+      const qy = -quoteH / 2;
+
+      // Rounded rectangle for transparent container
       ctx.beginPath();
-      ctx.moveTo(-60, 45);
-      ctx.quadraticCurveTo(-30, 40, 0, 45);
-      ctx.quadraticCurveTo(30, 50, 60, 45);
+      ctx.moveTo(qx + quoteRadius, qy);
+      ctx.lineTo(qx + quoteW - quoteRadius, qy);
+      ctx.quadraticCurveTo(qx + quoteW, qy, qx + quoteW, qy + quoteRadius);
+      ctx.lineTo(qx + quoteW, qy + quoteH - quoteRadius);
+      ctx.quadraticCurveTo(qx + quoteW, qy + quoteH, qx + quoteW - quoteRadius, qy + quoteH);
+      ctx.lineTo(qx + quoteRadius, qy + quoteH);
+      ctx.quadraticCurveTo(qx, qy + quoteH, qx, qy + quoteH - quoteRadius);
+      ctx.lineTo(qx, qy + quoteRadius);
+      ctx.quadraticCurveTo(qx, qy, qx + quoteRadius, qy);
+      ctx.closePath();
+
+      // Semi-transparent white background
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.fill();
+
+      // Semi-transparent border
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = 'transparent';
       ctx.stroke();
 
-      // Bottom star
-      ctx.font = '20px Arial';
-      ctx.fillText('★', 0, 75);
+      // Draw quote text
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 14px Telma, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const quoteLines = selectedQuotes[0].split('\n');
+      quoteLines.forEach((line, index) => {
+        const yOffset = (index - (quoteLines.length - 1) / 2) * 17;
+        ctx.fillText(line, 0, yOffset);
+      });
 
       ctx.restore();
     };
@@ -572,7 +637,7 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Center "2025 VISION BOARD" Card */}
+        {/* Center "2025 VISION BOARD" Card - Improved Styling */}
         <div
           className="absolute bg-white shadow-2xl flex flex-col items-center justify-center"
           style={{
@@ -581,77 +646,97 @@ export default function MagazineCollageTemplate({
             width: '207px',
             height: '148px',
             zIndex: 100,
+            borderRadius: '8px',
           }}
         >
-          {/* Purple Border */}
+          {/* Gradient Border */}
           <div
             style={{
               position: 'absolute',
-              top: '12px',
-              left: '12px',
-              right: '12px',
-              bottom: '12px',
-              border: '5px solid #8b5cf6',
+              top: '10px',
+              left: '10px',
+              right: '10px',
+              bottom: '10px',
+              border: '4px solid',
+              borderImage: 'linear-gradient(135deg, #8b5cf6, #ec4899) 1',
+              borderRadius: '4px',
             }}
           />
-
-          {/* Decorative Stars at top */}
-          <div style={{
-            position: 'absolute',
-            top: '18%',
-            fontSize: '20px',
-            color: '#2a2a2a',
-            display: 'flex',
-            gap: '100px'
-          }}>
-            <span>★</span>
-            <span>★</span>
-          </div>
 
           {/* Main Text Container */}
           <div style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '8px',
+            gap: '4px',
             marginTop: '0'
           }}>
             <div style={{
-              fontSize: '48px',
+              fontSize: '52px',
               fontWeight: 'bold',
-              color: '#2a2a2a',
-              lineHeight: '1'
+              background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              lineHeight: '1',
+              letterSpacing: '2px',
             }}>
               2025
             </div>
             <div style={{
-              fontFamily: '"Brush Script MT", cursive, Georgia',
+              fontFamily: 'Georgia, serif',
               fontStyle: 'italic',
-              fontSize: '18px',
-              color: '#2a2a2a',
+              fontSize: '16px',
+              color: '#4a5568',
+              letterSpacing: '1px',
+              fontWeight: '600',
             }}>
               VISION BOARD
             </div>
           </div>
 
-          {/* Wavy Line */}
-          <svg style={{
-            position: 'absolute',
-            bottom: '22%',
-            width: '50%'
-          }} height="12" viewBox="0 0 100 10">
-            <path d="M0,5 Q25,0 50,5 T100,5" stroke="#2a2a2a" strokeWidth="1.5" fill="none" />
-          </svg>
-
-          {/* Bottom Star */}
+          {/* Decorative underline */}
           <div style={{
             position: 'absolute',
-            bottom: '12%',
-            fontSize: '20px',
-            color: '#2a2a2a'
-          }}>
-            ★
-          </div>
+            bottom: '20px',
+            width: '60%',
+            height: '2px',
+            background: 'linear-gradient(to right, transparent, #8b5cf6, #ec4899, transparent)',
+          }} />
+        </div>
+
+        {/* Transparent Quote next to Vision Board card */}
+        <div
+          style={{
+            position: "absolute",
+            top: "185px",
+            left: "630px",
+            width: "100px",
+            height: "70px",
+            transform: "rotate(3deg)",
+            backgroundColor: "rgba(255, 255, 255, 0.3)",
+            border: "2px solid rgba(0, 0, 0, 0.2)",
+            borderRadius: "6px",
+            boxShadow: "2px 2px 6px rgba(0,0,0,0.1)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "6px",
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "14px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[0].replace("\n", "<br/>"),
+            }}
+          />
         </div>
       </div>
     </>
