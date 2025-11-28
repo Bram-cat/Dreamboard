@@ -73,8 +73,8 @@ export default function MinimalScrapbookTemplate({
     { top: 570, left: 670, width: 300, height: 170, rotate: -0.6, border: '#f9fbe7', keyword: "" },
     { top: 570, left: 1000, width: 310, height: 170, rotate: 1.1, border: '#e8eaf6', keyword: keywords[4] },
 
-    // Additional center image - small accent
-    { top: 350, left: 610, width: 180, height: 130, rotate: 2, border: '#fff3e0', keyword: "" },
+    // Additional right image - larger accent on right side
+    { top: 340, left: 820, width: 180, height: 190, rotate: -1.5, border: '#ede7f6', keyword: "" },
   ];
 
   // Canvas rendering for download
@@ -186,14 +186,14 @@ export default function MinimalScrapbookTemplate({
         }
       }
 
-      // Add inspirational quotes in containers - spread across the board
+      // Add inspirational quotes in containers - positioned between images
       const quotePositions = [
-        { x: 220, y: 160, size: 16, rotation: -2, width: 100, height: 70, radius: 8 }, // Top left area
-        { x: 700, y: 140, size: 16, rotation: 3, width: 100, height: 70, radius: 8 }, // Top center
-        { x: 1170, y: 180, size: 16, rotation: -1, width: 100, height: 70, radius: 8 }, // Top right
-        { x: 830, y: 460, size: 16, rotation: 2, width: 100, height: 70, radius: 8 }, // Center right
-        { x: 220, y: 630, size: 16, rotation: 1, width: 100, height: 70, radius: 8 }, // Bottom left
-        { x: 900, y: 680, size: 16, rotation: -3, width: 100, height: 70, radius: 8 }, // Bottom center
+        { x: 220, y: 320, size: 16, rotation: -2, width: 100, height: 70, radius: 8 }, // Between top-left and middle-left
+        { x: 700, y: 320, size: 16, rotation: 2, width: 100, height: 70, radius: 8 }, // Between top-center and center
+        { x: 1170, y: 260, size: 16, rotation: -1, width: 100, height: 70, radius: 8 }, // Between top-right and middle-right
+        { x: 360, y: 550, size: 16, rotation: 1, width: 100, height: 70, radius: 8 }, // Between middle and bottom left
+        { x: 850, y: 550, size: 16, rotation: -2, width: 100, height: 70, radius: 8 }, // Between middle and bottom center
+        { x: 1170, y: 550, size: 16, rotation: 2, width: 100, height: 70, radius: 8 }, // Between middle-right and bottom-right
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -263,8 +263,39 @@ export default function MinimalScrapbookTemplate({
       ctx.translate(centerX, centerY);
       ctx.rotate((-1 * Math.PI) / 180);
 
-      // Title background - completely transparent (no background)
-      // Removed background rectangle for transparent effect
+      // Title background - semi-transparent white with border
+      const titleWidth = 250;
+      const titleHeight = 90;
+      const titleX = -titleWidth / 2;
+      const titleY = -titleHeight / 2;
+      const titleRadius = 8;
+
+      // Draw rounded rectangle background
+      ctx.beginPath();
+      ctx.moveTo(titleX + titleRadius, titleY);
+      ctx.lineTo(titleX + titleWidth - titleRadius, titleY);
+      ctx.quadraticCurveTo(titleX + titleWidth, titleY, titleX + titleWidth, titleY + titleRadius);
+      ctx.lineTo(titleX + titleWidth, titleY + titleHeight - titleRadius);
+      ctx.quadraticCurveTo(titleX + titleWidth, titleY + titleHeight, titleX + titleWidth - titleRadius, titleY + titleHeight);
+      ctx.lineTo(titleX + titleRadius, titleY + titleHeight);
+      ctx.quadraticCurveTo(titleX, titleY + titleHeight, titleX, titleY + titleHeight - titleRadius);
+      ctx.lineTo(titleX, titleY + titleRadius);
+      ctx.quadraticCurveTo(titleX, titleY, titleX + titleRadius, titleY);
+      ctx.closePath();
+
+      // Fill with semi-transparent white
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+      ctx.shadowBlur = 15;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 2;
+      ctx.fill();
+
+      // Draw border
+      ctx.strokeStyle = 'rgba(139, 111, 71, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = 'transparent';
+      ctx.stroke();
 
       // Title text
       ctx.shadowColor = 'transparent';
@@ -379,14 +410,14 @@ export default function MinimalScrapbookTemplate({
           );
         })}
 
-        {/* Inspirational Quotes in Containers - Spread across the board */}
+        {/* Inspirational Quotes in Containers - Positioned between images */}
 
-        {/* Quote 1 - Top left area */}
+        {/* Quote 1 - Between top-left and middle-left */}
         <div
           style={{
             position: "absolute",
-            top: "160px",
-            left: "220px",
+            top: "285px",
+            left: "170px",
             width: "100px",
             height: "70px",
             transform: "rotate(-2deg)",
@@ -416,15 +447,15 @@ export default function MinimalScrapbookTemplate({
           />
         </div>
 
-        {/* Quote 2 - Top center */}
+        {/* Quote 2 - Between top-center and center */}
         <div
           style={{
             position: "absolute",
-            top: "140px",
-            left: "700px",
+            top: "285px",
+            left: "650px",
             width: "100px",
             height: "70px",
-            transform: "rotate(3deg)",
+            transform: "rotate(2deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
             borderRadius: "8px",
@@ -451,12 +482,12 @@ export default function MinimalScrapbookTemplate({
           />
         </div>
 
-        {/* Quote 3 - Top right */}
+        {/* Quote 3 - Between top-right and middle-right */}
         <div
           style={{
             position: "absolute",
-            top: "180px",
-            left: "1170px",
+            top: "225px",
+            left: "1120px",
             width: "100px",
             height: "70px",
             transform: "rotate(-1deg)",
@@ -486,15 +517,15 @@ export default function MinimalScrapbookTemplate({
           />
         </div>
 
-        {/* Quote 4 - Center right */}
+        {/* Quote 4 - Between middle and bottom left */}
         <div
           style={{
             position: "absolute",
-            top: "460px",
-            left: "830px",
+            top: "515px",
+            left: "310px",
             width: "100px",
             height: "70px",
-            transform: "rotate(2deg)",
+            transform: "rotate(1deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
             borderRadius: "8px",
@@ -521,15 +552,15 @@ export default function MinimalScrapbookTemplate({
           />
         </div>
 
-        {/* Quote 5 - Bottom left */}
+        {/* Quote 5 - Between middle and bottom center */}
         <div
           style={{
             position: "absolute",
-            top: "630px",
-            left: "220px",
+            top: "515px",
+            left: "800px",
             width: "100px",
             height: "70px",
-            transform: "rotate(1deg)",
+            transform: "rotate(-2deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
             borderRadius: "8px",
@@ -556,15 +587,15 @@ export default function MinimalScrapbookTemplate({
           />
         </div>
 
-        {/* Quote 6 - Bottom center */}
+        {/* Quote 6 - Between middle-right and bottom-right */}
         <div
           style={{
             position: "absolute",
-            top: "680px",
-            left: "900px",
+            top: "515px",
+            left: "1120px",
             width: "100px",
             height: "70px",
-            transform: "rotate(-3deg)",
+            transform: "rotate(2deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
             borderRadius: "8px",
@@ -591,15 +622,18 @@ export default function MinimalScrapbookTemplate({
           />
         </div>
 
-        {/* Center Title - Transparent background */}
+        {/* Center Title - Semi-transparent background */}
         <div
-          className="absolute flex flex-col items-center justify-center"
+          className="absolute flex flex-col items-center justify-center rounded-lg"
           style={{
             top: '320px',
-            left: '460px',
-            width: '280px',
-            height: '100px',
+            left: '475px',
+            width: '250px',
+            height: '90px',
             transform: 'rotate(-1deg)',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            border: '2px solid rgba(139, 111, 71, 0.3)',
+            boxShadow: '0 2px 15px rgba(0, 0, 0, 0.1)',
             zIndex: 100,
           }}
         >
