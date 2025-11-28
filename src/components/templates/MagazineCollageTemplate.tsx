@@ -67,8 +67,8 @@ export default function MagazineCollageTemplate({
     { top: 156, left: 0, width: 237, height: 167, rotate: 2, zIndex: 26 },
     { top: 160, left: 215, width: 193, height: 163, rotate: -3, zIndex: 27 },
     // CENTER CARD SPACE (400x156, 207x148)
-    // NEW IMAGE - Right of center card (replaces transparent quote)
-    { top: 158, left: 625, width: 155, height: 145, rotate: 2, zIndex: 35 },
+    // NEW IMAGE - Right of center card (replaces transparent quote) - Lower zIndex so card shows on top
+    { top: 165, left: 620, width: 160, height: 138, rotate: 3, zIndex: 27 },
     { top: 156, left: 793, width: 237, height: 167, rotate: 3, zIndex: 28 },
     { top: 160, left: 1008, width: 193, height: 163, rotate: -2, zIndex: 29 },
 
@@ -204,9 +204,9 @@ export default function MagazineCollageTemplate({
 
       // Add inspirational quotes in containers - positioned between images (reduced to 3)
       const quotePositions = [
-        { x: 215, y: 140, size: 14, rotation: 3, width: 90, height: 65, radius: 6 }, // Between top-left and middle-left
-        { x: 1030, y: 140, size: 14, rotation: -3, width: 90, height: 65, radius: 6 }, // Between top-right and middle-right
-        { x: 600, y: 380, size: 14, rotation: 2, width: 90, height: 65, radius: 6 }, // Between middle and bottom center
+        { x: 120, y: 240, size: 14, rotation: 3, width: 90, height: 65, radius: 6 }, // Left edge between top and middle rows
+        { x: 1095, y: 240, size: 14, rotation: -3, width: 90, height: 65, radius: 6 }, // Right edge between top and middle rows
+        { x: 320, y: 345, size: 13, rotation: 2, width: 85, height: 60, radius: 6 }, // Left side between middle and bottom rows
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -426,12 +426,15 @@ export default function MagazineCollageTemplate({
                 }}
               />
 
-              {/* Image */}
+              {/* Image - Cover mode to fill entire frame */}
               <img
                 src={image}
                 alt={`Vision ${idx + 1}`}
-                className="w-full h-full object-cover"
-                style={{ objectFit: 'cover' }}
+                className="w-full h-full"
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: 'center'
+                }}
               />
             </div>
           );
@@ -439,12 +442,12 @@ export default function MagazineCollageTemplate({
 
         {/* Inspirational Quotes in Containers - Positioned between images (3 quotes) */}
 
-        {/* Quote 1 - Between top-left and middle-left */}
+        {/* Quote 1 - Left edge between top and middle rows */}
         <div
           style={{
             position: "absolute",
-            top: "107px",
-            left: "170px",
+            top: "207px",
+            left: "75px",
             width: "90px",
             height: "65px",
             transform: "rotate(3deg)",
@@ -474,12 +477,12 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 2 - Between top-right and middle-right */}
+        {/* Quote 2 - Right edge between top and middle rows */}
         <div
           style={{
             position: "absolute",
-            top: "107px",
-            left: "985px",
+            top: "207px",
+            left: "1050px",
             width: "90px",
             height: "65px",
             transform: "rotate(-3deg)",
@@ -509,14 +512,14 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 3 - Between middle and bottom center */}
+        {/* Quote 3 - Left side between middle and bottom rows */}
         <div
           style={{
             position: "absolute",
-            top: "347px",
-            left: "555px",
-            width: "90px",
-            height: "65px",
+            top: "312px",
+            left: "275px",
+            width: "85px",
+            height: "60px",
             transform: "rotate(2deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
@@ -533,7 +536,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "14px",
+              fontSize: "13px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
