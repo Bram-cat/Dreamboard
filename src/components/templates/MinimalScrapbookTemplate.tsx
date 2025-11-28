@@ -43,10 +43,13 @@ export default function MinimalScrapbookTemplate({
     "MAKE\nMOVES",
   ];
 
-  // Randomly select 6 quotes from the pool
+  // Select quotes with "MAKE IT HAPPEN" fixed in top-right position
   const getRandomQuotes = () => {
-    const shuffled = [...quotePool].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 6);
+    const filtered = quotePool.filter(q => q !== "MAKE IT\nHAPPEN");
+    const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+    const randomFive = shuffled.slice(0, 5);
+    // Return with "MAKE IT HAPPEN" at index 2 (top-right position)
+    return [randomFive[0], randomFive[1], "MAKE IT\nHAPPEN", randomFive[2], randomFive[3], randomFive[4]];
   };
 
   // Use useMemo to maintain same quotes on re-renders
@@ -187,10 +190,11 @@ export default function MinimalScrapbookTemplate({
       }
 
       // Add inspirational quotes in containers - positioned between images
+      // "MAKE IT HAPPEN" is hardcoded at index 2 (top-right position)
       const quotePositions = [
         { x: 220, y: 320, size: 16, rotation: -2, width: 100, height: 70, radius: 8 }, // Between top-left and middle-left
         { x: 700, y: 320, size: 16, rotation: 2, width: 100, height: 70, radius: 8 }, // Between top-center and center
-        { x: 1170, y: 260, size: 16, rotation: -1, width: 100, height: 70, radius: 8 }, // Between top-right and middle-right
+        { x: 1170, y: 260, size: 16, rotation: -1, width: 100, height: 70, radius: 8 }, // Top-right - "MAKE IT HAPPEN"
         { x: 360, y: 550, size: 16, rotation: 1, width: 100, height: 70, radius: 8 }, // Between middle and bottom left
         { x: 850, y: 550, size: 16, rotation: -2, width: 100, height: 70, radius: 8 }, // Between middle and bottom center
         { x: 1170, y: 550, size: 16, rotation: 2, width: 100, height: 70, radius: 8 }, // Between middle-right and bottom-right

@@ -4,170 +4,208 @@ import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { useState } from "react";
 
 export default function HomePage() {
+  const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+
   const features = [
     {
-      icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
+      icon: "✨",
       title: "AI-Powered Creation",
-      description: "Advanced AI transforms your dreams into stunning visual boards in seconds"
+      description: "Advanced AI transforms your dreams into stunning visual boards in seconds using cutting-edge technology"
     },
     {
-      icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
+      icon: "🖼️",
       title: "Personalized Images",
-      description: "Upload your photos to create truly personal and meaningful vision boards"
+      description: "Upload your photos to create truly personal and meaningful vision boards that reflect your unique journey"
     },
     {
-      icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-        </svg>
-      ),
+      icon: "🎨",
       title: "Multiple Templates",
-      description: "Choose from magazine, polaroid, scrapbook, and grid layouts"
+      description: "Choose from magazine, polaroid, scrapbook, and grid layouts designed by professional artists"
     },
     {
-      icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-        </svg>
-      ),
+      icon: "⚡",
       title: "Instant Download",
-      description: "Get your vision board in 4K quality, ready to print or share"
+      description: "Get your vision board in 4K quality, ready to print or share across all your devices"
     }
   ];
 
-  const steps = [
-    { number: "01", title: "Set Your Goals", description: "Tell us what you want to achieve in 2025" },
-    { number: "02", title: "Upload Photos", description: "Add your selfie and dream items (optional)" },
-    { number: "03", title: "Choose Template", description: "Pick your favorite layout style" },
-    { number: "04", title: "Generate & Download", description: "Get your personalized vision board instantly" }
+  const stats = [
+    { number: "10,000+", label: "Vision Boards Created" },
+    { number: "5,000+", label: "Happy Dreamers" },
+    { number: "4.9/5", label: "User Rating" },
+    { number: "99%", label: "Satisfaction Rate" }
+  ];
+
+  const testimonials = [
+    {
+      quote: "Dreamboard helped me visualize my 2025 goals in ways I never imagined. The AI feature is incredible!",
+      author: "Sarah M.",
+      role: "Entrepreneur",
+      avatar: "🌟"
+    },
+    {
+      quote: "I created my vision board in under 5 minutes. It's now my phone wallpaper and daily inspiration.",
+      author: "Michael R.",
+      role: "Software Engineer",
+      avatar: "💼"
+    },
+    {
+      quote: "The templates are beautiful and the personalization options are endless. Highly recommend!",
+      author: "Emma L.",
+      role: "Life Coach",
+      avatar: "✨"
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-[#22223B]">
+    <div className="min-h-screen bg-gradient-to-b from-[#0D0C1D] via-[#1A1A2E] to-[#0D0C1D]">
       <Navigation />
 
-      {/* Hero Section - Catchy Phrase Design */}
-      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
-        {/* Subtle Background */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-1/4 w-96 h-96 bg-[#9A8C98]/30 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-[#C9ADA7]/20 rounded-full blur-3xl"></div>
-        </div>
+      {/* Hero Section - Lattice-inspired */}
+      <section className="relative pt-32 pb-24 px-6 overflow-hidden">
+        {/* Animated gradient orbs */}
+        <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-r from-[#7209B7]/20 to-[#9D4EDD]/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-r from-[#C77DFF]/20 to-[#E0AAFF]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col items-center text-center">
-            {/* Catchy Phrase Header */}
-            <div className="max-w-5xl mx-auto mb-12">
-              <h1
-                className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
-                style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
-              >
-                <span className="text-[#F2E9E4]">Turn Dreams Into</span>
-                <br />
-                <span className="text-[#9A8C98]">
-                  Reality
-                </span>
-              </h1>
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#7209B7]/10 to-[#9D4EDD]/10 border border-[#9D4EDD]/20 mb-8">
+              <span className="text-2xl">✨</span>
+              <span className="text-[#E0AAFF] text-sm font-semibold">AI-Powered Vision Boards for 2025</span>
+            </div>
 
-              <p className="text-xl md:text-2xl text-[#C9ADA7] max-w-3xl mx-auto mb-12 leading-relaxed">
-                Create stunning AI-powered vision boards that bring your goals to life
-              </p>
+            {/* Main Heading */}
+            <h1
+              className="text-6xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight max-w-5xl"
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
+            >
+              <span className="bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent">
+                Manifest Your Dreams
+              </span>
+              <br />
+              <span className="text-white">
+                With AI Vision Boards
+              </span>
+            </h1>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <Link href="/create">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="text-lg px-12 py-6 bg-[#9A8C98] hover:bg-[#C9ADA7] text-white font-bold shadow-2xl hover:shadow-xl hover:scale-105 transition-all duration-300"
-                  >
-                    Create Your Vision Board
-                  </Button>
-                </Link>
-                <a href="#examples">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="text-lg px-12 py-6 border-2 border-[#9A8C98] text-[#F2E9E4] hover:bg-[#9A8C98] hover:text-white font-semibold transition-all duration-300"
-                  >
-                    View Examples
-                  </Button>
-                </a>
-              </div>
+            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed">
+              Create stunning, personalized vision boards in minutes. Transform your goals
+              into beautiful visual reminders that inspire action every single day.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+              <Link href="/create">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="text-lg px-12 py-6 bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] hover:from-[#560BAD] hover:to-[#7209B7] text-white font-bold shadow-2xl shadow-purple-500/40 hover:shadow-purple-500/60 hover:scale-105 transition-all duration-300"
+                >
+                  Create Free Vision Board →
+                </Button>
+              </Link>
+              <a href="#examples">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-lg px-12 py-6 border-2 border-[#9D4EDD] text-white hover:bg-[#9D4EDD]/10 font-semibold transition-all duration-300"
+                >
+                  View Examples
+                </Button>
+              </a>
             </div>
 
             {/* Trust Indicators */}
-            <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-[#C9ADA7]">
+            <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-400">
               <span className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#9A8C98]" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-[#9D4EDD]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 No credit card required
               </span>
               <span className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#9A8C98]" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-[#9D4EDD]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                Secure processing
+                100% secure
               </span>
               <span className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#9A8C98]" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-[#9D4EDD]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                Free to use
+                Free forever plan
               </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Bento Box Gallery - Examples */}
-      <section id="examples" className="py-20 px-6 bg-[#4A4E69]">
+      {/* Stats Section */}
+      <section className="py-16 px-6 bg-[#0D0C1D]/50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-gray-400">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Examples Gallery - Bento Grid */}
+      <section id="examples" className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
             <h2
-              className="text-3xl md:text-4xl font-bold mb-3"
+              className="text-4xl md:text-6xl font-bold mb-4"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="text-[#F2E9E4]">
-                Examples
+              <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+                Beautiful Examples
               </span>
             </h2>
-            <p className="text-[#C9ADA7]">Vision boards created with AI</p>
+            <p className="text-xl text-gray-400">Real vision boards created by our community</p>
           </div>
 
-          {/* Bento Grid - Asymmetric Layout */}
-          <div className="grid grid-cols-12 gap-4 auto-rows-[200px]">
-            {/* Top Left - Tall */}
-            <div className="col-span-12 md:col-span-4 md:row-span-2 relative group overflow-hidden rounded-2xl border border-[#C9ADA7]/40 hover:border-[#9A8C98] transition-all">
+          {/* Bento Grid Layout */}
+          <div className="grid grid-cols-12 gap-4 auto-rows-[240px]">
+            <div className="col-span-12 md:col-span-5 md:row-span-2 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
               <img
                 src="/display.png"
                 alt="Vision Board Example"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#7209B7]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
+                <div className="text-white">
+                  <h3 className="text-2xl font-bold mb-2">Magazine Layout</h3>
+                  <p className="text-purple-100">Professional & polished</p>
+                </div>
+              </div>
             </div>
 
-            {/* Top Right - Wide */}
-            <div className="col-span-12 md:col-span-8 relative group overflow-hidden rounded-2xl border border-[#C9ADA7]/40 hover:border-[#9A8C98] transition-all">
+            <div className="col-span-12 md:col-span-7 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
               <img
                 src="/display2.png"
                 alt="Vision Board Example"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#9D4EDD]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
+                <div className="text-white">
+                  <h3 className="text-2xl font-bold mb-2">Polaroid Style</h3>
+                  <p className="text-purple-100">Casual & creative</p>
+                </div>
+              </div>
             </div>
 
-            {/* Middle Left */}
-            <div className="col-span-6 md:col-span-3 relative group overflow-hidden rounded-2xl border border-[#C9ADA7]/40 hover:border-[#9A8C98] transition-all">
+            <div className="col-span-6 md:col-span-3 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
               <img
                 src="/display3.png"
                 alt="Vision Board Example"
@@ -175,17 +213,21 @@ export default function HomePage() {
               />
             </div>
 
-            {/* Middle Right - Large */}
-            <div className="col-span-6 md:col-span-5 md:row-span-2 relative group overflow-hidden rounded-2xl border border-[#C9ADA7]/40 hover:border-[#9A8C98] transition-all">
+            <div className="col-span-6 md:col-span-4 md:row-span-2 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
               <img
                 src="/display4.png"
                 alt="Vision Board Example"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#C77DFF]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
+                <div className="text-white">
+                  <h3 className="text-2xl font-bold mb-2">Grid Layout</h3>
+                  <p className="text-purple-100">Clean & organized</p>
+                </div>
+              </div>
             </div>
 
-            {/* Bottom Left */}
-            <div className="col-span-12 md:col-span-7 relative group overflow-hidden rounded-2xl border border-[#C9ADA7]/40 hover:border-[#9A8C98] transition-all">
+            <div className="col-span-12 md:col-span-8 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
               <img
                 src="/display.png"
                 alt="Vision Board Example"
@@ -196,91 +238,107 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-6 bg-[#22223B]">
+      {/* Features Section - Lattice-inspired cards */}
+      <section className="py-24 px-6 bg-[#0D0C1D]/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
-              className="text-4xl md:text-5xl font-bold mb-4"
+              className="text-4xl md:text-6xl font-bold mb-4"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
-              <span className="text-[#F2E9E4]">
+              <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 Everything You Need
               </span>
             </h2>
-            <p className="text-lg text-[#C9ADA7]">Simple, powerful tools to create your perfect vision board</p>
+            <p className="text-xl text-gray-400">Powerful features to bring your vision to life</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
-              <Card key={index} hover>
-                <div className="text-[#9A8C98] mb-4">{feature.icon}</div>
-                <h3 className="text-lg font-bold text-[#F2E9E4] mb-2">{feature.title}</h3>
-                <p className="text-[#C9ADA7] text-sm leading-relaxed">{feature.description}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-20 px-6 bg-[#4A4E69]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2
-              className="text-4xl md:text-5xl font-bold mb-4"
-              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
-            >
-              <span className="text-[#F2E9E4]">
-                How It Works
-              </span>
-            </h2>
-            <p className="text-lg text-[#C9ADA7]">Four simple steps to your dream vision board</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step, index) => (
-              <div key={index} className="relative">
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#9A8C98] text-white text-xl font-bold mb-4">
-                    {step.number}
-                  </div>
-                  <h3 className="text-lg font-bold text-[#F2E9E4] mb-2">{step.title}</h3>
-                  <p className="text-[#C9ADA7] text-sm">{step.description}</p>
-                </div>
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-[#C9ADA7]/30"></div>
-                )}
+              <div
+                key={index}
+                onMouseEnter={() => setHoveredFeature(index)}
+                onMouseLeave={() => setHoveredFeature(null)}
+                className={`relative p-8 rounded-2xl bg-gradient-to-br from-[#1A1A2E] to-[#16213E] border transition-all duration-300 ${
+                  hoveredFeature === index
+                    ? 'border-purple-400/60 shadow-2xl shadow-purple-500/20 scale-105'
+                    : 'border-purple-500/20'
+                }`}
+              >
+                <div className="text-6xl mb-6">{feature.icon}</div>
+                <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
+                <p className="text-gray-400 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section - Better Visibility */}
-      <section className="py-24 px-6 bg-[#22223B]">
-        <div className="max-w-4xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl bg-[#9A8C98] border-2 border-[#C9ADA7] p-12 md:p-16">
-            <div className="relative z-10 text-center">
+      {/* Testimonials Section */}
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2
+              className="text-4xl md:text-6xl font-bold mb-4"
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
+            >
+              <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+                Loved By Dreamers
+              </span>
+            </h2>
+            <p className="text-xl text-gray-400">Join thousands manifesting their 2025 goals</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={index}
+                className="relative p-8 rounded-2xl bg-gradient-to-br from-[#1A1A2E] to-[#16213E] border border-purple-500/20 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300"
+              >
+                <div className="text-5xl mb-6">{testimonial.avatar}</div>
+                <p className="text-gray-300 text-lg mb-6 italic leading-relaxed">"{testimonial.quote}"</p>
+                <div>
+                  <div className="text-white font-bold">{testimonial.author}</div>
+                  <div className="text-gray-400 text-sm">{testimonial.role}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section - Gradient */}
+      <section className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="relative overflow-hidden rounded-3xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#7209B7] via-[#9D4EDD] to-[#C77DFF]"></div>
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+            <div className="relative p-16 md:p-20 text-center">
               <h2
-                className="text-4xl md:text-5xl font-bold mb-6"
+                className="text-4xl md:text-6xl font-bold text-white mb-6"
                 style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
-                <span className="text-white">
-                  Ready to Start?
-                </span>
+                Ready to Manifest<br />Your 2025 Dreams?
               </h2>
-              <p className="text-lg md:text-xl text-white/90 mb-10 max-w-xl mx-auto">
-                Create your vision board in minutes. No credit card required.
+              <p className="text-xl md:text-2xl text-purple-100 mb-12 max-w-2xl mx-auto leading-relaxed">
+                Join thousands creating vision boards and turning their dreams into reality
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                 <Link href="/create">
-                  <Button variant="primary" size="lg" className="min-w-[200px] bg-white hover:bg-[#F2E9E4] text-[#9A8C98] font-bold shadow-xl">
-                    Create Free Board
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="min-w-[240px] bg-white text-[#7209B7] hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6"
+                  >
+                    Start Creating Free →
                   </Button>
                 </Link>
                 <Link href="/pricing">
-                  <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white/10 min-w-[200px]">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="min-w-[240px] border-2 border-white text-white hover:bg-white/10 text-lg py-6"
+                  >
                     View Pricing
                   </Button>
                 </Link>
@@ -290,25 +348,54 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer - Personal & Simple */}
-      <footer className="bg-[#22223B] border-t border-[#4A4E69]/30">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-              <h3 className="text-lg font-bold text-[#F2E9E4]" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
-                DreamBoard
+      {/* Footer */}
+      <footer className="py-16 px-6 border-t border-purple-500/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-12 mb-12">
+            <div className="md:col-span-2">
+              <h3
+                className="text-2xl font-bold mb-4"
+                style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
+              >
+                <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+                  DREAMBOARD
+                </span>
               </h3>
+              <p className="text-gray-400 leading-relaxed mb-6 max-w-md">
+                Transform your 2025 goals into stunning visual boards with AI.
+                Built by dreamers, for dreamers.
+              </p>
+              <div className="flex gap-4">
+                <a href="#" className="w-10 h-10 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white hover:scale-110 transition-transform">
+                  <span>𝕏</span>
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white hover:scale-110 transition-transform">
+                  <span>in</span>
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white hover:scale-110 transition-transform">
+                  <span>ig</span>
+                </a>
+              </div>
             </div>
-
-            <div className="flex items-center gap-6 text-sm">
-              <Link href="/create" className="text-[#C9ADA7] hover:text-[#F2E9E4] transition-colors">Create</Link>
-              <Link href="/pricing" className="text-[#C9ADA7] hover:text-[#F2E9E4] transition-colors">Pricing</Link>
-              <Link href="/about" className="text-[#C9ADA7] hover:text-[#F2E9E4] transition-colors">About</Link>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Product</h4>
+              <ul className="space-y-3">
+                <li><Link href="/create" className="text-gray-400 hover:text-white transition">Create Board</Link></li>
+                <li><Link href="/pricing" className="text-gray-400 hover:text-white transition">Pricing</Link></li>
+                <li><Link href="/about" className="text-gray-400 hover:text-white transition">About</Link></li>
+              </ul>
             </div>
-
-            <p className="text-[#C9ADA7] text-sm">
-              Built with AI • 2025
-            </p>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Support</h4>
+              <ul className="space-y-3">
+                <li><a href="#" className="text-gray-400 hover:text-white transition">Help Center</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition">Contact Us</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="pt-8 border-t border-purple-500/10 text-center text-gray-400">
+            <p>&copy; 2025 Dreamboard AI. All rights reserved. Manifest your dreams.</p>
           </div>
         </div>
       </footer>
