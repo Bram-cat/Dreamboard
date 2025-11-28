@@ -54,6 +54,7 @@ export default function MinimalScrapbookTemplate({
 
   // Minimal scrapbook positions - GENTLE ROTATIONS, IMPROVED PASTEL THEME
   // Mix of different sizes, organized but casual - softer, more harmonious colors
+  // Removed overlapping center images to make space for "My 2025 Vision Board" tag
   const scrapbookPositions = [
     // Top row (large focus images) - warm pastels
     { top: 30, left: 30, width: 380, height: 280, rotate: -1.5, border: '#fde4e9', keyword: keywords[0] },
@@ -63,7 +64,7 @@ export default function MinimalScrapbookTemplate({
     // Middle row (medium + small mix) - cool pastels
     { top: 340, left: 30, width: 280, height: 200, rotate: 1.2, border: '#e8f5e9', keyword: "" },
     { top: 340, left: 340, width: 240, height: 200, rotate: -1, border: '#ffe8d9', keyword: keywords[2] },
-    // CENTER SPACE
+    // CENTER SPACE FOR "MY 2025 VISION BOARD" TAG
     { top: 340, left: 1030, width: 280, height: 200, rotate: 0.9, border: '#f3e5f5', keyword: "" },
 
     // Bottom row (varied sizes) - mixed pastels
@@ -71,12 +72,6 @@ export default function MinimalScrapbookTemplate({
     { top: 570, left: 380, width: 260, height: 170, rotate: 1.5, border: '#fce4ec', keyword: keywords[3] },
     { top: 570, left: 670, width: 300, height: 170, rotate: -0.6, border: '#f9fbe7', keyword: "" },
     { top: 570, left: 1000, width: 310, height: 170, rotate: 1.1, border: '#e8eaf6', keyword: keywords[4] },
-
-    // Accent small images - complementary pastels
-    { top: 350, left: 610, width: 180, height: 130, rotate: 2, border: '#fff3e0', keyword: "" },
-    { top: 350, left: 820, width: 180, height: 130, rotate: -1.8, border: '#fce4ec', keyword: "" },
-    { top: 490, left: 660, width: 160, height: 120, rotate: 1.5, border: '#ede7f6', keyword: "" },
-    { top: 490, left: 850, width: 160, height: 120, rotate: -1.2, border: '#e0f2f1', keyword: "" },
   ];
 
   // Canvas rendering for download

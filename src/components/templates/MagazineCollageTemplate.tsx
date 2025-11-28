@@ -148,25 +148,34 @@ export default function MagazineCollageTemplate({
           ctx.fillRect(0, 0, pos.width, pos.height);
           ctx.shadowColor = 'transparent';
 
-          // Draw image inside the border
+          // Draw image inside the border with proper scaling to cover the frame (true cover mode)
           const padding = 12;
           const imgRatio = img.width / img.height;
           const boxRatio = (pos.width - padding * 2) / (pos.height - padding * 2);
           let drawWidth, drawHeight, drawX, drawY;
 
+          // Always fill the frame completely (cover mode - image fills entire space)
           if (imgRatio > boxRatio) {
+            // Image is wider - match height, let width overflow
             drawHeight = pos.height - padding * 2;
             drawWidth = drawHeight * imgRatio;
             drawX = padding - (drawWidth - (pos.width - padding * 2)) / 2;
             drawY = padding;
           } else {
+            // Image is taller - match width, let height overflow
             drawWidth = pos.width - padding * 2;
             drawHeight = drawWidth / imgRatio;
             drawX = padding;
             drawY = padding - (drawHeight - (pos.height - padding * 2)) / 2;
           }
 
+          // Clip to ensure image doesn't overflow
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(padding, padding, pos.width - padding * 2, pos.height - padding * 2);
+          ctx.clip();
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+          ctx.restore();
 
           // Draw tape decorations AFTER image (so they appear on top)
           const drawTape = (x: number, y: number, angle: number) => {
