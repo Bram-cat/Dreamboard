@@ -150,29 +150,34 @@ export default function MagazineCollageTemplate({
           ctx.fillRect(0, 0, pos.width, pos.height);
           ctx.shadowColor = 'transparent';
 
-          // Draw image inside the border with contain mode - fit entire image inside frame
+          // Draw image inside the border - scale to fill frame with small white border
           const padding = 12;
           const imgRatio = img.width / img.height;
           const boxRatio = (pos.width - padding * 2) / (pos.height - padding * 2);
           let drawWidth, drawHeight, drawX, drawY;
 
-          // Contain mode - fit entire image inside frame without cropping
+          // Cover mode but scaled to 95% to show white border - fills frame nicely
           if (imgRatio > boxRatio) {
-            // Image is wider - match width, center vertically
-            drawWidth = pos.width - padding * 2;
-            drawHeight = drawWidth / imgRatio;
-            drawX = padding;
-            drawY = padding + (pos.height - padding * 2 - drawHeight) / 2;
-          } else {
-            // Image is taller - match height, center horizontally
-            drawHeight = pos.height - padding * 2;
+            // Image is wider - match height, let width overflow slightly
+            drawHeight = (pos.height - padding * 2) * 0.95;
             drawWidth = drawHeight * imgRatio;
             drawX = padding + (pos.width - padding * 2 - drawWidth) / 2;
-            drawY = padding;
+            drawY = padding + (pos.height - padding * 2 - drawHeight) / 2;
+          } else {
+            // Image is taller - match width, let height overflow slightly
+            drawWidth = (pos.width - padding * 2) * 0.95;
+            drawHeight = drawWidth / imgRatio;
+            drawX = padding + (pos.width - padding * 2 - drawWidth) / 2;
+            drawY = padding + (pos.height - padding * 2 - drawHeight) / 2;
           }
 
-          // Draw image without clipping (contain mode doesn't need clipping)
+          // Clip to ensure image doesn't overflow the frame
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(padding, padding, pos.width - padding * 2, pos.height - padding * 2);
+          ctx.clip();
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+          ctx.restore();
 
           // Draw tape decorations AFTER image (so they appear on top)
           const drawTape = (x: number, y: number, angle: number) => {
@@ -197,11 +202,11 @@ export default function MagazineCollageTemplate({
         }
       }
 
-      // Add inspirational quotes in containers - positioned between images (reduced to 3)
+      // Add inspirational quotes in containers - positioned on outer edges (reduced to 3)
       const quotePositions = [
-        { x: 60, y: 230, size: 13, rotation: 3, width: 80, height: 60, radius: 6 }, // Far left edge between rows
-        { x: 1140, y: 230, size: 13, rotation: -3, width: 80, height: 60, radius: 6 }, // Far right edge between rows
-        { x: 210, y: 360, size: 12, rotation: 2, width: 75, height: 55, radius: 6 }, // Left side between middle and bottom rows
+        { x: 60, y: 50, size: 14, rotation: -4, width: 90, height: 65, radius: 6 }, // Top left corner (outside)
+        { x: 1140, y: 50, size: 14, rotation: 4, width: 90, height: 65, radius: 6 }, // Top right corner (outside)
+        { x: 600, y: 420, size: 14, rotation: -2, width: 90, height: 65, radius: 6 }, // Bottom center (outside)
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -421,13 +426,13 @@ export default function MagazineCollageTemplate({
                 }}
               />
 
-              {/* Image - Contain mode to fit entire image inside frame */}
+              {/* Image - Cover mode scaled to 95% to show white border */}
               <img
                 src={image}
                 alt={`Vision ${idx + 1}`}
-                className="w-full h-full"
+                className="w-[95%] h-[95%] m-auto"
                 style={{
-                  objectFit: 'contain',
+                  objectFit: 'cover',
                   objectPosition: 'center'
                 }}
               />
@@ -435,17 +440,17 @@ export default function MagazineCollageTemplate({
           );
         })}
 
-        {/* Inspirational Quotes in Containers - Positioned between images (3 quotes) */}
+        {/* Inspirational Quotes in Containers - Positioned on outer edges (3 quotes) */}
 
-        {/* Quote 1 - Far left edge between top and middle rows */}
+        {/* Quote 1 - Top left corner (outside) */}
         <div
           style={{
             position: "absolute",
-            top: "230px",
+            top: "50px",
             left: "60px",
-            width: "80px",
-            height: "60px",
-            transform: "rotate(3deg)",
+            width: "90px",
+            height: "65px",
+            transform: "rotate(-4deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
             borderRadius: "6px",
@@ -461,7 +466,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "13px",
+              fontSize: "14px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -472,15 +477,15 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 2 - Far right edge between top and middle rows */}
+        {/* Quote 2 - Top right corner (outside) */}
         <div
           style={{
             position: "absolute",
-            top: "230px",
+            top: "50px",
             left: "1140px",
-            width: "80px",
-            height: "60px",
-            transform: "rotate(-3deg)",
+            width: "90px",
+            height: "65px",
+            transform: "rotate(4deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
             borderRadius: "6px",
@@ -496,7 +501,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "13px",
+              fontSize: "14px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -507,15 +512,15 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 3 - Left side between middle and bottom rows */}
+        {/* Quote 3 - Bottom center (outside) */}
         <div
           style={{
             position: "absolute",
-            top: "360px",
-            left: "210px",
-            width: "75px",
-            height: "55px",
-            transform: "rotate(2deg)",
+            top: "420px",
+            left: "600px",
+            width: "90px",
+            height: "65px",
+            transform: "rotate(-2deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
             borderRadius: "6px",
@@ -531,7 +536,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "12px",
+              fontSize: "14px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
