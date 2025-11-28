@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface MagazineCollageTemplateProps {
-  images: string[]; // 14 personalized images (all Gemini) - reduced to fit around center card
+  images: string[]; // 15 personalized images (all Gemini) - arranged around center card
   keywords: string[];
 }
 
@@ -43,16 +43,16 @@ export default function MagazineCollageTemplate({
     "MAKE\nMOVES",
   ];
 
-  // Randomly select 3 quotes from the pool (reduced from 4)
+  // Randomly select 4 quotes from the pool
   const getRandomQuotes = () => {
     const shuffled = [...quotePool].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 3);
+    return shuffled.slice(0, 4);
   };
 
   // Use useMemo to maintain same quotes on re-renders
   const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
 
-  // TIGHT-FIT Magazine collage - 14 visible images properly arranged around center card
+  // TIGHT-FIT Magazine collage - 15 visible images properly arranged around center card
   // Scaled to 1200px width (74% of original 1620px) for laptop screens
   const collagePositions = [
     // Top row - 6 LARGE images (overlapping, filling entire top)
@@ -63,19 +63,20 @@ export default function MagazineCollageTemplate({
     { top: 0, left: 860, width: 237, height: 167, rotate: -2, zIndex: 24 },
     { top: 4, left: 1075, width: 125, height: 167, rotate: 3, zIndex: 25 },
 
-    // Middle row - 5 images around center card (added one where quote was)
+    // Middle row - 5 images around center card
     { top: 156, left: 0, width: 237, height: 167, rotate: 2, zIndex: 26 },
     { top: 160, left: 215, width: 193, height: 163, rotate: -3, zIndex: 27 },
     // CENTER CARD SPACE (400x156, 207x148)
-    // NEW IMAGE - Right of center card (replaces transparent quote) - Lower zIndex so card shows on top
+    // NEW IMAGE - Right of center card (replaces transparent quote)
     { top: 165, left: 620, width: 160, height: 138, rotate: 3, zIndex: 27 },
     { top: 156, left: 793, width: 237, height: 167, rotate: 3, zIndex: 28 },
     { top: 160, left: 1008, width: 193, height: 163, rotate: -2, zIndex: 29 },
 
-    // Bottom row - 3 MASSIVE images (fill entire bottom)
-    { top: 312, left: 0, width: 400, height: 148, rotate: -2, zIndex: 30 },
-    { top: 314, left: 400, width: 400, height: 148, rotate: 3, zIndex: 31 },
-    { top: 312, left: 800, width: 400, height: 148, rotate: -3, zIndex: 32 },
+    // Bottom row - 4 images (proper dimensions to accommodate AI images)
+    { top: 312, left: 0, width: 290, height: 148, rotate: -2, zIndex: 30 },
+    { top: 314, left: 290, width: 290, height: 148, rotate: 2, zIndex: 31 },
+    { top: 312, left: 610, width: 290, height: 148, rotate: -3, zIndex: 32 },
+    { top: 314, left: 910, width: 290, height: 148, rotate: 3, zIndex: 33 },
   ];
 
   // Canvas rendering for download
@@ -202,11 +203,12 @@ export default function MagazineCollageTemplate({
         }
       }
 
-      // Add inspirational quotes in containers - positioned on outer edges (reduced to 3)
+      // Add inspirational quotes in containers - positioned between images toward center (4 quotes)
       const quotePositions = [
-        { x: 60, y: 50, size: 14, rotation: -4, width: 90, height: 65, radius: 6 }, // Top left corner (outside)
-        { x: 1140, y: 50, size: 14, rotation: 4, width: 90, height: 65, radius: 6 }, // Top right corner (outside)
-        { x: 600, y: 420, size: 14, rotation: -2, width: 90, height: 65, radius: 6 }, // Bottom center (outside)
+        { x: 280, y: 130, size: 13, rotation: -3, width: 85, height: 60, radius: 6 }, // Between top row images (left-center)
+        { x: 920, y: 130, size: 13, rotation: 3, width: 85, height: 60, radius: 6 }, // Between top row images (right-center)
+        { x: 145, y: 340, size: 13, rotation: 2, width: 85, height: 60, radius: 6 }, // Between bottom row images (left)
+        { x: 750, y: 340, size: 13, rotation: -2, width: 85, height: 60, radius: 6 }, // Between bottom row images (right)
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -383,8 +385,8 @@ export default function MagazineCollageTemplate({
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
         }}
       >
-        {/* Collage Images - 14 total (around center card) */}
-        {images.slice(0, 14).map((image, idx) => {
+        {/* Collage Images - 15 total (around center card) */}
+        {images.slice(0, 15).map((image, idx) => {
           const pos = collagePositions[idx];
           if (!pos) return null;
 
@@ -440,17 +442,17 @@ export default function MagazineCollageTemplate({
           );
         })}
 
-        {/* Inspirational Quotes in Containers - Positioned on outer edges (3 quotes) */}
+        {/* Inspirational Quotes in Containers - Positioned between images toward center (4 quotes) */}
 
-        {/* Quote 1 - Top left corner (outside) */}
+        {/* Quote 1 - Between top row images (left-center) */}
         <div
           style={{
             position: "absolute",
-            top: "50px",
-            left: "60px",
-            width: "90px",
-            height: "65px",
-            transform: "rotate(-4deg)",
+            top: "130px",
+            left: "280px",
+            width: "85px",
+            height: "60px",
+            transform: "rotate(-3deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
             borderRadius: "6px",
@@ -466,7 +468,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "14px",
+              fontSize: "13px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -477,15 +479,15 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 2 - Top right corner (outside) */}
+        {/* Quote 2 - Between top row images (right-center) */}
         <div
           style={{
             position: "absolute",
-            top: "50px",
-            left: "1140px",
-            width: "90px",
-            height: "65px",
-            transform: "rotate(4deg)",
+            top: "130px",
+            left: "920px",
+            width: "85px",
+            height: "60px",
+            transform: "rotate(3deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
             borderRadius: "6px",
@@ -501,7 +503,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "14px",
+              fontSize: "13px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -512,14 +514,49 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 3 - Bottom center (outside) */}
+        {/* Quote 3 - Between bottom row images (left) */}
         <div
           style={{
             position: "absolute",
-            top: "420px",
-            left: "600px",
-            width: "90px",
-            height: "65px",
+            top: "340px",
+            left: "145px",
+            width: "85px",
+            height: "60px",
+            transform: "rotate(2deg)",
+            backgroundColor: "#ffffff",
+            border: "2px solid #000000",
+            borderRadius: "6px",
+            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "6px",
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Telma, Arial, sans-serif",
+              fontWeight: "bold",
+              fontSize: "13px",
+              color: "#000000",
+              textAlign: "center",
+              lineHeight: "1.2",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: selectedQuotes[2].replace("\n", "<br/>"),
+            }}
+          />
+        </div>
+
+        {/* Quote 4 - Between bottom row images (right) */}
+        <div
+          style={{
+            position: "absolute",
+            top: "340px",
+            left: "750px",
+            width: "85px",
+            height: "60px",
             transform: "rotate(-2deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
@@ -536,13 +573,13 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "14px",
+              fontSize: "13px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[2].replace("\n", "<br/>"),
+              __html: selectedQuotes[3].replace("\n", "<br/>"),
             }}
           />
         </div>
