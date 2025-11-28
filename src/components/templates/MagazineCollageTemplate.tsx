@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface MagazineCollageTemplateProps {
-  images: string[]; // 13 personalized images (all Gemini) - reduced to fit around center card
+  images: string[]; // 14 personalized images (all Gemini) - reduced to fit around center card
   keywords: string[];
 }
 
@@ -43,16 +43,16 @@ export default function MagazineCollageTemplate({
     "MAKE\nMOVES",
   ];
 
-  // Randomly select 4 quotes from the pool
+  // Randomly select 3 quotes from the pool (reduced from 4)
   const getRandomQuotes = () => {
     const shuffled = [...quotePool].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 4);
+    return shuffled.slice(0, 3);
   };
 
   // Use useMemo to maintain same quotes on re-renders
   const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
 
-  // TIGHT-FIT Magazine collage - 13 visible images properly arranged around center card
+  // TIGHT-FIT Magazine collage - 14 visible images properly arranged around center card
   // Scaled to 1200px width (74% of original 1620px) for laptop screens
   const collagePositions = [
     // Top row - 6 LARGE images (overlapping, filling entire top)
@@ -63,10 +63,12 @@ export default function MagazineCollageTemplate({
     { top: 0, left: 860, width: 237, height: 167, rotate: -2, zIndex: 24 },
     { top: 4, left: 1075, width: 125, height: 167, rotate: 3, zIndex: 25 },
 
-    // Middle row - 4 LARGE images around center card
+    // Middle row - 5 images around center card (added one where quote was)
     { top: 156, left: 0, width: 237, height: 167, rotate: 2, zIndex: 26 },
     { top: 160, left: 215, width: 193, height: 163, rotate: -3, zIndex: 27 },
-    // CENTER CARD SPACE (400x156, 207x148) - NO IMAGES HERE
+    // CENTER CARD SPACE (400x156, 207x148)
+    // NEW IMAGE - Right of center card (replaces transparent quote)
+    { top: 158, left: 625, width: 155, height: 145, rotate: 2, zIndex: 35 },
     { top: 156, left: 793, width: 237, height: 167, rotate: 3, zIndex: 28 },
     { top: 160, left: 1008, width: 193, height: 163, rotate: -2, zIndex: 29 },
 
@@ -200,12 +202,11 @@ export default function MagazineCollageTemplate({
         }
       }
 
-      // Add inspirational quotes in containers - positioned between images with transparent backgrounds
+      // Add inspirational quotes in containers - positioned between images (reduced to 3)
       const quotePositions = [
-        { x: 600, y: 230, size: 15, rotation: -2, width: 95, height: 70, radius: 8, transparent: true }, // Center area (red marked zone)
-        { x: 215, y: 140, size: 14, rotation: 3, width: 90, height: 65, radius: 6, transparent: false }, // Between top-left and middle-left
-        { x: 1030, y: 140, size: 14, rotation: -3, width: 90, height: 65, radius: 6, transparent: false }, // Between top-right and middle-right
-        { x: 600, y: 380, size: 14, rotation: 2, width: 90, height: 65, radius: 6, transparent: false }, // Between middle and bottom center
+        { x: 215, y: 140, size: 14, rotation: 3, width: 90, height: 65, radius: 6 }, // Between top-left and middle-left
+        { x: 1030, y: 140, size: 14, rotation: -3, width: 90, height: 65, radius: 6 }, // Between top-right and middle-right
+        { x: 600, y: 380, size: 14, rotation: 2, width: 90, height: 65, radius: 6 }, // Between middle and bottom center
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -237,25 +238,19 @@ export default function MagazineCollageTemplate({
         ctx.quadraticCurveTo(x, y, x + radius, y);
         ctx.closePath();
 
-        // Fill background - transparent for center quote, white for others
-        if (quote.transparent) {
-          // Transparent background - no fill, no border
-          ctx.shadowColor = "transparent";
-        } else {
-          // White background with shadow and border
-          ctx.fillStyle = "#ffffff";
-          ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-          ctx.shadowBlur = 8;
-          ctx.shadowOffsetX = 3;
-          ctx.shadowOffsetY = 3;
-          ctx.fill();
+        // White background with shadow and border
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+        ctx.fill();
 
-          // Draw black border
-          ctx.strokeStyle = "#000000";
-          ctx.lineWidth = 2;
-          ctx.shadowColor = "transparent";
-          ctx.stroke();
-        }
+        // Draw black border
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 2;
+        ctx.shadowColor = "transparent";
+        ctx.stroke();
 
         // Draw text in black using Telma font
         ctx.fillStyle = "#000000";
@@ -338,61 +333,6 @@ export default function MagazineCollageTemplate({
       ctx.fillRect(-60, 54, 120, 2);
 
       ctx.restore();
-
-      // Draw transparent quote next to Vision Board card
-      const quoteX = 630;
-      const quoteY = 185;
-      const quoteW = 100;
-      const quoteH = 70;
-      const quoteRadius = 6;
-
-      ctx.save();
-      ctx.translate(quoteX + quoteW / 2, quoteY + quoteH / 2);
-      ctx.rotate((3 * Math.PI) / 180); // 3 degree rotation
-
-      const qx = -quoteW / 2;
-      const qy = -quoteH / 2;
-
-      // Rounded rectangle for transparent container
-      ctx.beginPath();
-      ctx.moveTo(qx + quoteRadius, qy);
-      ctx.lineTo(qx + quoteW - quoteRadius, qy);
-      ctx.quadraticCurveTo(qx + quoteW, qy, qx + quoteW, qy + quoteRadius);
-      ctx.lineTo(qx + quoteW, qy + quoteH - quoteRadius);
-      ctx.quadraticCurveTo(qx + quoteW, qy + quoteH, qx + quoteW - quoteRadius, qy + quoteH);
-      ctx.lineTo(qx + quoteRadius, qy + quoteH);
-      ctx.quadraticCurveTo(qx, qy + quoteH, qx, qy + quoteH - quoteRadius);
-      ctx.lineTo(qx, qy + quoteRadius);
-      ctx.quadraticCurveTo(qx, qy, qx + quoteRadius, qy);
-      ctx.closePath();
-
-      // Semi-transparent white background
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-      ctx.shadowBlur = 6;
-      ctx.shadowOffsetX = 2;
-      ctx.shadowOffsetY = 2;
-      ctx.fill();
-
-      // Semi-transparent border
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-      ctx.lineWidth = 2;
-      ctx.shadowColor = 'transparent';
-      ctx.stroke();
-
-      // Draw quote text
-      ctx.fillStyle = '#000000';
-      ctx.font = 'bold 14px Telma, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      const quoteLines = selectedQuotes[0].split('\n');
-      quoteLines.forEach((line, index) => {
-        const yOffset = (index - (quoteLines.length - 1) / 2) * 17;
-        ctx.fillText(line, 0, yOffset);
-      });
-
-      ctx.restore();
     };
 
     renderToCanvas();
@@ -443,8 +383,8 @@ export default function MagazineCollageTemplate({
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
         }}
       >
-        {/* Collage Images - 13 total (around center card) */}
-        {images.slice(0, 13).map((image, idx) => {
+        {/* Collage Images - 14 total (around center card) */}
+        {images.slice(0, 14).map((image, idx) => {
           const pos = collagePositions[idx];
           if (!pos) return null;
 
@@ -497,42 +437,9 @@ export default function MagazineCollageTemplate({
           );
         })}
 
-        {/* Inspirational Quotes in Containers - Positioned between images */}
+        {/* Inspirational Quotes in Containers - Positioned between images (3 quotes) */}
 
-        {/* Quote 1 - Center area (transparent background) - Red marked zone */}
-        <div
-          style={{
-            position: "absolute",
-            top: "195px",
-            left: "555px",
-            width: "95px",
-            height: "70px",
-            transform: "rotate(-2deg)",
-            backgroundColor: "transparent",
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "6px",
-            zIndex: 50,
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "Telma, Arial, sans-serif",
-              fontWeight: "bold",
-              fontSize: "15px",
-              color: "#000000",
-              textAlign: "center",
-              lineHeight: "1.2",
-            }}
-            dangerouslySetInnerHTML={{
-              __html: selectedQuotes[0].replace("\n", "<br/>"),
-            }}
-          />
-        </div>
-
-        {/* Quote 2 - Between top-left and middle-left */}
+        {/* Quote 1 - Between top-left and middle-left */}
         <div
           style={{
             position: "absolute",
@@ -562,12 +469,12 @@ export default function MagazineCollageTemplate({
               lineHeight: "1.2",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[1].replace("\n", "<br/>"),
+              __html: selectedQuotes[0].replace("\n", "<br/>"),
             }}
           />
         </div>
 
-        {/* Quote 3 - Between top-right and middle-right */}
+        {/* Quote 2 - Between top-right and middle-right */}
         <div
           style={{
             position: "absolute",
@@ -597,12 +504,12 @@ export default function MagazineCollageTemplate({
               lineHeight: "1.2",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[2].replace("\n", "<br/>"),
+              __html: selectedQuotes[1].replace("\n", "<br/>"),
             }}
           />
         </div>
 
-        {/* Quote 4 - Between middle and bottom center */}
+        {/* Quote 3 - Between middle and bottom center */}
         <div
           style={{
             position: "absolute",
@@ -632,7 +539,7 @@ export default function MagazineCollageTemplate({
               lineHeight: "1.2",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[3].replace("\n", "<br/>"),
+              __html: selectedQuotes[2].replace("\n", "<br/>"),
             }}
           />
         </div>
@@ -702,41 +609,6 @@ export default function MagazineCollageTemplate({
             height: '2px',
             background: 'linear-gradient(to right, transparent, #8b5cf6, #ec4899, transparent)',
           }} />
-        </div>
-
-        {/* Transparent Quote next to Vision Board card */}
-        <div
-          style={{
-            position: "absolute",
-            top: "185px",
-            left: "630px",
-            width: "100px",
-            height: "70px",
-            transform: "rotate(3deg)",
-            backgroundColor: "rgba(255, 255, 255, 0.3)",
-            border: "2px solid rgba(0, 0, 0, 0.2)",
-            borderRadius: "6px",
-            boxShadow: "2px 2px 6px rgba(0,0,0,0.1)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "6px",
-            zIndex: 50,
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "Telma, Arial, sans-serif",
-              fontWeight: "bold",
-              fontSize: "14px",
-              color: "#000000",
-              textAlign: "center",
-              lineHeight: "1.2",
-            }}
-            dangerouslySetInnerHTML={{
-              __html: selectedQuotes[0].replace("\n", "<br/>"),
-            }}
-          />
         </div>
       </div>
     </>
