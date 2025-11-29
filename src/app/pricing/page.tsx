@@ -399,7 +399,7 @@ export default function PricingPage() {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="min-w-[240px] color-[black] bg-white text-[black] hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6"
+                    className="min-w-[240px] bg-white text-[#7209B7] hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6"
                   >
                     Start Free Today →
                   </Button>

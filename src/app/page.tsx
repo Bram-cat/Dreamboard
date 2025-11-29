@@ -151,21 +151,82 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Showcase Section with db images */}
-      <section className="py-20 px-6">
+      {/* How It Works Section */}
+      <section className="py-24 px-6 bg-[#0D0C1D]/50">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
+          <div className="text-center mb-16">
+            <h2
+              className="text-4xl md:text-6xl font-bold mb-4"
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
+            >
+              <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
+                How It Works
+              </span>
+            </h2>
+            <p className="text-xl text-gray-400">From idea to manifestation in minutes</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
               <img
                 src="/db1.png"
-                alt="Vision Board Example 1"
+                alt="Collaborative Vision Board Creation"
                 className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
               />
             </div>
-            <div className="relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white font-bold text-xl">
+                  1
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Share Your Vision</h3>
+                  <p className="text-gray-400 leading-relaxed">Tell us about your goals, dreams, and aspirations for 2025. Upload personal photos or let our AI create perfect images.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white font-bold text-xl">
+                  2
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">AI Does the Magic</h3>
+                  <p className="text-gray-400 leading-relaxed">Our advanced AI generates stunning, personalized images and arranges them in beautiful templates.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white font-bold text-xl">
+                  3
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Download & Manifest</h3>
+                  <p className="text-gray-400 leading-relaxed">Get your high-resolution vision board instantly. Print it, set it as your wallpaper, or share it with friends.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center mt-20">
+            <div className="space-y-6 order-2 md:order-1">
+              <h3 className="text-3xl md:text-4xl font-bold text-white mb-6">Work Anywhere, Anytime</h3>
+              <p className="text-gray-400 text-lg leading-relaxed">
+                Create your vision boards from your laptop, tablet, or phone. Our platform works seamlessly across all devices, so you can manifest your dreams wherever inspiration strikes.
+              </p>
+              <div className="flex flex-wrap gap-4 pt-4">
+                <div className="px-6 py-3 rounded-full bg-gradient-to-r from-[#1A1A2E] to-[#16213E] border border-purple-500/20 text-white">
+                  Desktop
+                </div>
+                <div className="px-6 py-3 rounded-full bg-gradient-to-r from-[#1A1A2E] to-[#16213E] border border-purple-500/20 text-white">
+                  Tablet
+                </div>
+                <div className="px-6 py-3 rounded-full bg-gradient-to-r from-[#1A1A2E] to-[#16213E] border border-purple-500/20 text-white">
+                  Mobile
+                </div>
+              </div>
+            </div>
+            <div className="relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300 order-1 md:order-2">
               <img
                 src="/db2.png"
-                alt="Vision Board Example 2"
+                alt="Create Vision Boards Anywhere"
                 className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
               />
             </div>
