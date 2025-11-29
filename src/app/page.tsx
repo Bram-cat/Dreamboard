@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { useState } from "react";
 
 export default function HomePage() {
@@ -296,7 +295,7 @@ export default function HomePage() {
                 className="relative p-8 rounded-2xl bg-gradient-to-br from-[#1A1A2E] to-[#16213E] border border-purple-500/20 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300"
               >
                 <div className="text-5xl mb-6">{testimonial.avatar}</div>
-                <p className="text-gray-300 text-lg mb-6 italic leading-relaxed">"{testimonial.quote}"</p>
+                <p className="text-gray-300 text-lg mb-6 italic leading-relaxed">&ldquo;{testimonial.quote}&rdquo;</p>
                 <div>
                   <div className="text-white font-bold">{testimonial.author}</div>
                   <div className="text-gray-400 text-sm">{testimonial.role}</div>
