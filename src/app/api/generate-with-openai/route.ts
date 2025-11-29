@@ -47,12 +47,14 @@ export async function POST(request: NextRequest) {
 
     // ============================================
     // NEW STRATEGY: Generate ALL images with Gemini for personalization
-    // Grid template: 8 images, Magazine: 15 images, Polaroid: 15 images
+    // Grid template: 8 images, Magazine: 12 images (reduced for Netlify), Polaroid: 12 images
     // All images will include user's face/items for a cohesive personal vision board
     // NO generic OpenAI images - everything is personalized
+    // NETLIFY OPTIMIZATION: Reduced image count to stay under 10-second timeout
     // ============================================
     const geminiImages: string[] = [];
-    const numGeminiImages = selectedTemplate === "grid" ? 8 : selectedTemplate === "magazine" ? 15 : 15;
+    // Reduce image count for Netlify compatibility (10 second timeout limit)
+    const numGeminiImages = selectedTemplate === "grid" ? 6 : selectedTemplate === "magazine" ? 10 : 10;
 
     if (selectedTemplate !== "ai") {
       console.log(`\n🎨 STEP 1/2: Generating ${numGeminiImages} personalized images with Gemini (ALL images)...`);
@@ -317,7 +319,8 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Reduced delay for Netlify timeout constraints (500ms instead of 1000ms)
+        await new Promise(resolve => setTimeout(resolve, 500));
       } catch (error) {
         console.error(`  ✗ Error generating Gemini image ${i + 1}:`, error);
       }
@@ -613,10 +616,39 @@ Add beige rectangular labels in bottom-right corner of select tiles:
 
   } catch (error: unknown) {
     console.error("❌ Error:", error);
+
+    // Enhanced error logging for debugging
+    if (error instanceof Error) {
+      console.error("Error name:", error.name);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
+
+    // Check for specific error types
+    let errorMessage = "Failed to generate vision board";
+    let errorType = "unknown_error";
+
+    if (error instanceof Error) {
+      if (error.message.includes("API key")) {
+        errorMessage = "Invalid or missing API key. Please check your environment variables.";
+        errorType = "api_key_error";
+      } else if (error.message.includes("quota") || error.message.includes("rate limit")) {
+        errorMessage = "API quota exceeded or rate limit reached. Please try again later.";
+        errorType = "quota_error";
+      } else if (error.message.includes("network") || error.message.includes("fetch")) {
+        errorMessage = "Network error connecting to AI service. Please check your internet connection.";
+        errorType = "network_error";
+      } else {
+        errorMessage = error.message;
+        errorType = "api_error";
+      }
+    }
+
     return NextResponse.json(
       {
         status: "error",
-        error: "Failed to generate vision board",
+        error: errorMessage,
+        errorType: errorType,
         details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }

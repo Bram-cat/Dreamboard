@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface CleanGridTemplateProps {
-  images: string[]; // 8 personalized images (all Gemini)
+  images: string[]; // 6 personalized images (reduced for Netlify compatibility)
   keywords: string[];
 }
 
@@ -52,22 +52,17 @@ export default function CleanGridTemplate({
   // Use useMemo to maintain same quotes on re-renders
   const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
 
-  // Simple 3x3 grid layout - 8 images with minimal gaps and larger sizes
+  // Simple 2x3 grid layout - 6 images LARGER size to compensate for reduced count
   const gridPositions = [
-    // Top row - 3 images (minimal gaps: 10px)
-    { top: 10, left: 10, width: 435, height: 240, keyword: "" },
-    { top: 10, left: 455, width: 435, height: 240, keyword: "" },
-    { top: 10, left: 900, width: 435, height: 240, keyword: "" },
+    // Top row - 3 LARGER images (increased size)
+    { top: 10, left: 10, width: 530, height: 300, keyword: "" },
+    { top: 10, left: 550, width: 530, height: 300, keyword: "" },
+    { top: 10, left: 1090, width: 245, height: 300, keyword: "" },
 
-    // Middle row - 2 side images (center card in middle)
-    { top: 260, left: 10, width: 435, height: 240, keyword: "" },
-    // CENTER CARD HERE (positioned between middle images)
-    { top: 260, left: 900, width: 435, height: 240, keyword: "" },
-
-    // Bottom row - 3 images
-    { top: 510, left: 10, width: 435, height: 240, keyword: "" },
-    { top: 510, left: 455, width: 435, height: 240, keyword: "" },
-    { top: 510, left: 900, width: 435, height: 240, keyword: "" },
+    // Bottom row - 3 LARGER images
+    { top: 460, left: 10, width: 530, height: 300, keyword: "" },
+    { top: 460, left: 550, width: 530, height: 300, keyword: "" },
+    { top: 460, left: 1090, width: 245, height: 300, keyword: "" },
   ];
 
   // Canvas rendering for download
@@ -111,8 +106,8 @@ export default function CleanGridTemplate({
         });
       };
 
-      // Draw all grid images
-      for (let idx = 0; idx < Math.min(8, images.length); idx++) {
+      // Draw all grid images (max 6)
+      for (let idx = 0; idx < Math.min(6, images.length); idx++) {
         const pos = gridPositions[idx];
         if (!pos) continue;
 
@@ -262,11 +257,11 @@ export default function CleanGridTemplate({
         ctx.restore();
       });
 
-      // Draw center card - Larger, more prominent size
-      const centerX = 500;
-      const centerY = 290;
-      const centerW = 345;
-      const centerH = 180;
+      // Draw center card - Centered between rows
+      const centerX = 550;
+      const centerY = 320;
+      const centerW = 400;
+      const centerH = 200;
 
       ctx.save();
       ctx.fillStyle = '#6366f1'; // Indigo
@@ -349,8 +344,8 @@ export default function CleanGridTemplate({
         className="relative w-[1345px] h-[760px] mx-auto overflow-hidden"
         style={{ background: 'linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0)' }}
       >
-        {/* Grid Images */}
-        {images.slice(0, 8).map((image, idx) => {
+        {/* Grid Images - 6 larger images */}
+        {images.slice(0, 6).map((image, idx) => {
           const pos = gridPositions[idx];
           if (!pos) return null;
 
@@ -369,14 +364,14 @@ export default function CleanGridTemplate({
                 boxShadow: '0 2px 20px rgba(99, 102, 241, 0.15)',
               }}
             >
-              {/* Image */}
+              {/* Image - CONTAIN mode to show entire image */}
               <img
                 src={image}
                 alt={`Vision ${idx + 1}`}
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover',
+                  objectFit: 'contain',
                   objectPosition: 'center center',
                   display: 'block'
                 }}
@@ -576,20 +571,20 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* Center Card - Larger, more prominent */}
+        {/* Center Card - Centered between image rows */}
         <div
           className="absolute bg-indigo-500 shadow-2xl flex flex-col items-center justify-center"
           style={{
-            top: '290px',
-            left: '500px',
-            width: '345px',
-            height: '180px',
+            top: '320px',
+            left: '550px',
+            width: '400px',
+            height: '200px',
             borderRadius: '16px',
             zIndex: 20,
           }}
         >
-          <div className="text-white text-6xl font-bold mb-2">2025</div>
-          <div className="text-white text-lg tracking-widest">YOUR VISION BOARD</div>
+          <div className="text-white text-7xl font-bold mb-2">2025</div>
+          <div className="text-white text-xl tracking-widest">YOUR VISION BOARD</div>
         </div>
       </div>
     </>

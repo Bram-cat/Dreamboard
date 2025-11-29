@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface MagazineCollageTemplateProps {
-  images: string[]; // 15 personalized images (all Gemini) - arranged around center card
+  images: string[]; // 10 personalized images (all Gemini) - arranged around center card with LARGER containers
   keywords: string[];
 }
 
@@ -52,31 +52,25 @@ export default function MagazineCollageTemplate({
   // Use useMemo to maintain same quotes on re-renders
   const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
 
-  // TIGHT-FIT Magazine collage - 15 visible images properly arranged around center card
-  // Scaled to 1200px width (74% of original 1620px) for laptop screens
+  // TIGHT-FIT Magazine collage - 10 visible images LARGER containers arranged around center card
+  // Scaled to 1200px width for laptop screens - increased sizes by ~30%
   const collagePositions = [
-    // Top row - 6 LARGE images (overlapping, filling entire top)
-    { top: 0, left: 0, width: 237, height: 167, rotate: -3, zIndex: 20 },
-    { top: 4, left: 215, width: 237, height: 167, rotate: 2, zIndex: 21 },
-    { top: 0, left: 430, width: 237, height: 167, rotate: -2, zIndex: 22 },
-    { top: 4, left: 645, width: 237, height: 167, rotate: 3, zIndex: 23 },
-    { top: 0, left: 860, width: 237, height: 167, rotate: -2, zIndex: 24 },
-    { top: 4, left: 1075, width: 125, height: 167, rotate: 3, zIndex: 25 },
+    // Top row - 3 LARGER images (increased dimensions significantly)
+    { top: 0, left: 0, width: 310, height: 220, rotate: -3, zIndex: 20 },
+    { top: 5, left: 305, width: 310, height: 220, rotate: 2, zIndex: 21 },
+    { top: 0, left: 610, width: 310, height: 220, rotate: -2, zIndex: 22 },
+    { top: 5, left: 915, width: 285, height: 220, rotate: 3, zIndex: 23 },
 
-    // Middle row - 5 images around center card
-    { top: 156, left: 0, width: 237, height: 167, rotate: 2, zIndex: 26 },
-    { top: 160, left: 215, width: 193, height: 163, rotate: -3, zIndex: 27 },
+    // Middle row - 3 images around center card (LARGER)
+    { top: 160, left: 0, width: 310, height: 220, rotate: 2, zIndex: 26 },
     // CENTER CARD SPACE (400x156, 207x148)
-    // NEW IMAGE - Right of center card (replaces transparent quote)
-    { top: 165, left: 620, width: 160, height: 138, rotate: 3, zIndex: 27 },
-    { top: 156, left: 793, width: 237, height: 167, rotate: 3, zIndex: 28 },
-    { top: 160, left: 1008, width: 193, height: 163, rotate: -2, zIndex: 29 },
+    { top: 165, left: 625, width: 265, height: 200, rotate: 3, zIndex: 27 },
+    { top: 160, left: 890, width: 310, height: 220, rotate: -2, zIndex: 28 },
 
-    // Bottom row - 4 images (proper dimensions to accommodate AI images)
-    { top: 312, left: 0, width: 290, height: 148, rotate: -2, zIndex: 30 },
-    { top: 314, left: 290, width: 290, height: 148, rotate: 2, zIndex: 31 },
-    { top: 312, left: 610, width: 290, height: 148, rotate: -3, zIndex: 32 },
-    { top: 314, left: 910, width: 290, height: 148, rotate: 3, zIndex: 33 },
+    // Bottom row - 3 LARGER images
+    { top: 312, left: 0, width: 385, height: 195, rotate: -2, zIndex: 30 },
+    { top: 315, left: 385, width: 385, height: 195, rotate: 2, zIndex: 31 },
+    { top: 312, left: 815, width: 385, height: 195, rotate: -3, zIndex: 32 },
   ];
 
   // Canvas rendering for download
@@ -130,9 +124,9 @@ export default function MagazineCollageTemplate({
         .map((pos, idx) => ({ pos, idx }))
         .sort((a, b) => a.pos.zIndex - b.pos.zIndex);
 
-      // Draw all collage images
+      // Draw all collage images (max 10)
       for (const { pos, idx } of sortedPositions) {
-        if (idx >= images.length) continue;
+        if (idx >= images.length || idx >= 10) continue;
 
         try {
           const img = await loadImage(images[idx]);
@@ -151,34 +145,29 @@ export default function MagazineCollageTemplate({
           ctx.fillRect(0, 0, pos.width, pos.height);
           ctx.shadowColor = 'transparent';
 
-          // Draw image inside the border - scale to fill frame with small white border
+          // Draw image inside the border - CONTAIN mode to show entire image
           const padding = 12;
           const imgRatio = img.width / img.height;
           const boxRatio = (pos.width - padding * 2) / (pos.height - padding * 2);
           let drawWidth, drawHeight, drawX, drawY;
 
-          // Cover mode but scaled to 95% to show white border - fills frame nicely
+          // Contain mode - fit entire image within frame while maintaining aspect ratio
           if (imgRatio > boxRatio) {
-            // Image is wider - match height, let width overflow slightly
-            drawHeight = (pos.height - padding * 2) * 0.95;
-            drawWidth = drawHeight * imgRatio;
-            drawX = padding + (pos.width - padding * 2 - drawWidth) / 2;
+            // Image is wider - match width
+            drawWidth = pos.width - padding * 2;
+            drawHeight = drawWidth / imgRatio;
+            drawX = padding;
             drawY = padding + (pos.height - padding * 2 - drawHeight) / 2;
           } else {
-            // Image is taller - match width, let height overflow slightly
-            drawWidth = (pos.width - padding * 2) * 0.95;
-            drawHeight = drawWidth / imgRatio;
+            // Image is taller - match height
+            drawHeight = pos.height - padding * 2;
+            drawWidth = drawHeight * imgRatio;
             drawX = padding + (pos.width - padding * 2 - drawWidth) / 2;
-            drawY = padding + (pos.height - padding * 2 - drawHeight) / 2;
+            drawY = padding;
           }
 
-          // Clip to ensure image doesn't overflow the frame
-          ctx.save();
-          ctx.beginPath();
-          ctx.rect(padding, padding, pos.width - padding * 2, pos.height - padding * 2);
-          ctx.clip();
+          // Draw image - no clipping needed for contain mode
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-          ctx.restore();
 
           // Draw tape decorations AFTER image (so they appear on top)
           const drawTape = (x: number, y: number, angle: number) => {
@@ -385,8 +374,8 @@ export default function MagazineCollageTemplate({
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
         }}
       >
-        {/* Collage Images - 15 total (around center card) */}
-        {images.slice(0, 15).map((image, idx) => {
+        {/* Collage Images - 10 total (around center card) with LARGER containers */}
+        {images.slice(0, 10).map((image, idx) => {
           const pos = collagePositions[idx];
           if (!pos) return null;
 
@@ -428,13 +417,13 @@ export default function MagazineCollageTemplate({
                 }}
               />
 
-              {/* Image - Cover mode scaled to 95% to show white border */}
+              {/* Image - CONTAIN mode to show entire image */}
               <img
                 src={image}
                 alt={`Vision ${idx + 1}`}
-                className="w-[95%] h-[95%] m-auto"
+                className="w-full h-full"
                 style={{
-                  objectFit: 'cover',
+                  objectFit: 'contain',
                   objectPosition: 'center'
                 }}
               />

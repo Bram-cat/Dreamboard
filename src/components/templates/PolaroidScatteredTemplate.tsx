@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface PolaroidScatteredTemplateProps {
-  images: string[]; // 15 personalized images (all Gemini)
+  images: string[]; // 10 personalized images (all Gemini) with LARGER Polaroid frames
   quotes: string[];
 }
 
@@ -71,149 +71,104 @@ export default function PolaroidScatteredTemplate({
     "#FFECB3", // amber
   ];
 
-  // Polaroid scrapbook layout - 15 images scattered with vibrant colors
-  // Scaled to 1200px width for laptop screens
+  // Polaroid scrapbook layout - 10 images scattered with vibrant colors and LARGER frames
+  // Scaled to 1200px width for laptop screens - increased sizes by ~35%
   const gridPositions = [
-    // Top scattered row - 5 frames
+    // Top scattered row - 3 LARGER frames
     {
       top: 5,
       left: 5,
-      width: 200,
-      height: 160,
+      width: 270,
+      height: 216,
       rotation: -8,
       label: "",
       frameColor: frameColors[0],
     },
     {
       top: 10,
-      left: 215,
-      width: 195,
-      height: 155,
+      left: 285,
+      width: 265,
+      height: 210,
       rotation: 5,
       label: "",
       frameColor: frameColors[1],
     },
     {
       top: 8,
-      left: 420,
-      width: 190,
-      height: 150,
+      left: 560,
+      width: 260,
+      height: 205,
       rotation: -3,
       label: "",
       frameColor: frameColors[2],
     },
     {
       top: 12,
-      left: 620,
-      width: 200,
-      height: 160,
+      left: 830,
+      width: 370,
+      height: 216,
       rotation: 7,
       label: "",
       frameColor: frameColors[3],
     },
-    {
-      top: 6,
-      left: 830,
-      width: 195,
-      height: 155,
-      rotation: -5,
-      label: "",
-      frameColor: frameColors[4],
-    },
-    {
-      top: 10,
-      left: 1035,
-      width: 160,
-      height: 130,
-      rotation: 4,
-      label: "",
-      frameColor: frameColors[5],
-    },
 
-    // Middle scattered row - 4 frames (around center card)
+    // Middle scattered row - 3 frames (around center card) - LARGER
     {
       top: 185,
       left: 8,
-      width: 190,
-      height: 150,
+      width: 260,
+      height: 205,
       rotation: 6,
       label: "",
       frameColor: frameColors[6],
     },
-    {
-      top: 190,
-      left: 208,
-      width: 185,
-      height: 145,
-      rotation: -4,
-      label: "",
-      frameColor: frameColors[7],
-    },
     // CENTER CARD SPACE (400x200, 240x180)
     {
       top: 188,
-      left: 825,
-      width: 190,
-      height: 150,
+      left: 850,
+      width: 350,
+      height: 205,
       rotation: 5,
       label: "",
       frameColor: frameColors[8],
     },
-    {
-      top: 192,
-      left: 1025,
-      width: 170,
-      height: 135,
-      rotation: -6,
-      label: "",
-      frameColor: frameColors[9],
-    },
 
-    // Bottom scattered row - 5 frames
+    // Bottom scattered row - 3 LARGER frames
     {
       top: 360,
       left: 10,
-      width: 195,
-      height: 155,
+      width: 265,
+      height: 210,
       rotation: -7,
       label: "",
       frameColor: frameColors[10],
     },
     {
       top: 365,
-      left: 215,
-      width: 190,
-      height: 150,
+      left: 285,
+      width: 260,
+      height: 205,
       rotation: 6,
       label: "",
       frameColor: frameColors[11],
     },
     {
       top: 362,
-      left: 415,
-      width: 185,
-      height: 145,
+      left: 555,
+      width: 270,
+      height: 216,
       rotation: -4,
       label: "",
       frameColor: frameColors[12],
     },
     {
       top: 368,
-      left: 610,
-      width: 200,
-      height: 160,
+      left: 835,
+      width: 365,
+      height: 216,
       rotation: 5,
       label: "",
       frameColor: frameColors[13],
-    },
-    {
-      top: 363,
-      left: 1020,
-      width: 175,
-      height: 140,
-      rotation: -8,
-      label: "",
-      frameColor: frameColors[14],
     },
   ];
 
@@ -254,8 +209,8 @@ export default function PolaroidScatteredTemplate({
         });
       };
 
-      // Draw all polaroid frames with rotation (max 15 frames)
-      for (let idx = 0; idx < Math.min(15, images.length); idx++) {
+      // Draw all polaroid frames with rotation (max 10 frames)
+      for (let idx = 0; idx < Math.min(10, images.length); idx++) {
         const pos = gridPositions[idx];
         if (!pos) continue;
 
@@ -286,34 +241,31 @@ export default function PolaroidScatteredTemplate({
           );
           ctx.shadowColor = "transparent";
 
-          // Draw image inside polaroid frame with proper cover scaling
+          // Draw image inside polaroid frame with CONTAIN mode - show entire image
           const imgRatio = img.width / img.height;
           const boxRatio = pos.width / pos.height;
           let drawWidth, drawHeight, offsetX, offsetY;
 
-          // Fill the frame completely (cover mode)
+          // Contain mode - fit entire image within frame while maintaining aspect ratio
           if (imgRatio > boxRatio) {
-            // Image is wider - fit to height
-            drawHeight = pos.height;
-            drawWidth = drawHeight * imgRatio;
-            offsetX = -(drawWidth - pos.width) / 2;
-            offsetY = 0;
-          } else {
-            // Image is taller - fit to width
+            // Image is wider - match width
             drawWidth = pos.width;
             drawHeight = drawWidth / imgRatio;
             offsetX = 0;
-            offsetY = -(drawHeight - pos.height) / 2;
+            offsetY = (pos.height - drawHeight) / 2;
+          } else {
+            // Image is taller - match height
+            drawHeight = pos.height;
+            drawWidth = drawHeight * imgRatio;
+            offsetX = (pos.width - drawWidth) / 2;
+            offsetY = 0;
           }
 
           // Center image within frame
           const imgX = -pos.width / 2;
           const imgY = -frameHeight / 2 + 20; // 20px from top edge
 
-          ctx.save();
-          ctx.beginPath();
-          ctx.rect(imgX, imgY, pos.width, pos.height);
-          ctx.clip();
+          // Draw image - no clipping needed for contain mode
           ctx.drawImage(
             img,
             imgX + offsetX,
@@ -321,7 +273,6 @@ export default function PolaroidScatteredTemplate({
             drawWidth,
             drawHeight
           );
-          ctx.restore();
 
           // Draw label if exists (handwritten style)
           if (pos.label) {
@@ -516,8 +467,8 @@ export default function PolaroidScatteredTemplate({
           backgroundColor: "#f5f1ed",
         }}
       >
-        {/* Polaroid Frames - Rotated Scrapbook Style */}
-        {images.slice(0, 15).map((image, idx) => {
+        {/* Polaroid Frames - Rotated Scrapbook Style - 10 LARGER frames */}
+        {images.slice(0, 10).map((image, idx) => {
           const pos = gridPositions[idx];
           if (!pos) return null;
 
@@ -546,13 +497,13 @@ export default function PolaroidScatteredTemplate({
                   padding: "2% 2% 6% 2%", // Extra padding at bottom
                 }}
               >
-                {/* Image */}
+                {/* Image - CONTAIN mode to show entire image */}
                 <img
                   src={image}
                   alt={`Vision ${idx + 1}`}
                   className="w-full"
                   style={{
-                    objectFit: "cover",
+                    objectFit: "contain",
                     height: "85%",
                   }}
                 />
