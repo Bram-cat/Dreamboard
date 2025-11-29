@@ -312,7 +312,7 @@ export default function AboutPage() {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="min-w-[200px] bg-white text-[#7209B7] hover:bg-white/95 shadow-2xl hover:scale-105 font-bold text-lg py-6"
+                    className="min-w-[200px] bg-[#0D0C1D] text-white hover:bg-[#1A1A2E] shadow-2xl hover:scale-105 font-bold text-lg py-6"
                   >
                     Start Creating Today →
                   </Button>
