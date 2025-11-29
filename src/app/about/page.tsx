@@ -295,7 +295,7 @@ export default function AboutPage() {
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="relative overflow-hidden rounded-3xl">
-            <div className="absolute inset-0 bg-gradient-to-r from-[violet] via-[#9D4EDD] to-[#C77DFF]"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#7209B7] via-[#9D4EDD] to-[#E0AAFF]"></div>
             <div className="relative p-12 md:p-16 text-center">
               <h2
                 className="text-4xl md:text-6xl font-bold text-white mb-6"
@@ -303,20 +303,28 @@ export default function AboutPage() {
               >
                 JOIN OUR COMMUNITY
               </h2>
-              <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
                 Be part of a growing community of dreamers manifesting their
                 goals and supporting each other&apos;s journey
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/create">
-                  <button className="min-w-[200px] bg-white text-[violet] hover:bg-gray-100 shadow-2xl hover:scale-105">
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="min-w-[200px] bg-white text-[#7209B7] hover:bg-white/95 shadow-2xl hover:scale-105 font-bold text-lg py-6"
+                  >
                     Start Creating Today →
-                  </button>
+                  </Button>
                 </Link>
                 <Link href="/pricing">
-                  <button className="min-w-[200px] border-2 border-white text-white hover:bg-white/10">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="min-w-[200px] border-2 border-white text-white hover:bg-white/20 font-semibold text-lg py-6"
+                  >
                     View Pricing
-                  </button>
+                  </Button>
                 </Link>
               </div>
             </div>

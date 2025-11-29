@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/Button";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 export default function HomePage() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
@@ -390,7 +390,7 @@ export default function HomePage() {
       <section className="py-24 px-6 animate-on-scroll">
         <div className="max-w-5xl mx-auto">
           <div className="relative overflow-hidden rounded-3xl">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#7209B7] via-[#9D4EDD] to-[#C77DFF]"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#7209B7] via-[#9D4EDD] to-[#E0AAFF]"></div>
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
             <div className="relative p-16 md:p-20 text-center">
               <h2
@@ -399,7 +399,7 @@ export default function HomePage() {
               >
                 Ready to Manifest<br />Your 2025 Dreams?
               </h2>
-              <p className="text-xl md:text-2xl text-purple-100 mb-12 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed">
                 Join thousands creating vision boards and turning their dreams into reality
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -407,7 +407,7 @@ export default function HomePage() {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="min-w-[240px] bg-white text-black hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6"
+                    className="min-w-[240px] bg-white text-[#7209B7] hover:bg-white/95 shadow-2xl hover:scale-105 font-bold text-lg py-6"
                   >
                     Start Creating Free →
                   </Button>
@@ -416,7 +416,7 @@ export default function HomePage() {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="min-w-[240px] border-2 border-white text-white hover:bg-white/10 text-lg py-6"
+                    className="min-w-[240px] border-2 border-white text-white hover:bg-white/20 text-lg py-6 font-semibold"
                   >
                     View Pricing
                   </Button>
