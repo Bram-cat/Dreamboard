@@ -3,10 +3,28 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/Button";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function HomePage() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate-fade-in");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const sections = document.querySelectorAll(".animate-on-scroll");
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, []);
 
   const features = [
     {
@@ -136,7 +154,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-6 bg-[#0D0C1D]/50">
+      <section className="py-16 px-6 bg-[#0D0C1D]/50 animate-on-scroll">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -152,7 +170,7 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-24 px-6 bg-[#0D0C1D]/50">
+      <section className="py-24 px-6 bg-[#0D0C1D]/50 animate-on-scroll">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
@@ -204,38 +222,11 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-
-          <div className="grid md:grid-cols-2 gap-12 items-center mt-20">
-            <div className="space-y-6 order-2 md:order-1">
-              <h3 className="text-3xl md:text-4xl font-bold text-white mb-6">Work Anywhere, Anytime</h3>
-              <p className="text-gray-400 text-lg leading-relaxed">
-                Create your vision boards from your laptop, tablet, or phone. Our platform works seamlessly across all devices, so you can manifest your dreams wherever inspiration strikes.
-              </p>
-              <div className="flex flex-wrap gap-4 pt-4">
-                <div className="px-6 py-3 rounded-full bg-gradient-to-r from-[#1A1A2E] to-[#16213E] border border-purple-500/20 text-white">
-                  Desktop
-                </div>
-                <div className="px-6 py-3 rounded-full bg-gradient-to-r from-[#1A1A2E] to-[#16213E] border border-purple-500/20 text-white">
-                  Tablet
-                </div>
-                <div className="px-6 py-3 rounded-full bg-gradient-to-r from-[#1A1A2E] to-[#16213E] border border-purple-500/20 text-white">
-                  Mobile
-                </div>
-              </div>
-            </div>
-            <div className="relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300 order-1 md:order-2">
-              <img
-                src="/db2.png"
-                alt="Create Vision Boards Anywhere"
-                className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
-              />
-            </div>
-          </div>
         </div>
       </section>
 
       {/* Examples Gallery - Bento Grid */}
-      <section id="examples" className="py-24 px-6">
+      <section id="examples" className="py-24 px-6 animate-on-scroll">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
@@ -329,7 +320,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section - Lattice-inspired cards */}
-      <section className="py-24 px-6 bg-[#0D0C1D]/50">
+      <section className="py-24 px-6 bg-[#0D0C1D]/50 animate-on-scroll">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
@@ -364,7 +355,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 animate-on-scroll">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2
@@ -396,7 +387,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section - Gradient */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 animate-on-scroll">
         <div className="max-w-5xl mx-auto">
           <div className="relative overflow-hidden rounded-3xl">
             <div className="absolute inset-0 bg-gradient-to-r from-[#7209B7] via-[#9D4EDD] to-[#C77DFF]"></div>
@@ -416,7 +407,7 @@ export default function HomePage() {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="min-w-[240px] bg-white text-[#7209B7] hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6"
+                    className="min-w-[240px] bg-white text-black hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6"
                   >
                     Start Creating Free →
                   </Button>
