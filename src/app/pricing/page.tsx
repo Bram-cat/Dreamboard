@@ -379,7 +379,7 @@ export default function PricingPage() {
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="relative overflow-hidden rounded-3xl">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#7209B7] via-[#9D4EDD] to-[#C77DFF]"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[violet] via-[#9D4EDD] to-[#C77DFF]"></div>
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
             <div className="relative p-16 text-center">
               <h2
@@ -399,7 +399,7 @@ export default function PricingPage() {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="min-w-[240px] bg-white text-[#7209B7] hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6"
+                    className="min-w-[240px] bg-white text-[violet] hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6"
                   >
                     Start Free Today →
                   </Button>

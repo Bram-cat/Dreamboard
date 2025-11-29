@@ -10,40 +10,46 @@ export default function LandingPage() {
     {
       icon: "✨",
       title: "AI-Powered Generation",
-      description: "Transform your goals into stunning visual boards using advanced AI technology"
+      description:
+        "Transform your goals into stunning visual boards using advanced AI technology",
     },
     {
       icon: "🎨",
       title: "Multiple Templates",
-      description: "Choose from magazine, polaroid, scrapbook, and grid layouts"
+      description:
+        "Choose from magazine, polaroid, scrapbook, and grid layouts",
     },
     {
       icon: "📸",
       title: "Personalized Images",
-      description: "Upload your selfie and dream items to create truly personal vision boards"
+      description:
+        "Upload your selfie and dream items to create truly personal vision boards",
     },
     {
       icon: "⚡",
       title: "Instant Download",
-      description: "Generate and download your vision board in high quality within seconds"
+      description:
+        "Generate and download your vision board in high quality within seconds",
     },
     {
       icon: "🔒",
       title: "Privacy First",
-      description: "Your images and goals are processed securely and never shared"
+      description:
+        "Your images and goals are processed securely and never shared",
     },
     {
       icon: "💎",
       title: "Premium Quality",
-      description: "Professional-grade vision boards worthy of your biggest dreams"
-    }
+      description:
+        "Professional-grade vision boards worthy of your biggest dreams",
+    },
   ];
 
   const templates = [
     { name: "Magazine", image: "/sample.png" },
     { name: "Polaroid", image: "/sample2.png" },
     { name: "Scrapbook", image: "/sample3.png" },
-    { name: "Grid", image: "/image.png" }
+    { name: "Grid", image: "/image.png" },
   ];
 
   return (
@@ -53,7 +59,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span className="text-4xl">✨</span>
-            <h1 className="text-2xl font-bold" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
+            <h1
+              className="text-2xl font-bold"
+              style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
+            >
               <span className="bg-gradient-to-r from-[#E0AAFF] via-[#C77DFF] to-[#9D4EDD] bg-clip-text text-transparent">
                 DREAMBOARD
               </span>
@@ -61,9 +70,24 @@ export default function LandingPage() {
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-gray-300 hover:text-white transition">Features</a>
-            <a href="#templates" className="text-gray-300 hover:text-white transition">Templates</a>
-            <a href="#pricing" className="text-gray-300 hover:text-white transition">Pricing</a>
+            <a
+              href="#features"
+              className="text-gray-300 hover:text-white transition"
+            >
+              Features
+            </a>
+            <a
+              href="#templates"
+              className="text-gray-300 hover:text-white transition"
+            >
+              Templates
+            </a>
+            <a
+              href="#pricing"
+              className="text-gray-300 hover:text-white transition"
+            >
+              Pricing
+            </a>
             <Link
               href="/create"
               className="px-6 py-2 bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] rounded-lg hover:from-[#560BAD] hover:to-[#7209B7] transition text-white font-semibold"
@@ -89,8 +113,9 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed">
-            Create stunning, personalized vision boards powered by AI. Upload your photos, set your goals,
-            and watch as artificial intelligence transforms them into beautiful visual manifestations.
+            Create stunning, personalized vision boards powered by AI. Upload
+            your photos, set your goals, and watch as artificial intelligence
+            transforms them into beautiful visual manifestations.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -122,7 +147,9 @@ export default function LandingPage() {
                 Notify Me
               </button>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Get notified about new features and templates</p>
+            <p className="text-sm text-gray-500 mt-2">
+              Get notified about new features and templates
+            </p>
           </div>
         </div>
       </section>
@@ -149,8 +176,12 @@ export default function LandingPage() {
                 className="p-8 bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-2xl border border-purple-500/20 hover:border-purple-400/40 transition-all hover:scale-105"
               >
                 <div className="text-5xl mb-4">{feature.icon}</div>
-                <h3 className="text-2xl font-bold mb-3 text-white">{feature.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+                <h3 className="text-2xl font-bold mb-3 text-white">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-400 leading-relaxed">
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
@@ -183,8 +214,12 @@ export default function LandingPage() {
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
                   <div className="p-6 w-full">
-                    <h3 className="text-2xl font-bold text-white mb-2">{template.name} Layout</h3>
-                    <p className="text-gray-300 text-sm">Perfect for showcasing your dreams</p>
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      {template.name} Layout
+                    </h3>
+                    <p className="text-gray-300 text-sm">
+                      Perfect for showcasing your dreams
+                    </p>
                   </div>
                 </div>
               </div>
@@ -195,7 +230,7 @@ export default function LandingPage() {
 
       {/* CTA Section */}
       <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] rounded-3xl p-12">
+        <div className="max-w-4xl mx-auto text-center bg-gradient-to-r from-[violet] to-[#9D4EDD] rounded-3xl p-12">
           <h2
             className="text-4xl md:text-5xl font-bold mb-6"
             style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
@@ -203,11 +238,12 @@ export default function LandingPage() {
             START YOUR JOURNEY TODAY
           </h2>
           <p className="text-xl text-purple-100 mb-8">
-            Join thousands manifesting their dreams with AI-powered vision boards
+            Join thousands manifesting their dreams with AI-powered vision
+            boards
           </p>
           <Link
             href="/create"
-            className="inline-block px-10 py-4 bg-white text-[#7209B7] rounded-lg hover:bg-gray-100 transition font-bold text-lg"
+            className="inline-block px-10 py-4 bg-white text-[violet] rounded-lg hover:bg-gray-100 transition font-bold text-lg"
           >
             Create Your First Board Free
           </Link>
@@ -219,9 +255,15 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto text-center text-gray-400">
           <p>&copy; 2025 Dreamboard. All rights reserved.</p>
           <div className="flex justify-center gap-6 mt-4">
-            <a href="#" className="hover:text-white transition">Privacy</a>
-            <a href="#" className="hover:text-white transition">Terms</a>
-            <a href="#" className="hover:text-white transition">Contact</a>
+            <a href="#" className="hover:text-white transition">
+              Privacy
+            </a>
+            <a href="#" className="hover:text-white transition">
+              Terms
+            </a>
+            <a href="#" className="hover:text-white transition">
+              Contact
+            </a>
           </div>
         </div>
       </footer>
