@@ -241,11 +241,10 @@ export default function LandingPage() {
             Join thousands manifesting their dreams with AI-powered vision
             boards
           </p>
-          <Link
-            href="/create"
-            className="inline-block px-10 py-4 bg-white text-[violet] rounded-lg hover:bg-gray-100 transition font-bold text-lg"
-          >
-            Create Your First Board Free
+          <Link href="/create">
+            <button className="min-w-[200px] bg-white text-[violet] hover:bg-gray-100 shadow-2xl hover:scale-105">
+              Start Creating Today →
+            </button>
           </Link>
         </div>
       </section>

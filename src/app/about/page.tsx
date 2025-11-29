@@ -309,22 +309,14 @@ export default function AboutPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/create">
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    className="min-w-[200px] bg-white text-[violet] hover:bg-gray-100 shadow-2xl hover:scale-105"
-                  >
+                  <button className="min-w-[200px] bg-white text-[violet] hover:bg-gray-100 shadow-2xl hover:scale-105">
                     Start Creating Today →
-                  </Button>
+                  </button>
                 </Link>
                 <Link href="/pricing">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="min-w-[200px] border-2 border-white text-white hover:bg-white/10"
-                  >
+                  <button className="min-w-[200px] border-2 border-white text-white hover:bg-white/10">
                     View Pricing
-                  </Button>
+                  </button>
                 </Link>
               </div>
             </div>

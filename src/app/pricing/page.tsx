@@ -396,22 +396,14 @@ export default function PricingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/create">
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    className="min-w-[240px] bg-white text-[violet] hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6"
-                  >
+                  <button className="min-w-[240px] bg-white text-[violet] hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6">
                     Start Free Today →
-                  </Button>
+                  </button>
                 </Link>
                 <Link href="/about">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="min-w-[240px] border-2 border-white text-white hover:bg-white/10 text-lg py-6"
-                  >
+                  <button className="min-w-[240px] border-2 border-white text-white hover:bg-white/10 text-lg py-6">
                     Learn More
-                  </Button>
+                  </button>
                 </Link>
               </div>
             </div>
