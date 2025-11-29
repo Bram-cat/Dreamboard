@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
 export default function PricingPage() {
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
+    "monthly"
+  );
 
   const plans = [
     {
@@ -20,16 +22,12 @@ export default function PricingPage() {
         "AI-powered image generation",
         "HD quality downloads (1200x800px)",
         "Personal use only",
-        "Community support"
+        "Community support",
       ],
-      limitations: [
-        "Limited to 1 board total",
-        "Standard processing speed"
-      ],
+      limitations: ["Limited to 1 board total", "Standard processing speed"],
       cta: "Start Free",
       popular: false,
       gradient: "from-gray-600 to-gray-700",
-      emoji: "🎯"
     },
     {
       name: "Premium",
@@ -41,27 +39,38 @@ export default function PricingPage() {
         "All premium templates with exclusive designs",
         "Advanced AI generation with priority processing",
         "4K Ultra HD downloads (2800x2000px)",
-        "⚡ Lightning-fast processing (3x faster)",
+        "Lightning-fast processing (3x faster)",
         "Commercial use license",
         "Remove watermarks",
         "Early access to new features",
         "Priority email support",
-        "Custom template requests"
+        "Custom template requests",
       ],
       limitations: [],
       cta: "Go Premium",
       popular: true,
       gradient: "from-[#7209B7] to-[#9D4EDD]",
-      emoji: "🚀"
-    }
+    },
   ];
 
   const comparisonFeatures = [
-    { feature: "Vision Boards per Month", free: "1 total", premium: "20/month" },
-    { feature: "Template Styles", free: "All 4 templates", premium: "All + Exclusive" },
+    {
+      feature: "Vision Boards per Month",
+      free: "1 total",
+      premium: "20/month",
+    },
+    {
+      feature: "Template Styles",
+      free: "All 4 templates",
+      premium: "All + Exclusive",
+    },
     { feature: "AI Image Quality", free: "Standard", premium: "Advanced" },
-    { feature: "Download Quality", free: "HD (1200x800)", premium: "4K (2800x2000)" },
-    { feature: "Processing Speed", free: "Standard", premium: "3x Faster ⚡" },
+    {
+      feature: "Download Quality",
+      free: "HD (1200x800)",
+      premium: "4K (2800x2000)",
+    },
+    { feature: "Processing Speed", free: "Standard", premium: "3x Faster" },
     { feature: "Commercial Use", free: "✗", premium: "✓" },
     { feature: "Watermark", free: "Yes", premium: "Removed" },
     { feature: "Support", free: "Community", premium: "Priority Email" },
@@ -75,13 +84,17 @@ export default function PricingPage() {
       <section className="relative pt-32 pb-12 px-6 overflow-hidden">
         {/* Animated gradient orbs */}
         <div className="absolute top-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-10 w-72 h-72 bg-violet-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div
+          className="absolute bottom-20 left-10 w-72 h-72 bg-violet-500/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          {/* Fun Badge */}
+          {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#7209B7]/10 to-[#9D4EDD]/10 border border-[#9D4EDD]/20 mb-8">
-            <span className="text-2xl">💰</span>
-            <span className="text-[#E0AAFF] text-sm font-semibold">Affordable Plans for Every Dreamer</span>
+            <span className="text-[#E0AAFF] text-sm font-semibold">
+              Affordable Plans for Every Dreamer
+            </span>
           </div>
 
           <h1
@@ -96,7 +109,8 @@ export default function PricingPage() {
           </h1>
 
           <p className="text-2xl text-gray-300 mb-12 leading-relaxed">
-            Start free, upgrade when you&apos;re ready. No hidden fees, no surprises.
+            Start free, upgrade when you&apos;re ready. No hidden fees, no
+            surprises.
           </p>
 
           {/* Billing Toggle */}
@@ -134,13 +148,11 @@ export default function PricingPage() {
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`relative group ${
-                plan.popular ? "md:scale-105" : ""
-              }`}
+              className={`relative group ${plan.popular ? "md:scale-105" : ""}`}
             >
               {plan.popular && (
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-8 py-2 bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] rounded-full text-sm font-bold text-white shadow-lg shadow-purple-500/50 z-10 animate-pulse">
-                  ⭐ MOST POPULAR
+                  MOST POPULAR
                 </div>
               )}
 
@@ -160,10 +172,12 @@ export default function PricingPage() {
 
                 <div className="relative z-10">
                   <div className="text-center mb-10">
-                    <div className="text-6xl mb-4">{plan.emoji}</div>
                     <h3
                       className="text-4xl font-bold text-white mb-3"
-                      style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
+                      style={{
+                        fontFamily: "'Switzer', sans-serif",
+                        fontWeight: 700,
+                      }}
                     >
                       {plan.name}
                     </h3>
@@ -173,15 +187,20 @@ export default function PricingPage() {
                   <div className="text-center mb-10 py-6 border-y border-purple-500/20">
                     <div className="flex items-baseline justify-center gap-2">
                       <span className="text-7xl font-bold bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
-                        ${billingCycle === "yearly" && plan.yearlyPrice ? plan.yearlyPrice : plan.price}
+                        $
+                        {billingCycle === "yearly" && plan.yearlyPrice
+                          ? plan.yearlyPrice
+                          : plan.price}
                       </span>
                       {plan.price > 0 && (
-                        <span className="text-gray-400 text-xl">/{billingCycle === "yearly" ? "year" : "month"}</span>
+                        <span className="text-gray-400 text-xl">
+                          /{billingCycle === "yearly" ? "year" : "month"}
+                        </span>
                       )}
                     </div>
                     {billingCycle === "yearly" && plan.price > 0 && (
                       <p className="text-sm text-green-400 mt-3 font-semibold">
-                        💰 Save ${plan.price * 12 - (plan.yearlyPrice || 0)}/year
+                        Save ${plan.price * 12 - (plan.yearlyPrice || 0)}/year
                       </p>
                     )}
                   </div>
@@ -189,14 +208,23 @@ export default function PricingPage() {
                   <ul className="space-y-4 mb-10">
                     {plan.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-3">
-                        <span className="text-green-400 text-xl mt-0.5 flex-shrink-0">✓</span>
+                        <span className="text-green-400 text-xl mt-0.5 flex-shrink-0">
+                          ✓
+                        </span>
                         <span className="text-gray-300 text-lg">{feature}</span>
                       </li>
                     ))}
                     {plan.limitations.map((limitation, idx) => (
-                      <li key={idx} className="flex items-start gap-3 opacity-40">
-                        <span className="text-gray-500 text-xl mt-0.5 flex-shrink-0">○</span>
-                        <span className="text-gray-500 text-lg">{limitation}</span>
+                      <li
+                        key={idx}
+                        className="flex items-start gap-3 opacity-40"
+                      >
+                        <span className="text-gray-500 text-xl mt-0.5 flex-shrink-0">
+                          ○
+                        </span>
+                        <span className="text-gray-500 text-lg">
+                          {limitation}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -230,7 +258,9 @@ export default function PricingPage() {
                 FEATURE COMPARISON
               </span>
             </h2>
-            <p className="text-xl text-gray-400">See exactly what you get with each plan</p>
+            <p className="text-xl text-gray-400">
+              See exactly what you get with each plan
+            </p>
           </div>
 
           <div className="bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-3xl border border-purple-500/20 overflow-hidden">
@@ -238,17 +268,32 @@ export default function PricingPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-purple-500/20">
-                    <th className="text-left p-6 text-gray-400 font-semibold">Feature</th>
-                    <th className="text-center p-6 text-white font-bold">Free 🎯</th>
-                    <th className="text-center p-6 text-white font-bold">Premium 🚀</th>
+                    <th className="text-left p-6 text-gray-400 font-semibold">
+                      Feature
+                    </th>
+                    <th className="text-center p-6 text-white font-bold">
+                      Free
+                    </th>
+                    <th className="text-center p-6 text-white font-bold">
+                      Premium
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {comparisonFeatures.map((item, index) => (
-                    <tr key={index} className="border-b border-purple-500/10 hover:bg-purple-500/5 transition-colors">
-                      <td className="p-6 text-gray-300 font-medium">{item.feature}</td>
-                      <td className="p-6 text-center text-gray-400">{item.free}</td>
-                      <td className="p-6 text-center text-white font-semibold">{item.premium}</td>
+                    <tr
+                      key={index}
+                      className="border-b border-purple-500/10 hover:bg-purple-500/5 transition-colors"
+                    >
+                      <td className="p-6 text-gray-300 font-medium">
+                        {item.feature}
+                      </td>
+                      <td className="p-6 text-center text-gray-400">
+                        {item.free}
+                      </td>
+                      <td className="p-6 text-center text-white font-semibold">
+                        {item.premium}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -262,7 +307,6 @@ export default function PricingPage() {
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <div className="text-6xl mb-6">🤔</div>
             <h2
               className="text-5xl md:text-6xl font-bold mb-6"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
@@ -279,41 +323,36 @@ export default function PricingPage() {
               {
                 q: "Can I try before I buy?",
                 a: "Absolutely! Our free plan gives you 1 full vision board to try all features and templates. No credit card required, no strings attached. Create your board and see the magic happen!",
-                emoji: "✨"
               },
               {
                 q: "What if I want to create more than 20 boards?",
                 a: "Premium allows 20 boards per month, which resets on your billing date. Need more? Contact us for custom enterprise pricing. We're here to support your manifestation journey!",
-                emoji: "📊"
               },
               {
                 q: "Can I cancel anytime?",
                 a: "Yes! Cancel your subscription anytime with just one click. You'll keep access to premium features until the end of your billing period. No hassle, no hard feelings!",
-                emoji: "👋"
               },
               {
                 q: "Do you offer refunds?",
                 a: "We offer a 30-day money-back guarantee if you're not satisfied with premium features. Just email us and we'll process your refund within 48 hours. Your satisfaction is our priority!",
-                emoji: "💯"
               },
               {
                 q: "What's included in commercial use?",
                 a: "Premium users can use generated boards for business presentations, social media posts, marketing materials, client projects, coaching programs, and more. Unlimited commercial rights!",
-                emoji: "💼"
               },
               {
                 q: "How does the AI generation work?",
                 a: "We use advanced AI models (Gemini & DALL-E) to generate personalized images based on your uploaded photos and keywords. It's like having a professional designer and photographer in your pocket!",
-                emoji: "🤖"
-              }
+              },
             ].map((faq, index) => (
               <Card key={index} hover className="group">
-                <div className="flex gap-4">
-                  <div className="text-4xl flex-shrink-0">{faq.emoji}</div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[#E0AAFF] transition-colors">{faq.q}</h3>
-                    <p className="text-gray-400 leading-relaxed text-lg">{faq.a}</p>
-                  </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[#E0AAFF] transition-colors">
+                    {faq.q}
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed text-lg">
+                    {faq.a}
+                  </p>
                 </div>
               </Card>
             ))}
@@ -325,10 +364,12 @@ export default function PricingPage() {
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-2 border-green-500/30 rounded-3xl p-12 text-center">
-            <div className="text-6xl mb-6">🛡️</div>
-            <h3 className="text-3xl font-bold text-white mb-4">30-Day Money-Back Guarantee</h3>
+            <h3 className="text-3xl font-bold text-white mb-4">
+              30-Day Money-Back Guarantee
+            </h3>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Try Premium risk-free. If you&apos;re not 100% satisfied within 30 days, we&apos;ll refund every penny. No questions asked.
+              Try Premium risk-free. If you&apos;re not 100% satisfied within 30
+              days, we&apos;ll refund every penny. No questions asked.
             </p>
           </div>
         </div>
@@ -341,24 +382,34 @@ export default function PricingPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-[#7209B7] via-[#9D4EDD] to-[#C77DFF]"></div>
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
             <div className="relative p-16 text-center">
-              <div className="text-6xl mb-6">🎨</div>
               <h2
                 className="text-5xl md:text-7xl font-bold text-white mb-6"
                 style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
-                START MANIFESTING<br />YOUR DREAMS TODAY
+                START MANIFESTING
+                <br />
+                YOUR DREAMS TODAY
               </h2>
               <p className="text-2xl text-purple-100 mb-10 max-w-2xl mx-auto leading-relaxed">
-                Join thousands creating vision boards and achieving their 2025 goals
+                Join thousands creating vision boards and achieving their 2025
+                goals
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/create">
-                  <Button variant="secondary" size="lg" className="min-w-[240px] bg-white text-[#7209B7] hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6">
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="min-w-[240px] color-[black] bg-white text-[black] hover:bg-gray-100 shadow-2xl hover:scale-105 font-bold text-lg py-6"
+                  >
                     Start Free Today →
                   </Button>
                 </Link>
                 <Link href="/about">
-                  <Button variant="outline" size="lg" className="min-w-[240px] border-2 border-white text-white hover:bg-white/10 text-lg py-6">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="min-w-[240px] border-2 border-white text-white hover:bg-white/10 text-lg py-6"
+                  >
                     Learn More
                   </Button>
                 </Link>
@@ -373,7 +424,10 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="text-lg font-bold text-white mb-4" style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}>
+              <h3
+                className="text-lg font-bold text-white mb-4"
+                style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
+              >
                 <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
                   DREAMBOARD
                 </span>
@@ -385,30 +439,96 @@ export default function PricingPage() {
             <div>
               <h4 className="text-sm font-semibold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/create" className="text-gray-400 hover:text-white transition">Create Board</Link></li>
-                <li><Link href="/pricing" className="text-gray-400 hover:text-white transition">Pricing</Link></li>
-                <li><Link href="/about" className="text-gray-400 hover:text-white transition">About</Link></li>
+                <li>
+                  <Link
+                    href="/create"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Create Board
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/pricing"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/about"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    About
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Terms of Service</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Cookie Policy</a></li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Terms of Service
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Cookie Policy
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white mb-4">Connect</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Twitter</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Instagram</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Support</a></li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Twitter
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Instagram
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Support
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
           <div className="pt-8 border-t border-purple-500/10 text-center text-gray-400 text-sm">
-            <p>&copy; 2025 Dreamboard AI. All rights reserved. Manifest your dreams.</p>
+            <p>
+              &copy; 2025 Dreamboard AI. All rights reserved. Manifest your
+              dreams.
+            </p>
           </div>
         </div>
       </footer>

@@ -8,47 +8,41 @@ import { Card } from "@/components/ui/Card";
 export default function AboutPage() {
   const values = [
     {
-      icon: "🎯",
       title: "Purpose-Driven",
       description: "We believe in the power of visualization to transform dreams into reality. Every feature we build serves this mission."
     },
     {
-      icon: "🤖",
       title: "AI-First",
       description: "Leveraging cutting-edge AI to make vision boards accessible to everyone, regardless of design skills."
     },
     {
-      icon: "💜",
       title: "User-Centric",
       description: "Your success and satisfaction are at the heart of everything we do. We listen, adapt, and improve constantly."
     },
     {
-      icon: "🌟",
       title: "Innovation",
       description: "Constantly pushing boundaries to deliver the best manifestation tools. We're never satisfied with 'good enough'."
     }
   ];
 
-  const milestones = [
-    { year: "2024", event: "The Idea", description: "Two friends dreaming of making vision boarding accessible to everyone", icon: "💡" },
-    { year: "2024", event: "First Prototype", description: "Built and launched our first AI-powered vision board generator", icon: "🚀" },
-    { year: "2024", event: "10K Boards Created", description: "Our community created over 10,000 vision boards!", icon: "🎉" },
-    { year: "2025", event: "Premium Launch", description: "Introduced premium features based on user feedback", icon: "⭐" }
+  const stats = [
+    { number: "10,000+", label: "Vision Boards Created", subtext: "That's a lot of dreams" },
+    { number: "5,000+", label: "Happy Users", subtext: "And counting" },
+    { number: "0", label: "Scissors Needed", subtext: "We're scissor-free" },
+    { number: "100%", label: "AI-Powered", subtext: "The future is now" }
   ];
 
   const team = [
     {
       name: "Co-Founder 1",
       role: "Co-Founder & CEO",
-      bio: "Passionate about helping people achieve their goals through visualization. Combining tech expertise with a love for personal development.",
-      avatar: "👨‍💼",
+      bio: "Vision board enthusiast turned entrepreneur. Still has magazines from 2015. Refuses to throw them away 'just in case.'",
       social: { twitter: "#", linkedin: "#" }
     },
     {
       name: "Co-Founder 2",
       role: "Co-Founder & CTO",
-      bio: "Building AI-powered tools that make a difference. Believes that everyone deserves beautiful, personalized vision boards.",
-      avatar: "👨‍💻",
+      bio: "Coded this entire platform fueled by coffee and the belief that cutting magazines is a cruel punishment.",
       social: { twitter: "#", linkedin: "#" }
     }
   ];
@@ -65,7 +59,6 @@ export default function AboutPage() {
 
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#7209B7]/10 to-[#9D4EDD]/10 border border-[#9D4EDD]/20 mb-8">
-            <span className="text-2xl">✨</span>
             <span className="text-[#E0AAFF] text-sm font-semibold">Built by Dreamers, for Dreamers</span>
           </div>
 
@@ -78,8 +71,7 @@ export default function AboutPage() {
             </span>
           </h1>
           <p className="text-2xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed">
-            Empowering dreamers worldwide to visualize and manifest their goals
-            through the magic of AI-generated vision boards.
+            Helping dreamers worldwide turn their goals into reality with AI-powered vision boards.
           </p>
         </div>
       </section>
@@ -89,54 +81,33 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="text-6xl mb-6">📖</div>
               <h2
                 className="text-4xl md:text-5xl font-bold mb-6"
                 style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
                 <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
-                  THE STORY BEHIND DREAMBOARD
+                  THE STORY
                 </span>
               </h2>
               <div className="space-y-4 text-gray-300 leading-relaxed text-lg">
                 <p>
-                  Dreamboard started with a simple observation: vision boards work, but creating them
-                  is time-consuming, expensive, and often intimidating for beginners.
+                  Picture this: two friends spending hours cutting up magazines, desperately searching for the perfect images for their vision boards. There had to be a better way.
                 </p>
                 <p>
-                  Two friends, both passionate about personal development and technology, came together
-                  with a shared vision: democratize the power of visual manifestation by combining traditional
-                  vision boarding with cutting-edge AI technology.
+                  Fast forward through countless late nights, way too much coffee, and a shared obsession with AI—Dreamboard was born. We built the tool we wished existed: vision boards that don't require scissors, glue sticks, or a design degree.
                 </p>
                 <p>
-                  What began as a weekend project quickly grew into a platform that makes it possible for
-                  anyone to create professional, personalized vision boards in minutes—not hours.
-                </p>
-                <p>
-                  Today, we&apos;re proud to serve thousands of dreamers worldwide, helping them visualize
-                  and achieve their goals for 2025 and beyond.
+                  Today, thousands of people use Dreamboard to create beautiful vision boards in minutes. No mess, no stress, just manifestation.
                 </p>
               </div>
             </div>
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] rounded-3xl blur-2xl opacity-20"></div>
-              <div className="relative bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-3xl p-12 border-2 border-purple-500/30">
-                <div className="text-center space-y-8">
-                  <div className="text-8xl mb-6">✨</div>
-                  <div>
-                    <p className="text-5xl font-bold text-white mb-2">10,000+</p>
-                    <p className="text-gray-400">Vision Boards Created</p>
-                  </div>
-                  <div>
-                    <p className="text-5xl font-bold text-white mb-2">5,000+</p>
-                    <p className="text-gray-400">Happy Dreamers</p>
-                  </div>
-                  <div>
-                    <p className="text-5xl font-bold text-white mb-2">2024</p>
-                    <p className="text-gray-400">Founded with Passion</p>
-                  </div>
-                </div>
-              </div>
+              <img
+                src="/about.png"
+                alt="Dreamboard Vision Boards"
+                className="relative rounded-3xl border-2 border-purple-500/30 w-full h-auto shadow-2xl shadow-purple-500/20"
+              />
             </div>
           </div>
         </div>
@@ -146,16 +117,15 @@ export default function AboutPage() {
       <section className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <div className="text-6xl mb-6">👥</div>
             <h2
               className="text-5xl md:text-6xl font-bold mb-6"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
-                MEET THE CO-FOUNDERS
+                THE HUMANS BEHIND THE AI
               </span>
             </h2>
-            <p className="text-xl text-gray-400">The dreamers behind Dreamboard</p>
+            <p className="text-xl text-gray-400">Two friends who really hate cutting magazines</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12">
@@ -166,7 +136,6 @@ export default function AboutPage() {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
                 <div className="relative z-10">
-                  <div className="text-8xl mb-6 text-center">{member.avatar}</div>
                   <div className="text-center mb-6">
                     <h3 className="text-3xl font-bold text-white mb-2">{member.name}</h3>
                     <p className="text-lg text-[#E0AAFF] font-semibold">{member.role}</p>
@@ -213,7 +182,6 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
               <Card key={index} hover className="group">
-                <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">{value.icon}</div>
                 <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-[#E0AAFF] transition-colors">{value.title}</h3>
                 <p className="text-gray-400 leading-relaxed">{value.description}</p>
               </Card>
@@ -222,38 +190,32 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Journey Timeline */}
+      {/* Stats Section */}
       <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <div className="text-6xl mb-6">🗺️</div>
             <h2
               className="text-5xl md:text-6xl font-bold mb-6"
               style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
             >
               <span className="bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent">
-                OUR JOURNEY
+                BY THE NUMBERS
               </span>
             </h2>
-            <p className="text-xl text-gray-400">Key milestones in our growth story</p>
+            <p className="text-xl text-gray-400">Stats we're actually proud of</p>
           </div>
 
-          <div className="space-y-8">
-            {milestones.map((milestone, index) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
               <div
                 key={index}
-                className="flex gap-6 items-start group hover:scale-[1.02] transition-transform"
+                className="bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-3xl p-8 border border-purple-500/20 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 text-center"
               >
-                <div className="flex-shrink-0 w-24 h-24 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center group-hover:shadow-2xl group-hover:shadow-purple-500/40 transition-shadow">
-                  <div className="text-center">
-                    <div className="text-3xl mb-1">{milestone.icon}</div>
-                    <span className="text-sm font-bold text-white">{milestone.year}</span>
-                  </div>
+                <div className="text-6xl font-bold bg-gradient-to-r from-[#E0AAFF] to-[#9D4EDD] bg-clip-text text-transparent mb-3">
+                  {stat.number}
                 </div>
-                <div className="flex-1 bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-2xl p-6 border border-purple-500/20 group-hover:border-purple-400/60 transition-colors">
-                  <h3 className="text-2xl font-bold text-white mb-2">{milestone.event}</h3>
-                  <p className="text-gray-400 leading-relaxed text-lg">{milestone.description}</p>
-                </div>
+                <div className="text-white font-semibold text-lg mb-2">{stat.label}</div>
+                <div className="text-gray-400 text-sm">{stat.subtext}</div>
               </div>
             ))}
           </div>
@@ -263,7 +225,6 @@ export default function AboutPage() {
       {/* Why We Built This */}
       <section className="py-20 px-6 bg-[#0D0C1D]/50">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="text-6xl mb-8">❤️</div>
           <h2
             className="text-4xl md:text-5xl font-bold mb-8"
             style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
@@ -274,19 +235,13 @@ export default function AboutPage() {
           </h2>
           <div className="space-y-6 text-gray-300 text-lg leading-relaxed">
             <p>
-              We&apos;ve both experienced the transformative power of vision boards in our own lives. They helped us
-              land dream jobs, achieve fitness goals, travel the world, and build meaningful relationships.
+              Vision boards work. They helped us land dream jobs, hit fitness goals, and actually stick to our resolutions (most of them, anyway).
             </p>
             <p>
-              But we also remember the struggle: cutting magazines for hours, finding the perfect images,
-              spending money on printing and supplies. We thought, &quot;There has to be a better way.&quot;
+              But the traditional process? Exhausting. Cutting magazines for hours, hunting for the perfect images, dropping cash on supplies—only to end up with something that looked like a middle school art project.
             </p>
             <p>
-              Dreamboard is our answer. A tool that makes creating beautiful, personalized vision boards as easy
-              as describing your dreams. No scissors required, no design skills needed—just pure manifestation magic.
-            </p>
-            <p className="text-2xl font-bold text-white">
-              We built Dreamboard because we believe everyone deserves to dream big and achieve their goals. ✨
+              Dreamboard is our solution. Beautiful vision boards in minutes, not hours. No scissors, no glue sticks, no artistic talent required. Just your dreams and some AI magic.
             </p>
           </div>
         </div>
@@ -298,7 +253,6 @@ export default function AboutPage() {
           <div className="relative overflow-hidden rounded-3xl">
             <div className="absolute inset-0 bg-gradient-to-r from-[#7209B7] via-[#9D4EDD] to-[#C77DFF]"></div>
             <div className="relative p-12 md:p-16 text-center">
-              <div className="text-6xl mb-6">🚀</div>
               <h2
                 className="text-4xl md:text-6xl font-bold text-white mb-6"
                 style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}

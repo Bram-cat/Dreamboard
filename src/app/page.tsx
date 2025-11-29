@@ -10,22 +10,18 @@ export default function HomePage() {
 
   const features = [
     {
-      icon: "✨",
       title: "AI-Powered Creation",
       description: "Advanced AI transforms your dreams into stunning visual boards in seconds using cutting-edge technology"
     },
     {
-      icon: "🖼️",
       title: "Personalized Images",
       description: "Upload your photos to create truly personal and meaningful vision boards that reflect your unique journey"
     },
     {
-      icon: "🎨",
       title: "Multiple Templates",
       description: "Choose from magazine, polaroid, scrapbook, and grid layouts designed by professional artists"
     },
     {
-      icon: "⚡",
       title: "Instant Download",
       description: "Get your vision board in 4K quality, ready to print or share across all your devices"
     }
@@ -42,20 +38,17 @@ export default function HomePage() {
     {
       quote: "Dreamboard helped me visualize my 2025 goals in ways I never imagined. The AI feature is incredible!",
       author: "Sarah M.",
-      role: "Entrepreneur",
-      avatar: "🌟"
+      role: "Entrepreneur"
     },
     {
       quote: "I created my vision board in under 5 minutes. It's now my phone wallpaper and daily inspiration.",
       author: "Michael R.",
-      role: "Software Engineer",
-      avatar: "💼"
+      role: "Software Engineer"
     },
     {
       quote: "The templates are beautiful and the personalization options are endless. Highly recommend!",
       author: "Emma L.",
-      role: "Life Coach",
-      avatar: "✨"
+      role: "Life Coach"
     }
   ];
 
@@ -73,7 +66,6 @@ export default function HomePage() {
           <div className="flex flex-col items-center text-center">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#7209B7]/10 to-[#9D4EDD]/10 border border-[#9D4EDD]/20 mb-8">
-              <span className="text-2xl">✨</span>
               <span className="text-[#E0AAFF] text-sm font-semibold">AI-Powered Vision Boards for 2025</span>
             </div>
 
@@ -159,6 +151,28 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Showcase Section with db images */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            <div className="relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
+              <img
+                src="/db1.png"
+                alt="Vision Board Example 1"
+                className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+            <div className="relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
+              <img
+                src="/db2.png"
+                alt="Vision Board Example 2"
+                className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Examples Gallery - Bento Grid */}
       <section id="examples" className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
@@ -176,10 +190,11 @@ export default function HomePage() {
 
           {/* Bento Grid Layout */}
           <div className="grid grid-cols-12 gap-4 auto-rows-[240px]">
+            {/* Magazine Layout - Large */}
             <div className="col-span-12 md:col-span-5 md:row-span-2 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
               <img
-                src="/display.png"
-                alt="Vision Board Example"
+                src="/display4.png"
+                alt="Magazine Layout Vision Board"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#7209B7]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
@@ -190,10 +205,11 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Polaroid - Wide */}
             <div className="col-span-12 md:col-span-7 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
               <img
                 src="/display2.png"
-                alt="Vision Board Example"
+                alt="Polaroid Style Vision Board"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#9D4EDD]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
@@ -204,34 +220,48 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Scrapbook - Small */}
             <div className="col-span-6 md:col-span-3 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
               <img
                 src="/display3.png"
-                alt="Vision Board Example"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            </div>
-
-            <div className="col-span-6 md:col-span-4 md:row-span-2 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
-              <img
-                src="/display4.png"
-                alt="Vision Board Example"
+                alt="Scrapbook Vision Board"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#C77DFF]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
                 <div className="text-white">
-                  <h3 className="text-2xl font-bold mb-2">Grid Layout</h3>
-                  <p className="text-purple-100">Clean & organized</p>
+                  <h3 className="text-xl font-bold">Scrapbook</h3>
                 </div>
               </div>
             </div>
 
+            {/* Clean Grid - Tall */}
+            <div className="col-span-6 md:col-span-4 md:row-span-2 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
+              <img
+                src="/display5.png"
+                alt="Clean Grid Vision Board"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#E0AAFF]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
+                <div className="text-white">
+                  <h3 className="text-2xl font-bold mb-2">Clean Grid</h3>
+                  <p className="text-purple-100">Minimal & organized</p>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Generated - Wide */}
             <div className="col-span-12 md:col-span-8 relative group overflow-hidden rounded-3xl border border-purple-500/20 hover:border-purple-400/60 transition-all duration-300">
               <img
                 src="/display.png"
-                alt="Vision Board Example"
+                alt="AI Generated Vision Board"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#9D4EDD]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
+                <div className="text-white">
+                  <h3 className="text-2xl font-bold mb-2">AI Generated Layout</h3>
+                  <p className="text-purple-100">Smart & personalized</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -264,7 +294,6 @@ export default function HomePage() {
                     : 'border-purple-500/20'
                 }`}
               >
-                <div className="text-6xl mb-6">{feature.icon}</div>
                 <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
                 <p className="text-gray-400 leading-relaxed">{feature.description}</p>
               </div>
@@ -294,7 +323,6 @@ export default function HomePage() {
                 key={index}
                 className="relative p-8 rounded-2xl bg-gradient-to-br from-[#1A1A2E] to-[#16213E] border border-purple-500/20 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300"
               >
-                <div className="text-5xl mb-6">{testimonial.avatar}</div>
                 <p className="text-gray-300 text-lg mb-6 italic leading-relaxed">&ldquo;{testimonial.quote}&rdquo;</p>
                 <div>
                   <div className="text-white font-bold">{testimonial.author}</div>
