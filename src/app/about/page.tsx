@@ -94,7 +94,7 @@ export default function AboutPage() {
                   Picture this: two friends spending hours cutting up magazines, desperately searching for the perfect images for their vision boards. There had to be a better way.
                 </p>
                 <p>
-                  Fast forward through countless late nights, way too much coffee, and a shared obsession with AI—Dreamboard was born. We built the tool we wished existed: vision boards that don't require scissors, glue sticks, or a design degree.
+                  Fast forward through countless late nights, way too much coffee, and a shared obsession with AI—Dreamboard was born. We built the tool we wished existed: vision boards that don&apos;t require scissors, glue sticks, or a design degree.
                 </p>
                 <p>
                   Today, thousands of people use Dreamboard to create beautiful vision boards in minutes. No mess, no stress, just manifestation.
@@ -202,7 +202,7 @@ export default function AboutPage() {
                 BY THE NUMBERS
               </span>
             </h2>
-            <p className="text-xl text-gray-400">Stats we're actually proud of</p>
+            <p className="text-xl text-gray-400">Stats we&apos;re actually proud of</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
