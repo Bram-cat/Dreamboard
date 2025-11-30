@@ -334,45 +334,44 @@ export default function PolaroidScatteredTemplate({
         }
       }
 
-      // Draw center card - scrapbook style on MUCH LARGER board (moved slightly left)
-      const centerW = 550;
-      const centerH = 420;
-      const centerX = (2800 - centerW) / 2 - 100; // ~1025px - moved 100px to the left
-      const centerY = (1600 - centerH) / 2; // ~590px - vertically centered
+      // Draw center logo - circular logo image
+      const logoSize = 350;
+      const logoRadius = logoSize / 2;
+      const centerX = (2800 - logoSize) / 2; // Center horizontally
+      const centerY = (1600 - logoSize) / 2; // Center vertically
 
-      ctx.save();
-      ctx.translate(centerX + centerW / 2, centerY + centerH / 2);
-      ctx.rotate((-2 * Math.PI) / 180); // Slight rotation
+      try {
+        const logoImg = await loadImage('/Gemini_Generated_Image_q3n49dq3n49dq3n4.png');
 
-      // White background with shadow
-      ctx.fillStyle = "#ffffff";
-      ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
-      ctx.shadowBlur = 12;
-      ctx.shadowOffsetX = 4;
-      ctx.shadowOffsetY = 4;
-      ctx.fillRect(-centerW / 2, -centerH / 2, centerW, centerH);
-      ctx.shadowColor = "transparent";
+        ctx.save();
+        ctx.translate(centerX + logoRadius, centerY + logoRadius);
+        ctx.rotate((-2 * Math.PI) / 180); // Slight rotation to match JSX
 
-      // Purple border (scaled for MUCH LARGER card)
-      ctx.strokeStyle = "#8b5cf6";
-      ctx.lineWidth = 9;
-      ctx.strokeRect(
-        -centerW / 2 + 18,
-        -centerH / 2 + 18,
-        centerW - 36,
-        centerH - 36
-      );
+        // Create circular clip path
+        ctx.beginPath();
+        ctx.arc(0, 0, logoRadius, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
 
-      // Center text - scaled for MUCH LARGER card
-      ctx.fillStyle = "#2a2a2a";
-      ctx.font = "bold 95px Arial, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("2025", 0, -45);
+        // Draw shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetX = 4;
+        ctx.shadowOffsetY = 4;
 
-      ctx.font = 'italic 38px "Brush Script MT", cursive, Georgia';
-      ctx.fillText("VISION BOARD", 0, 15);
+        // Draw logo image (will be clipped to circle)
+        ctx.drawImage(
+          logoImg,
+          -logoRadius,
+          -logoRadius,
+          logoSize,
+          logoSize
+        );
 
-      ctx.restore();
+        ctx.restore();
+      } catch (error) {
+        console.error('Failed to load logo image:', error);
+      }
 
       // Load neon quote container image
       const quoteContainerImg = await loadImage('/quote container.png');
@@ -800,62 +799,29 @@ export default function PolaroidScatteredTemplate({
           />
         </div>
 
-        {/* Center Card - MUCH LARGER size, moved slightly left */}
+        {/* Center Logo - Circular logo image */}
         <div
-          className="absolute flex flex-col items-center justify-center bg-white"
+          className="absolute shadow-2xl"
           style={{
             top: "590px",
-            left: "1025px",
-            width: "550px",
-            height: "420px",
+            left: "1125px",
+            width: "350px",
+            height: "350px",
             transform: "rotate(-2deg)",
-            boxShadow: "7px 7px 20px rgba(0, 0, 0, 0.25)",
+            borderRadius: "50%",
+            overflow: "hidden",
+            zIndex: 50,
           }}
         >
-          {/* Purple Border - scaled for MUCH LARGER card */}
-          <div
+          <img
+            src="/Gemini_Generated_Image_q3n49dq3n49dq3n4.png"
+            alt="MY 2025 VISION BOARD"
             style={{
-              position: "absolute",
-              top: "18px",
-              left: "18px",
-              right: "18px",
-              bottom: "18px",
-              border: "9px solid #8b5cf6",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
             }}
           />
-
-          {/* Main Text Container */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "12px",
-              marginTop: "-18px",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "95px",
-                fontWeight: "bold",
-                color: "#2a2a2a",
-                lineHeight: "1",
-              }}
-            >
-              2025
-            </div>
-            <div
-              style={{
-                fontFamily: '"Brush Script MT", cursive, Georgia',
-                fontStyle: "italic",
-                fontSize: "38px",
-                color: "#2a2a2a",
-                marginTop: "12px",
-              }}
-            >
-              VISION BOARD
-            </div>
-          </div>
         </div>
         </div> {/* End of beige scrapbook content area */}
           </div> {/* End of outer container */}
