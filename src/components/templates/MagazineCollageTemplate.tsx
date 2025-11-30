@@ -369,15 +369,23 @@ export default function MagazineCollageTemplate({
         style={{ display: 'none' }}
       />
 
-      {/* Visible Vision Board - MUCH LARGER with decorative border */}
-      <div
-        ref={containerRef}
-        className="relative w-[2500px] h-[1400px] mx-auto overflow-hidden"
-        style={{
-          backgroundColor: '#2a2a2a',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
-        }}
-      >
+      {/* Scaled Container to fit screen */}
+      <div className="w-screen h-screen flex items-center justify-center overflow-hidden p-4">
+        <div
+          style={{
+            transform: 'scale(0.36)',
+            transformOrigin: 'center center',
+          }}
+        >
+          {/* Visible Vision Board - MUCH LARGER with decorative border */}
+          <div
+            ref={containerRef}
+            className="relative w-[2500px] h-[1400px] mx-auto"
+            style={{
+              backgroundColor: '#2a2a2a',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+            }}
+          >
         {/* Outer decorative border layers */}
         <div className="absolute inset-0" style={{
           background: 'linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.3) 100%)',
@@ -621,7 +629,9 @@ export default function MagazineCollageTemplate({
           />
         </div>
         </div> {/* End of cork board content area */}
-      </div> {/* End of outer container */}
+          </div> {/* End of outer container */}
+        </div>
+      </div>
     </>
   );
 }

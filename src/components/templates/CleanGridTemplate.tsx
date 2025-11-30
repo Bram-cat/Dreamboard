@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface CleanGridTemplateProps {
-  images: string[]; // 6 personalized images (reduced for Netlify compatibility)
+  images: string[]; // 8 personalized images for 3x3 grid (-1 for center logo)
   keywords: string[];
 }
 
@@ -43,26 +43,33 @@ export default function CleanGridTemplate({
     "MAKE\nMOVES",
   ];
 
-  // Randomly select 5 quotes from the pool
+  // Randomly select 4 quotes from the pool (for gaps between images)
   const getRandomQuotes = () => {
     const shuffled = [...quotePool].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 5);
+    return shuffled.slice(0, 4);
   };
 
   // Use useMemo to maintain same quotes on re-renders
   const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
 
-  // Simple 2x3 grid layout - 6 images MUCH LARGER to fill bigger board
+  // 3x3 grid layout - 8 equal-sized images (center is logo)
+  const gridSize = 680; // Equal size for all images
+  const gap = 10; // Gap between images
   const gridPositions = [
-    // Top row - 3 MUCH LARGER images
-    { top: 20, left: 20, width: 780, height: 480, keyword: "" },
-    { top: 20, left: 820, width: 780, height: 480, keyword: "" },
-    { top: 20, left: 1620, width: 460, height: 480, keyword: "" },
+    // Top row - 3 equal images
+    { top: 20, left: 20, width: gridSize, height: gridSize, keyword: "" },
+    { top: 20, left: 20 + gridSize + gap, width: gridSize, height: gridSize, keyword: "" },
+    { top: 20, left: 20 + (gridSize + gap) * 2, width: gridSize, height: gridSize, keyword: "" },
 
-    // Bottom row - 3 MUCH LARGER images
-    { top: 720, left: 20, width: 780, height: 480, keyword: "" },
-    { top: 720, left: 820, width: 780, height: 480, keyword: "" },
-    { top: 720, left: 1620, width: 460, height: 480, keyword: "" },
+    // Middle row - 2 images (center is logo)
+    { top: 20 + gridSize + gap, left: 20, width: gridSize, height: gridSize, keyword: "" },
+    // CENTER LOGO SPACE
+    { top: 20 + gridSize + gap, left: 20 + (gridSize + gap) * 2, width: gridSize, height: gridSize, keyword: "" },
+
+    // Bottom row - 3 equal images
+    { top: 20 + (gridSize + gap) * 2, left: 20, width: gridSize, height: gridSize, keyword: "" },
+    { top: 20 + (gridSize + gap) * 2, left: 20 + gridSize + gap, width: gridSize, height: gridSize, keyword: "" },
+    { top: 20 + (gridSize + gap) * 2, left: 20 + (gridSize + gap) * 2, width: gridSize, height: gridSize, keyword: "" },
   ];
 
   // Canvas rendering for download
@@ -83,17 +90,19 @@ export default function CleanGridTemplate({
         console.error('Failed to load Telma font:', error);
       }
 
-      // Set canvas size - LARGER board dimensions
-      canvas.width = 2100;
-      canvas.height = 1220;
+      // Set canvas size - 3x3 grid dimensions
+      const totalWidth = 20 + (gridSize + gap) * 3;
+      const totalHeight = 20 + (gridSize + gap) * 3;
+      canvas.width = totalWidth;
+      canvas.height = totalHeight;
 
       // Draw gradient background (soft, professional)
-      const gradient = ctx.createLinearGradient(0, 0, 2100, 1220);
+      const gradient = ctx.createLinearGradient(0, 0, totalWidth, totalHeight);
       gradient.addColorStop(0, '#f8fafc');
       gradient.addColorStop(0.5, '#f1f5f9');
       gradient.addColorStop(1, '#e2e8f0');
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 2100, 1220);
+      ctx.fillRect(0, 0, totalWidth, totalHeight);
 
       // Load and draw images
       const loadImage = (src: string): Promise<HTMLImageElement> => {
@@ -106,9 +115,10 @@ export default function CleanGridTemplate({
         });
       };
 
-      // Draw all grid images (max 6)
-      for (let idx = 0; idx < Math.min(6, images.length); idx++) {
-        const pos = gridPositions[idx];
+      // Draw all grid images (max 8 - skip index 4 which is center)
+      for (let idx = 0; idx < Math.min(8, images.length); idx++) {
+        const posIndex = idx < 4 ? idx : idx + 1; // Skip center position (index 4)
+        const pos = gridPositions[posIndex];
         if (!pos) continue;
 
         try {
@@ -257,11 +267,11 @@ export default function CleanGridTemplate({
         ctx.restore();
       });
 
-      // Draw center logo image - perfectly rounded circle
-      const centerX = 850;
-      const centerY = 510;
-      const logoSize = 300; // Diameter of circular logo
+      // Draw center logo image - perfectly rounded circle in 3x3 grid center
+      const logoSize = gridSize * 0.9; // 90% of grid cell size
       const logoRadius = logoSize / 2;
+      const centerX = 20 + gridSize + gap + gridSize / 2; // Center of middle column
+      const centerY = 20 + gridSize + gap + gridSize / 2; // Center of middle row
 
       try {
         const logoImg = await loadImage('/Gemini_Generated_Image_q3n49dq3n49dq3n4.png');
@@ -270,7 +280,7 @@ export default function CleanGridTemplate({
 
         // Create circular clip path
         ctx.beginPath();
-        ctx.arc(centerX + 300, centerY + 150, logoRadius, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, logoRadius, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
 
@@ -283,8 +293,8 @@ export default function CleanGridTemplate({
         // Draw logo image (will be clipped to circle)
         ctx.drawImage(
           logoImg,
-          centerX + 300 - logoRadius,
-          centerY + 150 - logoRadius,
+          centerX - logoRadius,
+          centerY - logoRadius,
           logoSize,
           logoSize
         );
@@ -293,6 +303,64 @@ export default function CleanGridTemplate({
       } catch (error) {
         console.error('Failed to load logo image:', error);
       }
+
+      // Add 4 quotes in gaps between images
+      const quotePositions = [
+        { x: 20 + gridSize / 2, y: 20 + gridSize + gap / 2, size: 28 }, // Between top-left and middle-left
+        { x: 20 + (gridSize + gap) * 2.5, y: 20 + gridSize / 2, size: 28 }, // Between top-right and middle-right
+        { x: 20 + gridSize + gap + gridSize / 2, y: 20 + (gridSize + gap) * 2.5, size: 28 }, // Between middle-center and bottom-center
+        { x: totalWidth - 100, y: 20 + (gridSize + gap) * 1.5, size: 26 }, // Right edge middle
+      ];
+
+      quotePositions.forEach((qPos, index) => {
+        if (!selectedQuotes[index]) return;
+
+        ctx.save();
+        ctx.translate(qPos.x, qPos.y);
+
+        // White rounded rectangle background
+        const qWidth = 120;
+        const qHeight = 80;
+        const qRadius = 8;
+
+        ctx.beginPath();
+        ctx.moveTo(-qWidth/2 + qRadius, -qHeight/2);
+        ctx.lineTo(qWidth/2 - qRadius, -qHeight/2);
+        ctx.quadraticCurveTo(qWidth/2, -qHeight/2, qWidth/2, -qHeight/2 + qRadius);
+        ctx.lineTo(qWidth/2, qHeight/2 - qRadius);
+        ctx.quadraticCurveTo(qWidth/2, qHeight/2, qWidth/2 - qRadius, qHeight/2);
+        ctx.lineTo(-qWidth/2 + qRadius, qHeight/2);
+        ctx.quadraticCurveTo(-qWidth/2, qHeight/2, -qWidth/2, qHeight/2 - qRadius);
+        ctx.lineTo(-qWidth/2, -qHeight/2 + qRadius);
+        ctx.quadraticCurveTo(-qWidth/2, -qHeight/2, -qWidth/2 + qRadius, -qHeight/2);
+        ctx.closePath();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw quote text
+        ctx.fillStyle = '#000000';
+        ctx.font = `bold ${qPos.size}px Telma, Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const lines = selectedQuotes[index].split('\n');
+        lines.forEach((line, i) => {
+          const yOffset = (i - (lines.length - 1) / 2) * (qPos.size + 4);
+          ctx.fillText(line, 0, yOffset);
+        });
+
+        ctx.restore();
+      });
     };
 
     renderToCanvas();
@@ -329,20 +397,33 @@ export default function CleanGridTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={2100}
-        height={1220}
+        width={20 + (gridSize + gap) * 3}
+        height={20 + (gridSize + gap) * 3}
         style={{ display: 'none' }}
       />
 
-      {/* Visible Vision Board - LARGER dimensions */}
-      <div
-        ref={containerRef}
-        className="relative w-[2100px] h-[1220px] mx-auto overflow-hidden"
-        style={{ background: 'linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0)' }}
-      >
-        {/* Grid Images - 6 larger images */}
-        {images.slice(0, 6).map((image, idx) => {
-          const pos = gridPositions[idx];
+      {/* Scaled Container to fit screen */}
+      <div className="w-screen h-screen flex items-center justify-center overflow-hidden p-4">
+        <div
+          style={{
+            transform: 'scale(0.45)',
+            transformOrigin: 'center center',
+          }}
+        >
+          {/* Visible Vision Board - 3x3 Grid */}
+          <div
+            ref={containerRef}
+            className="relative mx-auto"
+            style={{
+              width: `${20 + (gridSize + gap) * 3}px`,
+              height: `${20 + (gridSize + gap) * 3}px`,
+              background: 'linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0)'
+            }}
+          >
+        {/* Grid Images - 8 images (skip center position 4) */}
+        {images.slice(0, 8).map((image, idx) => {
+          const posIndex = idx < 4 ? idx : idx + 1; // Skip center position
+          const pos = gridPositions[posIndex];
           if (!pos) return null;
 
           return (
@@ -567,28 +648,81 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* Center Logo - Perfectly Rounded Circle */}
+        {/* Center Logo - Perfectly Rounded Circle in 3x3 Grid */}
         <div
           className="absolute shadow-2xl"
           style={{
-            top: '510px',
-            left: '1150px',
-            width: '300px',
-            height: '300px',
+            top: `${20 + gridSize + gap}px`,
+            left: `${20 + gridSize + gap}px`,
+            width: `${gridSize}px`,
+            height: `${gridSize}px`,
             borderRadius: '50%',
             overflow: 'hidden',
             zIndex: 20,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <img
             src="/Gemini_Generated_Image_q3n49dq3n49dq3n4.png"
             alt="MY 2025 VISION BOARD"
             style={{
-              width: '100%',
-              height: '100%',
+              width: '90%',
+              height: '90%',
               objectFit: 'cover',
+              borderRadius: '50%',
             }}
           />
+        </div>
+
+        {/* 4 Quotes between images */}
+        {selectedQuotes.slice(0, 4).map((quote, i) => {
+          const positions = [
+            { top: 20 + gridSize + gap / 2 - 40, left: 20 + gridSize / 2 - 60 },
+            { top: 20 + gridSize / 2 - 40, left: 20 + (gridSize + gap) * 2.5 - 60 },
+            { top: 20 + (gridSize + gap) * 2.5 - 40, left: 20 + gridSize + gap + gridSize / 2 - 60 },
+            { top: 20 + (gridSize + gap) * 1.5 - 40, left: 20 + (gridSize + gap) * 3 - 140 },
+          ];
+          const pos = positions[i];
+
+          return (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                top: `${pos.top}px`,
+                left: `${pos.left}px`,
+                width: "120px",
+                height: "80px",
+                backgroundColor: "#ffffff",
+                border: "2px solid #000000",
+                borderRadius: "8px",
+                boxShadow: "2px 2px 8px rgba(0,0,0,0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "8px",
+                zIndex: 15,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "Telma, Arial, sans-serif",
+                  fontWeight: "bold",
+                  fontSize: i % 2 === 0 ? "28px" : "26px",
+                  color: "#000000",
+                  textAlign: "center",
+                  lineHeight: "1.2",
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: quote.replace("\n", "<br/>"),
+                }}
+              />
+            </div>
+          );
+        })}
+          </div>
         </div>
       </div>
     </>

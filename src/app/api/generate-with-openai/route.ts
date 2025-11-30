@@ -16,13 +16,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check API keys - support 5 Gemini keys for parallel processing
+    // Check API keys - support up to 11 Gemini keys for parallel processing
     const openaiApiKey = process.env.OPENAI_API_KEY;
     const geminiApiKey1 = process.env.GEMINI_API_KEY_1 || process.env.GEMINI_API_KEY;
     const geminiApiKey2 = process.env.GEMINI_API_KEY_2;
     const geminiApiKey3 = process.env.GEMINI_API_KEY_3;
     const geminiApiKey4 = process.env.GEMINI_API_KEY_4;
     const geminiApiKey5 = process.env.GEMINI_API_KEY_5;
+    const geminiApiKey6 = process.env.GEMINI_API_KEY_6;
+    const geminiApiKey7 = process.env.GEMINI_API_KEY_7;
+    const geminiApiKey8 = process.env.GEMINI_API_KEY_8;
+    const geminiApiKey9 = process.env.GEMINI_API_KEY_9;
+    const geminiApiKey10 = process.env.GEMINI_API_KEY_10;
+    const geminiApiKey11 = process.env.GEMINI_API_KEY_11;
 
     if (!openaiApiKey) {
       console.error("OPENAI_API_KEY not found");
@@ -34,13 +40,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Gemini API key not configured" }, { status: 500 });
     }
 
-    // Count available API keys
-    const availableKeys = [geminiApiKey1, geminiApiKey2, geminiApiKey3, geminiApiKey4, geminiApiKey5].filter(Boolean);
-    const useParallelProcessing = availableKeys.length > 1;
+    // All available API keys
+    const allAvailableKeys = [
+      geminiApiKey1, geminiApiKey2, geminiApiKey3, geminiApiKey4, geminiApiKey5,
+      geminiApiKey6, geminiApiKey7, geminiApiKey8, geminiApiKey9, geminiApiKey10, geminiApiKey11
+    ].filter(Boolean);
 
-    if (useParallelProcessing) {
-      console.log(`🚀 ${availableKeys.length} Gemini API keys detected - enabling parallel processing!`);
-    }
+    console.log(`🔑 Total Gemini API keys available: ${allAvailableKeys.length}`);
 
     console.log("🎨 Starting vision board generation...");
     console.log("📝 User keywords:", keywords);
@@ -54,21 +60,22 @@ export async function POST(request: NextRequest) {
 
     console.log("📸 User uploads:", { hasSelfie, hasDreamHouse, hasDreamCar, hasDestination });
 
-    // Initialize Gemini clients (1 to 5 depending on available keys)
-    const genaiClients = availableKeys.map(key => new GoogleGenAI({ apiKey: key }));
+    // ============================================
+    // NEW STRATEGY: Generate ALL images with Gemini for personalization
+    // Grid template: 8 images (3x3-1), Magazine: 11 images, Polaroid: 11 images
+    // Use EXACTLY the number of API keys needed per template for maximum parallel speed
+    // ============================================
+    const geminiImages: string[] = [];
+    // Grid: 8 images (use 8 keys), Magazine/Polaroid: 11 images (use 11 keys)
+    const numGeminiImages = selectedTemplate === "grid" ? 8 : selectedTemplate === "magazine" ? 11 : 11;
+
+    // Use exactly the number of keys we need for this template
+    const keysToUse = allAvailableKeys.slice(0, numGeminiImages);
+    const genaiClients = keysToUse.map(key => new GoogleGenAI({ apiKey: key }));
     const genai1 = genaiClients[0]; // Always have at least one
     const allQuotes: string[] = [];
 
-    // ============================================
-    // NEW STRATEGY: Generate ALL images with Gemini for personalization
-    // Grid template: 6 images, Magazine: 11 images, Polaroid: 11 images
-    // All images will include user's face/items for a cohesive personal vision board
-    // NO generic OpenAI images - everything is personalized
-    // NETLIFY OPTIMIZATION: Image count optimized for performance with dual API keys
-    // ============================================
-    const geminiImages: string[] = [];
-    // Increased to 11 images for Magazine and Polaroid templates (using dual API keys for faster generation)
-    const numGeminiImages = selectedTemplate === "grid" ? 6 : selectedTemplate === "magazine" ? 11 : 11;
+    console.log(`🚀 Using ${keysToUse.length} API keys for ${numGeminiImages} images (1 image per key for maximum parallel speed)`);
 
     if (selectedTemplate !== "ai") {
       console.log(`\n🎨 STEP 1/2: Generating ${numGeminiImages} personalized images with Gemini (ALL images)...`);
@@ -293,86 +300,70 @@ export async function POST(request: NextRequest) {
     // Generate Gemini images from combinations
     console.log(`\n📋 Prepared ${combinations.length} image combinations, will generate ${numGeminiImages} for Gemini`);
 
-    if (useParallelProcessing) {
-      // PARALLEL PROCESSING: Split workload evenly across all available API keys
+    if (genaiClients.length > 1) {
+      // ULTRA-FAST PARALLEL PROCESSING: 1 image per API key (maximum parallelization)
+      // Grid: 8 keys for 8 images, Magazine/Polaroid: 11 keys for 11 images
       const numKeys = genaiClients.length;
-      const imagesPerKey = Math.ceil(numGeminiImages / numKeys);
-      const batches = [];
 
-      for (let i = 0; i < numKeys; i++) {
-        const start = i * imagesPerKey;
-        const end = Math.min(start + imagesPerKey, numGeminiImages);
-        batches.push(combinations.slice(start, end));
-      }
+      console.log(`🚀 ULTRA-FAST mode: ${numKeys} API keys working in parallel - 1 image per key!`);
 
-      console.log(`🚀 Parallel processing with ${numKeys} API keys:`);
-      batches.forEach((batch, i) => {
-        console.log(`   Batch ${i + 1}: ${batch.length} images with API key ${i + 1}`);
-      });
-
-      // Helper function to generate images with a specific client
-      const generateBatch = async (batch: typeof combinations, genai: typeof genai1, batchName: string) => {
-        const results: string[] = [];
-        for (let i = 0; i < batch.length; i++) {
-          console.log(`  [${batchName}] [${i + 1}/${batch.length}] Generating image...`);
-          try {
-            const combo = batch[i];
-            const imageParts = combo.images.map((dataUrl: string) => ({
-              inlineData: {
-                data: dataUrl.split(",")[1],
-                mimeType: "image/jpeg"
-              }
-            }));
-
-            const aspectRatioPrompt = `${combo.prompt}\n\n🚨 CRITICAL DIMENSIONS REQUIREMENT 🚨:\n- OUTPUT FORMAT: WIDE LANDSCAPE ONLY - NOT PORTRAIT!\n- ASPECT RATIO: 16:9 or 1.78:1 (WIDER than tall)\n- MINIMUM WIDTH: 1600px\n- ORIENTATION: HORIZONTAL/LANDSCAPE (width MUST be 1.78x greater than height)\n- DO NOT generate portrait/vertical images\n- DO NOT generate square images\n- MUST be WIDE LANDSCAPE format like a movie screen or TV\n\nExample valid dimensions:\n- 1920x1080 (16:9)\n- 1600x900 (16:9)\n- 1440x810 (16:9)`;
-
-            const contentParts = imageParts.length > 0
-              ? [...imageParts, { text: aspectRatioPrompt }]
-              : [{ text: aspectRatioPrompt }];
-
-            const response = await genai.models.generateContent({
-              model: "gemini-2.5-flash-image",
-              contents: [{
-                role: "user",
-                parts: contentParts
-              }],
-              config: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
-            });
-
-            const candidate = response.candidates?.[0];
-            if (candidate?.content?.parts) {
-              const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-                part.inlineData?.mimeType?.startsWith("image/")
-              );
-              if (imagePart?.inlineData?.data) {
-                results.push(imagePart.inlineData.data);
-                console.log(`  [${batchName}] ✓ Generated image ${i + 1} (original size preserved)`);
-              }
+      // Helper function to generate a single image with a specific client
+      const generateSingleImage = async (combo: typeof combinations[0], genai: typeof genai1, imageIndex: number) => {
+        console.log(`  [Image ${imageIndex + 1}] Generating with API key ${imageIndex + 1}...`);
+        try {
+          const imageParts = combo.images.map((dataUrl: string) => ({
+            inlineData: {
+              data: dataUrl.split(",")[1],
+              mimeType: "image/jpeg"
             }
+          }));
 
-            // Small delay to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 300));
-          } catch (error) {
-            console.error(`  [${batchName}] ✗ Error generating image ${i + 1}:`, error);
+          const aspectRatioPrompt = `${combo.prompt}\n\n🚨 CRITICAL DIMENSIONS REQUIREMENT 🚨:\n- OUTPUT FORMAT: WIDE LANDSCAPE ONLY - NOT PORTRAIT!\n- ASPECT RATIO: 16:9 or 1.78:1 (WIDER than tall)\n- MINIMUM WIDTH: 1600px\n- ORIENTATION: HORIZONTAL/LANDSCAPE (width MUST be 1.78x greater than height)\n- DO NOT generate portrait/vertical images\n- DO NOT generate square images\n- MUST be WIDE LANDSCAPE format like a movie screen or TV\n\nExample valid dimensions:\n- 1920x1080 (16:9)\n- 1600x900 (16:9)\n- 1440x810 (16:9)`;
+
+          const contentParts = imageParts.length > 0
+            ? [...imageParts, { text: aspectRatioPrompt }]
+            : [{ text: aspectRatioPrompt }];
+
+          const response = await genai.models.generateContent({
+            model: "gemini-2.5-flash-image",
+            contents: [{
+              role: "user",
+              parts: contentParts
+            }],
+            config: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
+          });
+
+          const candidate = response.candidates?.[0];
+          if (candidate?.content?.parts) {
+            const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+              part.inlineData?.mimeType?.startsWith("image/")
+            );
+            if (imagePart?.inlineData?.data) {
+              console.log(`  [Image ${imageIndex + 1}] ✓ Generated successfully`);
+              return imagePart.inlineData.data;
+            }
           }
+        } catch (error) {
+          console.error(`  [Image ${imageIndex + 1}] ✗ Error:`, error);
         }
-        return results;
+        return null;
       };
 
-      // Run all batches in parallel
-      const allBatchPromises = batches.map((batch, i) =>
-        generateBatch(batch, genaiClients[i], `Batch${i + 1}/API${i + 1}`)
+      // Generate ALL images in parallel - 1 image per API key
+      const allImagePromises = combinations.slice(0, numGeminiImages).map((combo, i) =>
+        generateSingleImage(combo, genaiClients[i], i)
       );
 
-      const allResults = await Promise.all(allBatchPromises);
+      const allResults = await Promise.all(allImagePromises);
 
-      // Combine results from all batches
-      allResults.forEach((results, i) => {
-        geminiImages.push(...results);
-        console.log(`✅ Batch ${i + 1} complete: ${results.length} images from API key ${i + 1}`);
+      // Filter out nulls and add to geminiImages
+      allResults.forEach((result, i) => {
+        if (result) {
+          geminiImages.push(result);
+        }
       });
 
-      console.log(`✅ Parallel processing complete: ${geminiImages.length} total images generated`);
+      console.log(`✅ Ultra-fast parallel processing complete: ${geminiImages.length} images generated simultaneously!`);
     } else {
       // SEQUENTIAL PROCESSING: Use single API key
       console.log(`📝 Sequential processing with single API key`);

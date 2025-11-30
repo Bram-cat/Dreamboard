@@ -484,15 +484,23 @@ export default function PolaroidScatteredTemplate({
         style={{ display: "none" }}
       />
 
-      {/* Visible Vision Board - MUCH LARGER with decorative border */}
-      <div
-        ref={containerRef}
-        className="relative w-[2800px] h-[1600px] mx-auto overflow-hidden"
-        style={{
-          backgroundColor: "#1a1a1a",
-          boxShadow: '0 25px 70px rgba(0, 0, 0, 0.6)',
-        }}
-      >
+      {/* Scaled Container to fit screen */}
+      <div className="w-screen h-screen flex items-center justify-center overflow-hidden p-4">
+        <div
+          style={{
+            transform: 'scale(0.32)',
+            transformOrigin: 'center center',
+          }}
+        >
+          {/* Visible Vision Board - MUCH LARGER with decorative border */}
+          <div
+            ref={containerRef}
+            className="relative w-[2800px] h-[1600px] mx-auto"
+            style={{
+              backgroundColor: "#1a1a1a",
+              boxShadow: '0 25px 70px rgba(0, 0, 0, 0.6)',
+            }}
+          >
         {/* Outer decorative border layers */}
         <div className="absolute inset-0" style={{
           background: 'linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4) 100%)',
@@ -872,7 +880,9 @@ export default function PolaroidScatteredTemplate({
           </div>
         </div>
         </div> {/* End of beige scrapbook content area */}
-      </div> {/* End of outer container */}
+          </div> {/* End of outer container */}
+        </div>
+      </div>
     </>
   );
 }
