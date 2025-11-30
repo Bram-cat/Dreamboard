@@ -241,9 +241,15 @@ export default function MagazineCollageTemplate({
         ...pos,
       }));
 
-      // Draw each quote with neon container background
+      // Draw each quote with neon container background and circular clipping
       for (const quote of inspirationalQuotes) {
         ctx.save();
+
+        // Create circular clip path for the quote container
+        ctx.beginPath();
+        ctx.arc(quote.x, quote.y, Math.max(quote.width, quote.height) / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
 
         // Draw neon container image as background
         ctx.drawImage(
@@ -254,7 +260,10 @@ export default function MagazineCollageTemplate({
           quote.height
         );
 
-        // Draw text in white with glow effect
+        ctx.restore();
+        ctx.save();
+
+        // Draw text in white with glow effect (no clipping for text)
         ctx.fillStyle = "#ffffff";
         ctx.font = `bold ${quote.size}px Arial, sans-serif`;
         ctx.textAlign = "center";
@@ -461,7 +470,7 @@ export default function MagazineCollageTemplate({
             backgroundImage: "url('/quote container.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            borderRadius: "20px",
+            borderRadius: "50%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -500,7 +509,7 @@ export default function MagazineCollageTemplate({
             backgroundImage: "url('/quote container.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            borderRadius: "20px",
+            borderRadius: "50%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -539,7 +548,7 @@ export default function MagazineCollageTemplate({
             backgroundImage: "url('/quote container.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            borderRadius: "20px",
+            borderRadius: "50%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -578,7 +587,7 @@ export default function MagazineCollageTemplate({
             backgroundImage: "url('/quote container.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            borderRadius: "20px",
+            borderRadius: "50%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

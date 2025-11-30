@@ -374,15 +374,18 @@ export default function PolaroidScatteredTemplate({
 
       ctx.restore();
 
-      // Add inspirational quotes in containers - MUCH LARGER and repositioned between images
+      // Load neon quote container image
+      const quoteContainerImg = await loadImage('/quote container.png');
+
+      // Add inspirational quotes in neon containers - MUCH LARGER and repositioned between images
       const quotePositions = [
-        { x: 1000, y: 220, size: 32, rotation: -3, width: 200, height: 130, radius: 12 }, // Top center between frames
-        { x: 240, y: 500, size: 30, rotation: 4, width: 190, height: 125, radius: 12 }, // Left edge between frames
-        { x: 930, y: 580, size: 32, rotation: -2, width: 200, height: 130, radius: 12 }, // Left of center card
-        { x: 2100, y: 700, size: 30, rotation: 5, width: 190, height: 125, radius: 12 }, // Right edge
-        { x: 1020, y: 1000, size: 32, rotation: 2, width: 200, height: 130, radius: 12 }, // Bottom center left
-        { x: 1500, y: 1000, size: 30, rotation: -4, width: 190, height: 125, radius: 12 }, // Bottom center right
-        { x: 2140, y: 340, size: 30, rotation: 3, width: 190, height: 125, radius: 12 }, // Top right between frames
+        { x: 1075, y: 267, size: 18, rotation: 0, width: 200, height: 135 }, // Top center between frames
+        { x: 320, y: 547, size: 18, rotation: 0, width: 200, height: 135 }, // Left edge between frames
+        { x: 1005, y: 627, size: 18, rotation: 0, width: 200, height: 135 }, // Left of center card
+        { x: 2175, y: 747, size: 18, rotation: 0, width: 200, height: 135 }, // Right edge
+        { x: 1095, y: 1047, size: 18, rotation: 0, width: 200, height: 135 }, // Bottom center left
+        { x: 1575, y: 1047, size: 18, rotation: 0, width: 200, height: 135 }, // Bottom center right
+        { x: 2215, y: 387, size: 18, rotation: 0, width: 200, height: 135 }, // Top right between frames
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -390,55 +393,37 @@ export default function PolaroidScatteredTemplate({
         ...pos,
       }));
 
-      // Draw each quote container with rounded corners
+      // Draw each quote with neon container background
       inspirationalQuotes.forEach((quote) => {
         ctx.save();
-        ctx.translate(quote.x, quote.y);
-        ctx.rotate((quote.rotation * Math.PI) / 180);
 
-        // Draw rounded rectangle for white container with black border
-        const x = -quote.width / 2;
-        const y = -quote.height / 2;
-        const radius = quote.radius;
+        // Draw neon container image as background
+        ctx.drawImage(
+          quoteContainerImg,
+          quote.x - quote.width / 2,
+          quote.y - quote.height / 2,
+          quote.width,
+          quote.height
+        );
 
-        // Create rounded rectangle path
-        ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + quote.width - radius, y);
-        ctx.quadraticCurveTo(x + quote.width, y, x + quote.width, y + radius);
-        ctx.lineTo(x + quote.width, y + quote.height - radius);
-        ctx.quadraticCurveTo(x + quote.width, y + quote.height, x + quote.width - radius, y + quote.height);
-        ctx.lineTo(x + radius, y + quote.height);
-        ctx.quadraticCurveTo(x, y + quote.height, x, y + quote.height - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
-        ctx.closePath();
-
-        // Fill white background with shadow
+        // Draw text in white with glow effect
         ctx.fillStyle = "#ffffff";
-        ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetX = 3;
-        ctx.shadowOffsetY = 3;
-        ctx.fill();
-
-        // Draw black border
-        ctx.strokeStyle = "#000000";
-        ctx.lineWidth = 3;
-        ctx.shadowColor = "transparent";
-        ctx.stroke();
-
-        // Draw text in black using Telma font
-        ctx.fillStyle = "#000000";
-        ctx.font = `bold ${quote.size}px Telma, Arial, sans-serif`;
+        ctx.font = `bold ${quote.size}px Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
+        // Text shadow for glow effect
+        ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
+        ctx.shadowBlur = 10;
+
         // Handle multi-line text
         const lines = quote.text.split("\n");
+        const lineHeight = quote.size * 1.3;
+        const totalHeight = lines.length * lineHeight;
+        const startY = quote.y - totalHeight / 2 + lineHeight / 2;
+
         lines.forEach((line, index) => {
-          const yOffset = (index - (lines.length - 1) / 2) * (quote.size + 4);
-          ctx.fillText(line, 0, yOffset);
+          ctx.fillText(line, quote.x, startY + index * lineHeight);
         });
 
         ctx.restore();

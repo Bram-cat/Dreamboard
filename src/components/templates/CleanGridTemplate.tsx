@@ -236,59 +236,49 @@ export default function CleanGridTemplate({
         console.error('Failed to load logo image:', error);
       }
 
-      // Add 4 quotes in gaps between images
+      // Load neon quote container image
+      const quoteContainerImg = await loadImage('/quote container.png');
+
+      // Add 4 quotes with neon containers between images
       const quotePositions = [
-        { x: 20 + gridSize / 2, y: 20 + gridSize + gap / 2, size: 28 }, // Between top-left and middle-left
-        { x: 20 + (gridSize + gap) * 2.5, y: 20 + gridSize / 2, size: 28 }, // Between top-right and middle-right
-        { x: 20 + gridSize + gap + gridSize / 2, y: 20 + (gridSize + gap) * 2.5, size: 28 }, // Between middle-center and bottom-center
-        { x: totalWidth - 100, y: 20 + (gridSize + gap) * 1.5, size: 26 }, // Right edge middle
+        { x: 20 + gridSize + gap / 2, y: 20 + gridSize / 2, size: 16, width: 150, height: 100 }, // Between Image1 and Image2
+        { x: 20 + (gridSize + gap) * 2 + gap / 2, y: 20 + gridSize / 2, size: 16, width: 150, height: 100 }, // Between Image2 and Image3
+        { x: 20 + gridSize + gap / 2, y: 20 + (gridSize + gap) * 2 + gridSize / 2, size: 16, width: 150, height: 100 }, // Between Image6 and Image7
+        { x: 20 + (gridSize + gap) * 2 + gap / 2, y: 20 + (gridSize + gap) * 2 + gridSize / 2, size: 16, width: 150, height: 100 }, // Between Image7 and Image8
       ];
 
       quotePositions.forEach((qPos, index) => {
         if (!selectedQuotes[index]) return;
 
         ctx.save();
-        ctx.translate(qPos.x, qPos.y);
 
-        // White rounded rectangle background
-        const qWidth = 120;
-        const qHeight = 80;
-        const qRadius = 8;
+        // Draw neon container image as background
+        ctx.drawImage(
+          quoteContainerImg,
+          qPos.x - qPos.width / 2,
+          qPos.y - qPos.height / 2,
+          qPos.width,
+          qPos.height
+        );
 
-        ctx.beginPath();
-        ctx.moveTo(-qWidth/2 + qRadius, -qHeight/2);
-        ctx.lineTo(qWidth/2 - qRadius, -qHeight/2);
-        ctx.quadraticCurveTo(qWidth/2, -qHeight/2, qWidth/2, -qHeight/2 + qRadius);
-        ctx.lineTo(qWidth/2, qHeight/2 - qRadius);
-        ctx.quadraticCurveTo(qWidth/2, qHeight/2, qWidth/2 - qRadius, qHeight/2);
-        ctx.lineTo(-qWidth/2 + qRadius, qHeight/2);
-        ctx.quadraticCurveTo(-qWidth/2, qHeight/2, -qWidth/2, qHeight/2 - qRadius);
-        ctx.lineTo(-qWidth/2, -qHeight/2 + qRadius);
-        ctx.quadraticCurveTo(-qWidth/2, -qHeight/2, -qWidth/2 + qRadius, -qHeight/2);
-        ctx.closePath();
-
+        // Draw quote text in white with glow effect
         ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetX = 2;
-        ctx.shadowOffsetY = 2;
-        ctx.fill();
-        ctx.shadowColor = 'transparent';
-
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Draw quote text
-        ctx.fillStyle = '#000000';
-        ctx.font = `bold ${qPos.size}px Telma, Arial, sans-serif`;
+        ctx.font = `bold ${qPos.size}px Arial, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
+        // Text shadow for glow effect
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+        ctx.shadowBlur = 10;
+
+        // Handle multi-line text
         const lines = selectedQuotes[index].split('\n');
+        const lineHeight = qPos.size * 1.3;
+        const totalHeight = lines.length * lineHeight;
+        const startY = qPos.y - totalHeight / 2 + lineHeight / 2;
+
         lines.forEach((line, i) => {
-          const yOffset = (i - (lines.length - 1) / 2) * (qPos.size + 4);
-          ctx.fillText(line, 0, yOffset);
+          ctx.fillText(line, qPos.x, startY + i * lineHeight);
         });
 
         ctx.restore();
@@ -656,7 +646,7 @@ export default function CleanGridTemplate({
                   textShadow: "0 0 10px rgba(255,255,255,0.5)",
                 }}
                 dangerouslySetInnerHTML={{
-                  __html: quote.replace(/\n/g, "<br/>"),
+                  __html: (quote || "").replace(/\n/g, "<br/>"),
                 }}
               />
             </div>
