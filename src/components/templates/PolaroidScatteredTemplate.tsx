@@ -363,13 +363,6 @@ export default function PolaroidScatteredTemplate({
         centerH - 36
       );
 
-      // Decorative stars - top (scaled for MUCH LARGER card)
-      ctx.fillStyle = "#2a2a2a";
-      ctx.font = "42px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText("★", -105, -150);
-      ctx.fillText("★", 105, -150);
-
       // Center text - scaled for MUCH LARGER card
       ctx.fillStyle = "#2a2a2a";
       ctx.font = "bold 95px Arial, sans-serif";
@@ -379,30 +372,17 @@ export default function PolaroidScatteredTemplate({
       ctx.font = 'italic 38px "Brush Script MT", cursive, Georgia';
       ctx.fillText("VISION BOARD", 0, 15);
 
-      // Wavy line decoration - below text (scaled for MUCH LARGER card)
-      ctx.strokeStyle = "#2a2a2a";
-      ctx.lineWidth = 3.5;
-      ctx.beginPath();
-      ctx.moveTo(-125, 75);
-      ctx.quadraticCurveTo(-63, 67, 0, 75);
-      ctx.quadraticCurveTo(63, 83, 125, 75);
-      ctx.stroke();
-
-      // Bottom star (scaled for MUCH LARGER card)
-      ctx.font = "42px Arial";
-      ctx.fillText("★", 0, 155);
-
       ctx.restore();
 
-      // Add inspirational quotes in containers - scaled and repositioned for MUCH LARGER board
+      // Add inspirational quotes in containers - MUCH LARGER and repositioned between images
       const quotePositions = [
-        { x: 900, y: 190, size: 22, rotation: -3, width: 140, height: 95, radius: 10 }, // Top center empty space
-        { x: 1680, y: 310, size: 20, rotation: 4, width: 130, height: 90, radius: 10 }, // Right edge between top images
-        { x: 650, y: 480, size: 22, rotation: -2, width: 140, height: 95, radius: 10 }, // Left center between rows
-        { x: 1680, y: 500, size: 20, rotation: 5, width: 130, height: 90, radius: 10 }, // Right center
-        { x: 1220, y: 720, size: 22, rotation: 2, width: 140, height: 95, radius: 10 }, // Bottom center between images
-        { x: 530, y: 850, size: 20, rotation: -4, width: 130, height: 90, radius: 10 }, // Bottom left edge
-        { x: 1530, y: 850, size: 20, rotation: 3, width: 130, height: 90, radius: 10 }, // Bottom right corner
+        { x: 1000, y: 220, size: 32, rotation: -3, width: 200, height: 130, radius: 12 }, // Top center between frames
+        { x: 240, y: 500, size: 30, rotation: 4, width: 190, height: 125, radius: 12 }, // Left edge between frames
+        { x: 930, y: 580, size: 32, rotation: -2, width: 200, height: 130, radius: 12 }, // Left of center card
+        { x: 2100, y: 700, size: 30, rotation: 5, width: 190, height: 125, radius: 12 }, // Right edge
+        { x: 1020, y: 1000, size: 32, rotation: 2, width: 200, height: 130, radius: 12 }, // Bottom center left
+        { x: 1500, y: 1000, size: 30, rotation: -4, width: 190, height: 125, radius: 12 }, // Bottom center right
+        { x: 2140, y: 340, size: 30, rotation: 3, width: 190, height: 125, radius: 12 }, // Top right between frames
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -561,6 +541,7 @@ export default function PolaroidScatteredTemplate({
                   padding: "2% 2% 6% 2%", // Extra padding at bottom
                   border: "3px solid rgba(0, 0, 0, 0.1)",
                   borderRadius: "2px",
+                  overflow: "hidden", // Prevent images from overflowing frame
                 }}
               >
                 {/* Image - COVER mode to fill entire container */}
@@ -593,32 +574,32 @@ export default function PolaroidScatteredTemplate({
           );
         })}
 
-        {/* Inspirational Quotes in Containers - Random from pool */}
+        {/* Inspirational Quotes in Containers - MUCH LARGER and repositioned between images */}
 
-        {/* Quote 1 - Top center empty space */}
+        {/* Quote 1 - Top center between frames */}
         <div
           style={{
             position: "absolute",
-            top: "190px",
-            left: "900px",
-            width: "140px",
-            height: "95px",
+            top: "220px",
+            left: "1000px",
+            width: "200px",
+            height: "130px",
             transform: "rotate(-3deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
-            borderRadius: "10px",
-            boxShadow: "4px 4px 12px rgba(0,0,0,0.2)",
+            borderRadius: "12px",
+            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "10px",
+            padding: "12px",
           }}
         >
           <div
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "22px",
+              fontSize: "32px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -629,30 +610,30 @@ export default function PolaroidScatteredTemplate({
           />
         </div>
 
-        {/* Quote 2 - Right edge between top images */}
+        {/* Quote 2 - Left edge between frames */}
         <div
           style={{
             position: "absolute",
-            top: "310px",
-            left: "1680px",
-            width: "130px",
-            height: "90px",
+            top: "500px",
+            left: "240px",
+            width: "190px",
+            height: "125px",
             transform: "rotate(4deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
-            borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            borderRadius: "12px",
+            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "8px",
+            padding: "12px",
           }}
         >
           <div
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "16px",
+              fontSize: "30px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -663,30 +644,30 @@ export default function PolaroidScatteredTemplate({
           />
         </div>
 
-        {/* Quote 3 - Left center between rows */}
+        {/* Quote 3 - Left of center card */}
         <div
           style={{
             position: "absolute",
-            top: "480px",
-            left: "650px",
-            width: "140px",
-            height: "95px",
+            top: "580px",
+            left: "930px",
+            width: "200px",
+            height: "130px",
             transform: "rotate(-2deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
-            borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            borderRadius: "12px",
+            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "8px",
+            padding: "12px",
           }}
         >
           <div
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "18px",
+              fontSize: "32px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -697,30 +678,30 @@ export default function PolaroidScatteredTemplate({
           />
         </div>
 
-        {/* Quote 4 - Right center */}
+        {/* Quote 4 - Right edge */}
         <div
           style={{
             position: "absolute",
-            top: "500px",
-            left: "1680px",
-            width: "130px",
-            height: "90px",
+            top: "700px",
+            left: "2100px",
+            width: "190px",
+            height: "125px",
             transform: "rotate(5deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
-            borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            borderRadius: "12px",
+            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "8px",
+            padding: "12px",
           }}
         >
           <div
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "16px",
+              fontSize: "30px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -731,30 +712,30 @@ export default function PolaroidScatteredTemplate({
           />
         </div>
 
-        {/* Quote 5 - Bottom center between images */}
+        {/* Quote 5 - Bottom center left */}
         <div
           style={{
             position: "absolute",
-            top: "720px",
-            left: "1220px",
-            width: "140px",
-            height: "95px",
+            top: "1000px",
+            left: "1020px",
+            width: "200px",
+            height: "130px",
             transform: "rotate(2deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
-            borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            borderRadius: "12px",
+            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "8px",
+            padding: "12px",
           }}
         >
           <div
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "18px",
+              fontSize: "32px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -765,30 +746,30 @@ export default function PolaroidScatteredTemplate({
           />
         </div>
 
-        {/* Quote 6 - Bottom left edge */}
+        {/* Quote 6 - Bottom center right */}
         <div
           style={{
             position: "absolute",
-            top: "850px",
-            left: "530px",
-            width: "130px",
-            height: "90px",
+            top: "1000px",
+            left: "1500px",
+            width: "190px",
+            height: "125px",
             transform: "rotate(-4deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
-            borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            borderRadius: "12px",
+            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "8px",
+            padding: "12px",
           }}
         >
           <div
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "16px",
+              fontSize: "30px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -799,30 +780,30 @@ export default function PolaroidScatteredTemplate({
           />
         </div>
 
-        {/* Quote 7 - Bottom right corner */}
+        {/* Quote 7 - Top right between frames */}
         <div
           style={{
             position: "absolute",
-            top: "850px",
-            left: "1530px",
-            width: "130px",
-            height: "90px",
+            top: "340px",
+            left: "2140px",
+            width: "190px",
+            height: "125px",
             transform: "rotate(3deg)",
             backgroundColor: "#ffffff",
             border: "3px solid #000000",
-            borderRadius: "8px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            borderRadius: "12px",
+            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "8px",
+            padding: "12px",
           }}
         >
           <div
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "16px",
+              fontSize: "30px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -857,21 +838,6 @@ export default function PolaroidScatteredTemplate({
             }}
           />
 
-          {/* Decorative Stars - scaled */}
-          <div
-            style={{
-              position: "absolute",
-              top: "42px",
-              fontSize: "42px",
-              color: "#2a2a2a",
-              display: "flex",
-              gap: "210px",
-            }}
-          >
-            <span>★</span>
-            <span>★</span>
-          </div>
-
           {/* Main Text Container */}
           <div
             style={{
@@ -904,36 +870,6 @@ export default function PolaroidScatteredTemplate({
               VISION BOARD
             </div>
           </div>
-
-          {/* Bottom Star - scaled */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: "48px",
-              fontSize: "42px",
-              color: "#2a2a2a",
-            }}
-          >
-            ★
-          </div>
-
-          {/* Wavy Line */}
-          <svg
-            style={{
-              position: "absolute",
-              bottom: "60px",
-              width: "50%",
-            }}
-            height="20"
-            viewBox="0 0 100 10"
-          >
-            <path
-              d="M0,5 Q25,0 50,5 T100,5"
-              stroke="#2a2a2a"
-              strokeWidth="2.5"
-              fill="none"
-            />
-          </svg>
         </div>
         </div> {/* End of beige scrapbook content area */}
       </div> {/* End of outer container */}
