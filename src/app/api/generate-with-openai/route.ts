@@ -47,6 +47,28 @@ export async function POST(request: NextRequest) {
     ].filter(Boolean);
 
     console.log(`🔑 Total Gemini API keys available: ${allAvailableKeys.length}`);
+    console.log(`🔑 Keys found:`, {
+      key1: !!geminiApiKey1,
+      key2: !!geminiApiKey2,
+      key3: !!geminiApiKey3,
+      key4: !!geminiApiKey4,
+      key5: !!geminiApiKey5,
+      key6: !!geminiApiKey6,
+      key7: !!geminiApiKey7,
+      key8: !!geminiApiKey8,
+      key9: !!geminiApiKey9,
+      key10: !!geminiApiKey10,
+      key11: !!geminiApiKey11,
+    });
+
+    // CRITICAL: Ensure we have enough keys for the template
+    const requiredKeys = selectedTemplate === "grid" ? 8 : 11;
+    if (allAvailableKeys.length < requiredKeys) {
+      console.error(`❌ Not enough API keys! Need ${requiredKeys} for ${selectedTemplate} template, but only have ${allAvailableKeys.length}`);
+      return NextResponse.json({
+        error: `Not enough API keys configured. Need ${requiredKeys} keys for ${selectedTemplate} template, but only ${allAvailableKeys.length} are available.`
+      }, { status: 500 });
+    }
 
     console.log("🎨 Starting vision board generation...");
     console.log("📝 User keywords:", keywords);

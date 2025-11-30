@@ -373,7 +373,7 @@ export default function MagazineCollageTemplate({
       <div className="w-screen h-screen flex items-center justify-center overflow-hidden p-4">
         <div
           style={{
-            transform: 'scale(0.36)',
+            transform: 'scale(0.65)',
             transformOrigin: 'center center',
           }}
         >

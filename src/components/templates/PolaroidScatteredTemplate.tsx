@@ -488,7 +488,7 @@ export default function PolaroidScatteredTemplate({
       <div className="w-screen h-screen flex items-center justify-center overflow-hidden p-4">
         <div
           style={{
-            transform: 'scale(0.32)',
+            transform: 'scale(0.58)',
             transformOrigin: 'center center',
           }}
         >

@@ -338,7 +338,7 @@ export default function CleanGridTemplate({
       <div className="w-screen h-screen flex items-center justify-center overflow-hidden p-4">
         <div
           style={{
-            transform: 'scale(0.45)',
+            transform: 'scale(0.85)',
             transformOrigin: 'center center',
           }}
         >
