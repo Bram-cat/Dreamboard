@@ -225,12 +225,15 @@ export default function MagazineCollageTemplate({
         }
       }
 
-      // Add inspirational quotes in containers - scaled and offset for new dimensions
+      // Load neon quote container image
+      const quoteContainerImg = await loadImage('/quote container.png');
+
+      // Add inspirational quotes with neon containers - NEW POSITIONS
       const quotePositions = [
-        { x: 410, y: 240, size: 15, rotation: -3, width: 95, height: 70, radius: 7 }, // Between top row images (left-center)
-        { x: 1150, y: 240, size: 15, rotation: 3, width: 95, height: 70, radius: 7 }, // Between top row images (right-center)
-        { x: 260, y: 530, size: 15, rotation: 2, width: 95, height: 70, radius: 7 }, // Between middle row images (left)
-        { x: 980, y: 530, size: 15, rotation: -2, width: 95, height: 70, radius: 7 }, // Between middle row images (right)
+        { x: 730, y: 340, size: 18, width: 200, height: 140 }, // Between top row images 1&2
+        { x: 1870, y: 340, size: 18, width: 200, height: 140 }, // Between top row images 3&4
+        { x: 1870, y: 1020, size: 18, width: 200, height: 140 }, // Between bottom row images 3&4
+        { x: 730, y: 1020, size: 18, width: 200, height: 140 }, // Between bottom row images 1&2
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -238,64 +241,46 @@ export default function MagazineCollageTemplate({
         ...pos,
       }));
 
-      // Draw each quote container with rounded corners
-      inspirationalQuotes.forEach((quote) => {
+      // Draw each quote with neon container background
+      for (const quote of inspirationalQuotes) {
         ctx.save();
-        ctx.translate(quote.x, quote.y);
-        ctx.rotate((quote.rotation * Math.PI) / 180);
 
-        // Draw rounded rectangle for white container with black border
-        const x = -quote.width / 2;
-        const y = -quote.height / 2;
-        const radius = quote.radius;
+        // Draw neon container image as background
+        ctx.drawImage(
+          quoteContainerImg,
+          quote.x - quote.width / 2,
+          quote.y - quote.height / 2,
+          quote.width,
+          quote.height
+        );
 
-        // Create rounded rectangle path
-        ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + quote.width - radius, y);
-        ctx.quadraticCurveTo(x + quote.width, y, x + quote.width, y + radius);
-        ctx.lineTo(x + quote.width, y + quote.height - radius);
-        ctx.quadraticCurveTo(x + quote.width, y + quote.height, x + quote.width - radius, y + quote.height);
-        ctx.lineTo(x + radius, y + quote.height);
-        ctx.quadraticCurveTo(x, y + quote.height, x, y + quote.height - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
-        ctx.closePath();
-
-        // White background with shadow and border
+        // Draw text in white with glow effect
         ctx.fillStyle = "#ffffff";
-        ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetX = 3;
-        ctx.shadowOffsetY = 3;
-        ctx.fill();
-
-        // Draw black border
-        ctx.strokeStyle = "#000000";
-        ctx.lineWidth = 2;
-        ctx.shadowColor = "transparent";
-        ctx.stroke();
-
-        // Draw text in black using Telma font
-        ctx.fillStyle = "#000000";
-        ctx.font = `bold ${quote.size}px Telma, Arial, sans-serif`;
+        ctx.font = `bold ${quote.size}px Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
+        // Text shadow for glow effect
+        ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
+        ctx.shadowBlur = 10;
+
         // Handle multi-line text
         const lines = quote.text.split("\n");
+        const lineHeight = quote.size * 1.3;
+        const totalHeight = lines.length * lineHeight;
+        const startY = quote.y - totalHeight / 2 + lineHeight / 2;
+
         lines.forEach((line, index) => {
-          const yOffset = (index - (lines.length - 1) / 2) * (quote.size + 3);
-          ctx.fillText(line, 0, yOffset);
+          ctx.fillText(line, quote.x, startY + index * lineHeight);
         });
 
         ctx.restore();
-      });
+      }
 
-      // Draw center logo image - perfectly rounded circle
-      const centerX = 900;
-      const centerY = 450;
-      const logoSize = 350; // Diameter of circular logo
+      // Draw logo image - moved to left (where Quote 3 was)
+      const logoX = 1040;
+      const logoY = 705;
+      const logoSize = 280; // Diameter of circular logo
       const logoRadius = logoSize / 2;
 
       try {
@@ -305,7 +290,7 @@ export default function MagazineCollageTemplate({
 
         // Create circular clip path
         ctx.beginPath();
-        ctx.arc(centerX + 210, centerY + 150, logoRadius, 0, Math.PI * 2);
+        ctx.arc(logoX, logoY, logoRadius, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
 
@@ -318,8 +303,8 @@ export default function MagazineCollageTemplate({
         // Draw logo image (will be clipped to circle)
         ctx.drawImage(
           logoImg,
-          centerX + 210 - logoRadius,
-          centerY + 150 - logoRadius,
+          logoX - logoRadius,
+          logoY - logoRadius,
           logoSize,
           logoSize
         );
@@ -543,14 +528,14 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 3 - CENTER position (where logo was) */}
+        {/* Quote 3 - Between bottom row images 3&4 */}
         <div
           style={{
             position: "absolute",
-            top: "550px",
-            left: "1085px",
-            width: "220px",
-            height: "160px",
+            top: "950px",
+            left: "1770px",
+            width: "200px",
+            height: "140px",
             backgroundImage: "url('/quote container.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
@@ -558,8 +543,8 @@ export default function MagazineCollageTemplate({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "30px",
-            zIndex: 100,
+            padding: "25px",
+            zIndex: 50,
             overflow: "hidden",
           }}
         >
@@ -567,7 +552,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "20px",
+              fontSize: "18px",
               color: "#ffffff",
               textAlign: "center",
               lineHeight: "1.3",
