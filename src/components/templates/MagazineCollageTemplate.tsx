@@ -52,26 +52,26 @@ export default function MagazineCollageTemplate({
   // Use useMemo to maintain same quotes on re-renders
   const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
 
-  // TIGHT-FIT Magazine collage - 11 visible images MUCH LARGER with no empty space
-  // Middle row images maximized, better spacing and borders
+  // TIGHT-FIT Magazine collage - 11 visible images SCALED UP with border offset
+  // Positions scaled by 1.1x and offset by 100px for border
   const collagePositions = [
-    // Top row - 4 LARGER images
-    { top: 0, left: 0, width: 520, height: 370, rotate: -3, zIndex: 20 },
-    { top: 8, left: 515, width: 520, height: 370, rotate: 2, zIndex: 21 },
-    { top: 0, left: 1030, width: 520, height: 370, rotate: -2, zIndex: 22 },
-    { top: 8, left: 1545, width: 555, height: 370, rotate: 3, zIndex: 23 },
+    // Top row - 4 LARGER images (scaled and offset)
+    { top: 100, left: 100, width: 570, height: 410, rotate: -3, zIndex: 20 },
+    { top: 110, left: 670, width: 570, height: 410, rotate: 2, zIndex: 21 },
+    { top: 100, left: 1240, width: 570, height: 410, rotate: -2, zIndex: 22 },
+    { top: 110, left: 1810, width: 590, height: 410, rotate: 3, zIndex: 23 },
 
-    // Middle row - 3 MAXIMIZED images around center card (fill entire row height)
-    { top: 270, left: 0, width: 680, height: 450, rotate: 2, zIndex: 26 },
-    // CENTER CARD SPACE (700x275, 365x260)
-    { top: 290, left: 1090, width: 465, height: 350, rotate: 3, zIndex: 27 },
-    { top: 270, left: 1555, width: 545, height: 450, rotate: -2, zIndex: 28 },
+    // Middle row - 3 MAXIMIZED images around center card (scaled and offset)
+    { top: 400, left: 100, width: 750, height: 500, rotate: 2, zIndex: 26 },
+    // CENTER CARD SPACE
+    { top: 420, left: 1300, width: 510, height: 390, rotate: 3, zIndex: 27 },
+    { top: 400, left: 1810, width: 590, height: 500, rotate: -2, zIndex: 28 },
 
-    // Bottom row - 4 LARGER images (added one more)
-    { top: 550, left: 0, width: 520, height: 340, rotate: -2, zIndex: 30 },
-    { top: 555, left: 520, width: 520, height: 340, rotate: 2, zIndex: 31 },
-    { top: 550, left: 1040, width: 520, height: 340, rotate: -1, zIndex: 32 },
-    { top: 555, left: 1560, width: 540, height: 340, rotate: 3, zIndex: 33 },
+    // Bottom row - 4 LARGER images (scaled and offset)
+    { top: 800, left: 100, width: 570, height: 380, rotate: -2, zIndex: 30 },
+    { top: 810, left: 670, width: 570, height: 380, rotate: 2, zIndex: 31 },
+    { top: 800, left: 1240, width: 570, height: 380, rotate: -1, zIndex: 32 },
+    { top: 810, left: 1810, width: 590, height: 380, rotate: 3, zIndex: 33 },
   ];
 
   // Canvas rendering for download
@@ -92,18 +92,40 @@ export default function MagazineCollageTemplate({
         console.error('Failed to load Telma font:', error);
       }
 
-      // Set canvas size - LARGER dimensions for bigger board
-      canvas.width = 2100;
-      canvas.height = 805;
+      // Set canvas size - MUCH LARGER dimensions with border space
+      canvas.width = 2500;
+      canvas.height = 1400;
 
-      // Draw cork board background
+      // Draw outer decorative border background (dark elegant frame)
+      ctx.fillStyle = '#2a2a2a';
+      ctx.fillRect(0, 0, 2500, 1400);
+
+      // Draw inner shadow for depth
+      const borderGradient = ctx.createLinearGradient(0, 0, 2500, 1400);
+      borderGradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+      borderGradient.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
+      borderGradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+      ctx.fillStyle = borderGradient;
+      ctx.fillRect(40, 40, 2420, 1320);
+
+      // Draw decorative gold accent border
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(50, 50, 2400, 1300);
+
+      // Inner gold border
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(70, 70, 2360, 1260);
+
+      // Draw main cork board background (content area)
       ctx.fillStyle = '#d4a574';
-      ctx.fillRect(0, 0, 2100, 805);
+      ctx.fillRect(100, 100, 2300, 1200);
 
-      // Add texture (noise pattern)
-      for (let i = 0; i < 4000; i++) {
-        const x = Math.random() * 2100;
-        const y = Math.random() * 805;
+      // Add texture (noise pattern) to cork board area only
+      for (let i = 0; i < 6000; i++) {
+        const x = 100 + Math.random() * 2300;
+        const y = 100 + Math.random() * 1200;
         const brightness = Math.random() * 30 - 15;
         ctx.fillStyle = `rgba(${120 + brightness}, ${80 + brightness}, ${50 + brightness}, 0.3)`;
         ctx.fillRect(x, y, 2, 2);
@@ -203,12 +225,12 @@ export default function MagazineCollageTemplate({
         }
       }
 
-      // Add inspirational quotes in containers - positioned between images toward center (4 quotes)
+      // Add inspirational quotes in containers - scaled and offset for new dimensions
       const quotePositions = [
-        { x: 280, y: 130, size: 13, rotation: -3, width: 85, height: 60, radius: 6 }, // Between top row images (left-center)
-        { x: 920, y: 130, size: 13, rotation: 3, width: 85, height: 60, radius: 6 }, // Between top row images (right-center)
-        { x: 145, y: 340, size: 13, rotation: 2, width: 85, height: 60, radius: 6 }, // Between bottom row images (left)
-        { x: 750, y: 340, size: 13, rotation: -2, width: 85, height: 60, radius: 6 }, // Between bottom row images (right)
+        { x: 410, y: 240, size: 15, rotation: -3, width: 95, height: 70, radius: 7 }, // Between top row images (left-center)
+        { x: 1150, y: 240, size: 15, rotation: 3, width: 95, height: 70, radius: 7 }, // Between top row images (right-center)
+        { x: 260, y: 530, size: 15, rotation: 2, width: 95, height: 70, radius: 7 }, // Between middle row images (left)
+        { x: 980, y: 530, size: 15, rotation: -2, width: 95, height: 70, radius: 7 }, // Between middle row images (right)
       ];
 
       const inspirationalQuotes = quotePositions.map((pos, index) => ({
@@ -270,12 +292,12 @@ export default function MagazineCollageTemplate({
         ctx.restore();
       });
 
-      // Draw center "2025 VISION BOARD" card - Improved styling on LARGER board
-      const centerX = 700;
-      const centerY = 275;
-      const centerW = 365;
-      const centerH = 260;
-      const borderRadius = 14;
+      // Draw center "2025 VISION BOARD" card - Scaled for new dimensions with border offset
+      const centerX = 900;
+      const centerY = 450;
+      const centerW = 420;
+      const centerH = 300;
+      const borderRadius = 16;
 
       ctx.save();
       ctx.translate(centerX + centerW / 2, centerY + centerH / 2);
@@ -371,16 +393,35 @@ export default function MagazineCollageTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={2100}
-        height={805}
+        width={2500}
+        height={1400}
         style={{ display: 'none' }}
       />
 
-      {/* Visible Vision Board - LARGER dimensions */}
+      {/* Visible Vision Board - MUCH LARGER with decorative border */}
       <div
         ref={containerRef}
-        className="relative w-[2100px] h-[805px] mx-auto overflow-hidden"
+        className="relative w-[2500px] h-[1400px] mx-auto overflow-hidden"
         style={{
+          backgroundColor: '#2a2a2a',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+        }}
+      >
+        {/* Outer decorative border layers */}
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.3) 100%)',
+        }} />
+
+        {/* Gold accent borders */}
+        <div className="absolute top-[50px] left-[50px] right-[50px] bottom-[50px]" style={{
+          border: '8px solid #d4af37',
+        }} />
+        <div className="absolute top-[70px] left-[70px] right-[70px] bottom-[70px]" style={{
+          border: '3px solid #d4af37',
+        }} />
+
+        {/* Cork board content area */}
+        <div className="absolute top-[100px] left-[100px] w-[2300px] h-[1200px]" style={{
           backgroundColor: '#d4a574',
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
         }}
@@ -449,19 +490,19 @@ export default function MagazineCollageTemplate({
         <div
           style={{
             position: "absolute",
-            top: "130px",
-            left: "280px",
-            width: "85px",
-            height: "60px",
+            top: "240px",
+            left: "410px",
+            width: "95px",
+            height: "70px",
             transform: "rotate(-3deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
-            borderRadius: "6px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            borderRadius: "7px",
+            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "6px",
+            padding: "8px",
             zIndex: 50,
           }}
         >
@@ -469,7 +510,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "13px",
+              fontSize: "15px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -484,19 +525,19 @@ export default function MagazineCollageTemplate({
         <div
           style={{
             position: "absolute",
-            top: "130px",
-            left: "920px",
-            width: "85px",
-            height: "60px",
+            top: "240px",
+            left: "1150px",
+            width: "95px",
+            height: "70px",
             transform: "rotate(3deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
-            borderRadius: "6px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            borderRadius: "7px",
+            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "6px",
+            padding: "8px",
             zIndex: 50,
           }}
         >
@@ -504,7 +545,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "13px",
+              fontSize: "15px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -515,23 +556,23 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 3 - Between bottom row images (left) */}
+        {/* Quote 3 - Between middle row images (left) */}
         <div
           style={{
             position: "absolute",
-            top: "340px",
-            left: "145px",
-            width: "85px",
-            height: "60px",
+            top: "530px",
+            left: "260px",
+            width: "95px",
+            height: "70px",
             transform: "rotate(2deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
-            borderRadius: "6px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            borderRadius: "7px",
+            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "6px",
+            padding: "8px",
             zIndex: 50,
           }}
         >
@@ -539,7 +580,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "13px",
+              fontSize: "15px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -550,23 +591,23 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 4 - Between bottom row images (right) */}
+        {/* Quote 4 - Between middle row images (right) */}
         <div
           style={{
             position: "absolute",
-            top: "340px",
-            left: "750px",
-            width: "85px",
-            height: "60px",
+            top: "530px",
+            left: "980px",
+            width: "95px",
+            height: "70px",
             transform: "rotate(-2deg)",
             backgroundColor: "#ffffff",
             border: "2px solid #000000",
-            borderRadius: "6px",
-            boxShadow: "3px 3px 8px rgba(0,0,0,0.15)",
+            borderRadius: "7px",
+            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "6px",
+            padding: "8px",
             zIndex: 50,
           }}
         >
@@ -574,7 +615,7 @@ export default function MagazineCollageTemplate({
             style={{
               fontFamily: "Telma, Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "13px",
+              fontSize: "15px",
               color: "#000000",
               textAlign: "center",
               lineHeight: "1.2",
@@ -585,16 +626,16 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Center "2025 VISION BOARD" Card - Improved Styling on LARGER board */}
+        {/* Center "2025 VISION BOARD" Card - Scaled for new dimensions */}
         <div
           className="absolute bg-white shadow-2xl flex flex-col items-center justify-center"
           style={{
-            top: '275px',
-            left: '700px',
-            width: '365px',
-            height: '260px',
+            top: '450px',
+            left: '900px',
+            width: '420px',
+            height: '300px',
             zIndex: 100,
-            borderRadius: '14px',
+            borderRadius: '16px',
           }}
         >
           {/* Gradient Border */}
@@ -651,7 +692,8 @@ export default function MagazineCollageTemplate({
             background: 'linear-gradient(to right, transparent, #8b5cf6, #ec4899, transparent)',
           }} />
         </div>
-      </div>
+        </div> {/* End of cork board content area */}
+      </div> {/* End of outer container */}
     </>
   );
 }
