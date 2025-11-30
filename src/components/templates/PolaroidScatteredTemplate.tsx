@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface PolaroidScatteredTemplateProps {
-  images: string[]; // 10 personalized images (all Gemini) with LARGER Polaroid frames
+  images: string[]; // 11 personalized images (all Gemini) with LARGER Polaroid frames
   quotes: string[];
 }
 
@@ -71,7 +71,7 @@ export default function PolaroidScatteredTemplate({
     "#FFECB3", // amber
   ];
 
-  // Polaroid scrapbook layout - 10 images with MAXIMIZED middle row and aesthetic borders
+  // Polaroid scrapbook layout - 11 images with MAXIMIZED middle row and aesthetic borders
   // Middle row frames significantly larger to fill space
   const gridPositions = [
     // Top scattered row - 4 LARGER frames
@@ -112,7 +112,7 @@ export default function PolaroidScatteredTemplate({
       frameColor: frameColors[3],
     },
 
-    // Middle scattered row - 2 MAXIMIZED frames (around center card) - MUCH BIGGER
+    // Middle scattered row - 3 MAXIMIZED frames (around center card) - ADDED ONE MORE
     {
       top: 320,
       left: 10,
@@ -123,6 +123,15 @@ export default function PolaroidScatteredTemplate({
       frameColor: frameColors[6],
     },
     // CENTER CARD SPACE (700x350, 420x315)
+    {
+      top: 340,
+      left: 1100,
+      width: 360,
+      height: 440,
+      rotation: -4,
+      label: "",
+      frameColor: frameColors[7],
+    },
     {
       top: 325,
       left: 1480,
@@ -482,8 +491,8 @@ export default function PolaroidScatteredTemplate({
           backgroundColor: "#f5f1ed",
         }}
       >
-        {/* Polaroid Frames - Rotated Scrapbook Style - 10 LARGER frames */}
-        {images.slice(0, 10).map((image, idx) => {
+        {/* Polaroid Frames - Rotated Scrapbook Style - 11 LARGER frames */}
+        {images.slice(0, 11).map((image, idx) => {
           const pos = gridPositions[idx];
           if (!pos) return null;
 

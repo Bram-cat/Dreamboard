@@ -16,18 +16,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check API keys
+    // Check API keys - support dual Gemini keys for parallel processing
     const openaiApiKey = process.env.OPENAI_API_KEY;
-    const geminiApiKey = process.env.GEMINI_API_KEY;
+    const geminiApiKey1 = process.env.GEMINI_API_KEY_1 || process.env.GEMINI_API_KEY;
+    const geminiApiKey2 = process.env.GEMINI_API_KEY_2;
 
     if (!openaiApiKey) {
       console.error("OPENAI_API_KEY not found");
       return NextResponse.json({ error: "OpenAI API key not configured" }, { status: 500 });
     }
 
-    if (!geminiApiKey) {
-      console.error("GEMINI_API_KEY not found");
+    if (!geminiApiKey1) {
+      console.error("GEMINI_API_KEY_1 not found");
       return NextResponse.json({ error: "Gemini API key not configured" }, { status: 500 });
+    }
+
+    const useDualKeys = !!geminiApiKey2;
+    if (useDualKeys) {
+      console.log("🚀 Dual Gemini API keys detected - enabling parallel processing!");
     }
 
     console.log("🎨 Starting vision board generation...");
@@ -42,25 +48,27 @@ export async function POST(request: NextRequest) {
 
     console.log("📸 User uploads:", { hasSelfie, hasDreamHouse, hasDreamCar, hasDestination });
 
-    const genai = new GoogleGenAI({ apiKey: geminiApiKey });
+    // Initialize Gemini clients (one or two depending on available keys)
+    const genai1 = new GoogleGenAI({ apiKey: geminiApiKey1 });
+    const genai2 = geminiApiKey2 ? new GoogleGenAI({ apiKey: geminiApiKey2 }) : null;
     const allQuotes: string[] = [];
 
     // ============================================
     // NEW STRATEGY: Generate ALL images with Gemini for personalization
-    // Grid template: 8 images, Magazine: 12 images (reduced for Netlify), Polaroid: 12 images
+    // Grid template: 6 images, Magazine: 11 images, Polaroid: 11 images
     // All images will include user's face/items for a cohesive personal vision board
     // NO generic OpenAI images - everything is personalized
-    // NETLIFY OPTIMIZATION: Reduced image count to stay under 10-second timeout
+    // NETLIFY OPTIMIZATION: Image count optimized for performance with dual API keys
     // ============================================
     const geminiImages: string[] = [];
-    // Reduce image count for Netlify compatibility (10 second timeout limit)
-    const numGeminiImages = selectedTemplate === "grid" ? 6 : selectedTemplate === "magazine" ? 10 : 10;
+    // Increased to 11 images for Magazine and Polaroid templates (using dual API keys for faster generation)
+    const numGeminiImages = selectedTemplate === "grid" ? 6 : selectedTemplate === "magazine" ? 11 : 11;
 
     if (selectedTemplate !== "ai") {
       console.log(`\n🎨 STEP 1/2: Generating ${numGeminiImages} personalized images with Gemini (ALL images)...`);
 
     // Strategy: Create diverse image combinations from user uploads + lifestyle scenarios
-    const combinations = [];
+    const combinations: Array<{ images: string[]; prompt: string }> = [];
 
     // CRITICAL FIX: If user provides NO images at all, generate random person lifestyle images
     const hasAnyUploads = hasSelfie || hasDreamHouse || hasDreamCar || hasDestination;
@@ -279,50 +287,117 @@ export async function POST(request: NextRequest) {
     // Generate Gemini images from combinations
     console.log(`\n📋 Prepared ${combinations.length} image combinations, will generate ${numGeminiImages} for Gemini`);
 
-    for (let i = 0; i < Math.min(numGeminiImages, combinations.length); i++) {
-      console.log(`  [${i + 1}/${numGeminiImages}] Generating Gemini image ${i + 1}`);
-      try {
-        const combo = combinations[i];
-        const imageParts = combo.images.map((dataUrl: string) => ({
-          inlineData: {
-            data: dataUrl.split(",")[1],
-            mimeType: "image/jpeg"
-          }
-        }));
+    if (useDualKeys && genai2) {
+      // PARALLEL PROCESSING: Split workload 50/50 between two API keys
+      const midpoint = Math.ceil(numGeminiImages / 2);
+      const batch1 = combinations.slice(0, midpoint);
+      const batch2 = combinations.slice(midpoint, numGeminiImages);
 
-        // Add VERY explicit aspect ratio instruction to prompt
-        const aspectRatioPrompt = `${combo.prompt}\n\n🚨 CRITICAL DIMENSIONS REQUIREMENT 🚨:\n- OUTPUT FORMAT: WIDE LANDSCAPE ONLY - NOT PORTRAIT!\n- ASPECT RATIO: 16:9 or 1.78:1 (WIDER than tall)\n- MINIMUM WIDTH: 1600px\n- ORIENTATION: HORIZONTAL/LANDSCAPE (width MUST be 1.78x greater than height)\n- DO NOT generate portrait/vertical images\n- DO NOT generate square images\n- MUST be WIDE LANDSCAPE format like a movie screen or TV\n\nExample valid dimensions:\n- 1920x1080 (16:9)\n- 1600x900 (16:9)\n- 1440x810 (16:9)`;
+      console.log(`🚀 Parallel processing: Batch 1 (${batch1.length} images) with API key 1, Batch 2 (${batch2.length} images) with API key 2`);
 
-        // If no images provided (random person generation), only send text prompt
-        const contentParts = imageParts.length > 0
-          ? [...imageParts, { text: aspectRatioPrompt }]
-          : [{ text: aspectRatioPrompt }];
+      // Helper function to generate images with a specific client
+      const generateBatch = async (batch: typeof combinations, genai: typeof genai1, batchName: string) => {
+        const results: string[] = [];
+        for (let i = 0; i < batch.length; i++) {
+          console.log(`  [${batchName}] [${i + 1}/${batch.length}] Generating image...`);
+          try {
+            const combo = batch[i];
+            const imageParts = combo.images.map((dataUrl: string) => ({
+              inlineData: {
+                data: dataUrl.split(",")[1],
+                mimeType: "image/jpeg"
+              }
+            }));
 
-        const response = await genai.models.generateContent({
-          model: "gemini-2.5-flash-image",
-          contents: [{
-            role: "user",
-            parts: contentParts
-          }],
-          config: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
-        });
+            const aspectRatioPrompt = `${combo.prompt}\n\n🚨 CRITICAL DIMENSIONS REQUIREMENT 🚨:\n- OUTPUT FORMAT: WIDE LANDSCAPE ONLY - NOT PORTRAIT!\n- ASPECT RATIO: 16:9 or 1.78:1 (WIDER than tall)\n- MINIMUM WIDTH: 1600px\n- ORIENTATION: HORIZONTAL/LANDSCAPE (width MUST be 1.78x greater than height)\n- DO NOT generate portrait/vertical images\n- DO NOT generate square images\n- MUST be WIDE LANDSCAPE format like a movie screen or TV\n\nExample valid dimensions:\n- 1920x1080 (16:9)\n- 1600x900 (16:9)\n- 1440x810 (16:9)`;
 
-        const candidate = response.candidates?.[0];
-        if (candidate?.content?.parts) {
-          const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
-            part.inlineData?.mimeType?.startsWith("image/")
-          );
-          if (imagePart?.inlineData?.data) {
-            // Keep original image - no cropping to preserve faces
-            geminiImages.push(imagePart.inlineData.data);
-            console.log(`  ✓ Generated Gemini image ${i + 1} (original size preserved)`);
+            const contentParts = imageParts.length > 0
+              ? [...imageParts, { text: aspectRatioPrompt }]
+              : [{ text: aspectRatioPrompt }];
+
+            const response = await genai.models.generateContent({
+              model: "gemini-2.5-flash-image",
+              contents: [{
+                role: "user",
+                parts: contentParts
+              }],
+              config: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
+            });
+
+            const candidate = response.candidates?.[0];
+            if (candidate?.content?.parts) {
+              const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+                part.inlineData?.mimeType?.startsWith("image/")
+              );
+              if (imagePart?.inlineData?.data) {
+                results.push(imagePart.inlineData.data);
+                console.log(`  [${batchName}] ✓ Generated image ${i + 1} (original size preserved)`);
+              }
+            }
+
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 300));
+          } catch (error) {
+            console.error(`  [${batchName}] ✗ Error generating image ${i + 1}:`, error);
           }
         }
+        return results;
+      };
 
-        // Reduced delay for Netlify timeout constraints (500ms instead of 1000ms)
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (error) {
-        console.error(`  ✗ Error generating Gemini image ${i + 1}:`, error);
+      // Run both batches in parallel
+      const [results1, results2] = await Promise.all([
+        generateBatch(batch1, genai1, "Batch1/API1"),
+        generateBatch(batch2, genai2, "Batch2/API2")
+      ]);
+
+      // Combine results from both batches
+      geminiImages.push(...results1, ...results2);
+      console.log(`✅ Parallel processing complete: ${results1.length} from API1, ${results2.length} from API2`);
+    } else {
+      // SEQUENTIAL PROCESSING: Use single API key
+      console.log(`📝 Sequential processing with single API key`);
+      for (let i = 0; i < Math.min(numGeminiImages, combinations.length); i++) {
+        console.log(`  [${i + 1}/${numGeminiImages}] Generating Gemini image ${i + 1}`);
+        try {
+          const combo = combinations[i];
+          const imageParts = combo.images.map((dataUrl: string) => ({
+            inlineData: {
+              data: dataUrl.split(",")[1],
+              mimeType: "image/jpeg"
+            }
+          }));
+
+          const aspectRatioPrompt = `${combo.prompt}\n\n🚨 CRITICAL DIMENSIONS REQUIREMENT 🚨:\n- OUTPUT FORMAT: WIDE LANDSCAPE ONLY - NOT PORTRAIT!\n- ASPECT RATIO: 16:9 or 1.78:1 (WIDER than tall)\n- MINIMUM WIDTH: 1600px\n- ORIENTATION: HORIZONTAL/LANDSCAPE (width MUST be 1.78x greater than height)\n- DO NOT generate portrait/vertical images\n- DO NOT generate square images\n- MUST be WIDE LANDSCAPE format like a movie screen or TV\n\nExample valid dimensions:\n- 1920x1080 (16:9)\n- 1600x900 (16:9)\n- 1440x810 (16:9)`;
+
+          const contentParts = imageParts.length > 0
+            ? [...imageParts, { text: aspectRatioPrompt }]
+            : [{ text: aspectRatioPrompt }];
+
+          const response = await genai1.models.generateContent({
+            model: "gemini-2.5-flash-image",
+            contents: [{
+              role: "user",
+              parts: contentParts
+            }],
+            config: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 8192 },
+          });
+
+          const candidate = response.candidates?.[0];
+          if (candidate?.content?.parts) {
+            const imagePart = candidate.content.parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) =>
+              part.inlineData?.mimeType?.startsWith("image/")
+            );
+            if (imagePart?.inlineData?.data) {
+              geminiImages.push(imagePart.inlineData.data);
+              console.log(`  ✓ Generated Gemini image ${i + 1} (original size preserved)`);
+            }
+          }
+
+          // Reduced delay for Netlify timeout constraints (500ms instead of 1000ms)
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+          console.error(`  ✗ Error generating Gemini image ${i + 1}:`, error);
+        }
       }
     }
 
@@ -362,7 +437,7 @@ Examples of good quotes:
 
 Return ONLY the 5 quotes, one per line, without quotes or numbering.`;
 
-      const quoteResponse = await genai.models.generateContent({
+      const quoteResponse = await genai1.models.generateContent({
         model: "gemini-2.0-flash-lite",
         contents: [{
           role: "user",
@@ -555,7 +630,7 @@ Add beige rectangular labels in bottom-right corner of select tiles:
 - [ ] 1920x1080 canvas filled completely
 - [ ] Professional magazine aesthetic`;
 
-      const finalResponse = await genai.models.generateContent({
+      const finalResponse = await genai1.models.generateContent({
         model: "gemini-2.5-flash-image",
         contents: [{
           role: "user",

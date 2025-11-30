@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 
 interface MagazineCollageTemplateProps {
-  images: string[]; // 10 personalized images (all Gemini) - arranged around center card with LARGER containers
+  images: string[]; // 11 personalized images (all Gemini) - arranged around center card with LARGER containers
   keywords: string[];
 }
 
@@ -52,7 +52,7 @@ export default function MagazineCollageTemplate({
   // Use useMemo to maintain same quotes on re-renders
   const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
 
-  // TIGHT-FIT Magazine collage - 10 visible images MUCH LARGER with no empty space
+  // TIGHT-FIT Magazine collage - 11 visible images MUCH LARGER with no empty space
   // Middle row images maximized, better spacing and borders
   const collagePositions = [
     // Top row - 4 LARGER images
@@ -67,10 +67,11 @@ export default function MagazineCollageTemplate({
     { top: 290, left: 1090, width: 465, height: 350, rotate: 3, zIndex: 27 },
     { top: 270, left: 1555, width: 545, height: 450, rotate: -2, zIndex: 28 },
 
-    // Bottom row - 3 LARGER images
-    { top: 550, left: 0, width: 700, height: 340, rotate: -2, zIndex: 30 },
-    { top: 555, left: 700, width: 700, height: 340, rotate: 2, zIndex: 31 },
-    { top: 550, left: 1400, width: 700, height: 340, rotate: -3, zIndex: 32 },
+    // Bottom row - 4 LARGER images (added one more)
+    { top: 550, left: 0, width: 520, height: 340, rotate: -2, zIndex: 30 },
+    { top: 555, left: 520, width: 520, height: 340, rotate: 2, zIndex: 31 },
+    { top: 550, left: 1040, width: 520, height: 340, rotate: -1, zIndex: 32 },
+    { top: 555, left: 1560, width: 540, height: 340, rotate: 3, zIndex: 33 },
   ];
 
   // Canvas rendering for download
@@ -124,9 +125,9 @@ export default function MagazineCollageTemplate({
         .map((pos, idx) => ({ pos, idx }))
         .sort((a, b) => a.pos.zIndex - b.pos.zIndex);
 
-      // Draw all collage images (max 10)
+      // Draw all collage images (max 11)
       for (const { pos, idx } of sortedPositions) {
-        if (idx >= images.length || idx >= 10) continue;
+        if (idx >= images.length || idx >= 11) continue;
 
         try {
           const img = await loadImage(images[idx]);
@@ -384,8 +385,8 @@ export default function MagazineCollageTemplate({
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
         }}
       >
-        {/* Collage Images - 10 total (around center card) with LARGER containers */}
-        {images.slice(0, 10).map((image, idx) => {
+        {/* Collage Images - 11 total (around center card) with LARGER containers */}
+        {images.slice(0, 11).map((image, idx) => {
           const pos = collagePositions[idx];
           if (!pos) return null;
 
