@@ -18,17 +18,17 @@ export default function CleanGridTemplate({
   const gridSize = 680; // Equal size for all images
   const gap = 10; // Gap between images
   const gridPositions = [
-    // Top row - 3 equal images
+    // Top row - 3 images (grid positions 0, 1, 2)
     { top: 20, left: 20, width: gridSize, height: gridSize, keyword: "" },
     { top: 20, left: 20 + gridSize + gap, width: gridSize, height: gridSize, keyword: "" },
     { top: 20, left: 20 + (gridSize + gap) * 2, width: gridSize, height: gridSize, keyword: "" },
 
-    // Middle row - 2 images (center is logo)
+    // Middle row - left image, CENTER LOGO, right image (grid positions 3, 4=LOGO, 5)
     { top: 20 + gridSize + gap, left: 20, width: gridSize, height: gridSize, keyword: "" },
-    // CENTER LOGO SPACE
+    null, // Position 4 - CENTER LOGO (placeholder)
     { top: 20 + gridSize + gap, left: 20 + (gridSize + gap) * 2, width: gridSize, height: gridSize, keyword: "" },
 
-    // Bottom row - 3 equal images
+    // Bottom row - 3 images (grid positions 6, 7, 8)
     { top: 20 + (gridSize + gap) * 2, left: 20, width: gridSize, height: gridSize, keyword: "" },
     { top: 20 + (gridSize + gap) * 2, left: 20 + gridSize + gap, width: gridSize, height: gridSize, keyword: "" },
     { top: 20 + (gridSize + gap) * 2, left: 20 + (gridSize + gap) * 2, width: gridSize, height: gridSize, keyword: "" },
@@ -77,14 +77,20 @@ export default function CleanGridTemplate({
         });
       };
 
-      // Draw all grid images (max 8 - skip index 4 which is center)
-      for (let idx = 0; idx < Math.min(8, images.length); idx++) {
-        const posIndex = idx < 4 ? idx : idx + 1; // Skip center position (index 4)
+      // Draw all grid images in 3x3 grid (position 4 is logo)
+      for (let posIndex = 0; posIndex < gridPositions.length; posIndex++) {
+        // Skip position 4 (center logo)
+        if (posIndex === 4) continue;
+
         const pos = gridPositions[posIndex];
         if (!pos) continue;
 
+        // Calculate which image to use (accounting for skipped position 4)
+        const imageIndex = posIndex < 4 ? posIndex : posIndex - 1;
+        if (imageIndex >= images.length) continue;
+
         try {
-          const img = await loadImage(images[idx]);
+          const img = await loadImage(images[imageIndex]);
 
           ctx.save();
 
@@ -157,7 +163,7 @@ export default function CleanGridTemplate({
 
           ctx.restore();
         } catch (error) {
-          console.error(`Failed to load image ${idx}:`, error);
+          console.error(`Failed to load image ${imageIndex}:`, error);
         }
       }
 
@@ -257,15 +263,19 @@ export default function CleanGridTemplate({
               background: 'linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0)'
             }}
           >
-        {/* Grid Images - 8 images (skip center position 4) */}
-        {images.slice(0, 8).map((image, idx) => {
-          const posIndex = idx < 4 ? idx : idx + 1; // Skip center position
-          const pos = gridPositions[posIndex];
-          if (!pos) return null;
+        {/* Grid Images - 8 images in 3x3 grid (position 4 is logo) */}
+        {gridPositions.map((pos, posIndex) => {
+          // Skip position 4 (center logo)
+          if (posIndex === 4 || !pos) return null;
+
+          // Calculate which image to use (accounting for skipped position 4)
+          const imageIndex = posIndex < 4 ? posIndex : posIndex - 1;
+          const image = images[imageIndex];
+          if (!image) return null;
 
           return (
             <div
-              key={idx}
+              key={posIndex}
               className="absolute shadow-lg"
               style={{
                 top: `${pos.top}px`,
@@ -281,7 +291,7 @@ export default function CleanGridTemplate({
               {/* Image - COVER mode to fill entire container */}
               <img
                 src={image}
-                alt={`Vision ${idx + 1}`}
+                alt={`Vision ${imageIndex + 1}`}
                 style={{
                   width: '100%',
                   height: '100%',
