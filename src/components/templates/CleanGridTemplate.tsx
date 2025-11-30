@@ -610,6 +610,9 @@ export default function CleanGridTemplate({
 
         {/* 4 Quotes between images */}
         {selectedQuotes.slice(0, 4).map((quote, i) => {
+          // Safety check for undefined quotes
+          if (!quote) return null;
+
           const positions = [
             { top: 20 + gridSize + gap / 2 - 40, left: 20 + gridSize / 2 - 60 },
             { top: 20 + gridSize / 2 - 40, left: 20 + (gridSize + gap) * 2.5 - 60 },
