@@ -2,13 +2,7 @@
 
 [build]
   command = "npm run build"
-  publish = ".next"
-
-# Serverless function settings
-[functions]
-  # Increase timeout to maximum (26 seconds for Pro, 10 seconds for free tier)
-  # Note: Free tier is limited to 10 seconds - consider upgrading if needed
-  node_bundler = "esbuild"
+  # Don't set publish directory - let @netlify/plugin-nextjs handle it
 
 # Next.js specific settings
 [[plugins]]
@@ -16,16 +10,10 @@
 
 # Environment variables (configure these in Netlify Dashboard > Site settings > Environment variables)
 # Required variables:
-# - GEMINI_API_KEY
+# - GEMINI_API_KEY_1 through GEMINI_API_KEY_11
 # - OPENAI_API_KEY
 # - DEEPSEEK_API_KEY (if used)
 # - RUNWAYML_API_SECRET (if used)
-
-# Redirect rules for API routes
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
 
 # Headers for better performance
 [[headers]]
