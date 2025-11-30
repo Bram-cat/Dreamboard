@@ -485,10 +485,10 @@ export default function PolaroidScatteredTemplate({
       />
 
       {/* Scaled Container to fit screen */}
-      <div className="w-screen h-screen flex items-center justify-center overflow-hidden p-4">
+      <div className="w-screen h-screen flex items-center justify-center overflow-hidden">
         <div
           style={{
-            transform: 'scale(0.58)',
+            transform: 'scale(0.50)',
             transformOrigin: 'center center',
           }}
         >

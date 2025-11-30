@@ -335,17 +335,17 @@ export default function CleanGridTemplate({
       />
 
       {/* Scaled Container to fit screen */}
-      <div className="w-screen h-screen flex items-center justify-center overflow-hidden p-4">
+      <div className="w-screen h-screen flex items-center justify-center overflow-hidden">
         <div
           style={{
-            transform: 'scale(0.85)',
+            transform: 'scale(0.75)',
             transformOrigin: 'center center',
           }}
         >
           {/* Visible Vision Board - 3x3 Grid */}
           <div
             ref={containerRef}
-            className="relative mx-auto"
+            className="relative"
             style={{
               width: `${20 + (gridSize + gap) * 3}px`,
               height: `${20 + (gridSize + gap) * 3}px`,
@@ -608,16 +608,21 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* 4 Quotes between images */}
+        {/* 4 Quotes between images - positioned in the gaps */}
         {selectedQuotes.slice(0, 4).map((quote, i) => {
           // Safety check for undefined quotes
           if (!quote) return null;
 
+          // Position quotes in the horizontal and vertical gaps between images
           const positions = [
-            { top: 20 + gridSize + gap / 2 - 40, left: 20 + gridSize / 2 - 60 },
-            { top: 20 + gridSize / 2 - 40, left: 20 + (gridSize + gap) * 2.5 - 60 },
-            { top: 20 + (gridSize + gap) * 2.5 - 40, left: 20 + gridSize + gap + gridSize / 2 - 60 },
-            { top: 20 + (gridSize + gap) * 1.5 - 40, left: 20 + (gridSize + gap) * 3 - 140 },
+            // Quote 1: Between Image1 and Image2 (top row, left gap)
+            { top: 20 + gridSize / 2 - 40, left: 20 + gridSize + gap / 2 - 60 },
+            // Quote 2: Between Image2 and Image3 (top row, right gap)
+            { top: 20 + gridSize / 2 - 40, left: 20 + (gridSize + gap) * 2 + gap / 2 - 60 },
+            // Quote 3: Between Image6 and Image7 (bottom row, left gap)
+            { top: 20 + (gridSize + gap) * 2 + gridSize / 2 - 40, left: 20 + gridSize + gap / 2 - 60 },
+            // Quote 4: Between Image7 and Image8 (bottom row, right gap)
+            { top: 20 + (gridSize + gap) * 2 + gridSize / 2 - 40, left: 20 + (gridSize + gap) * 2 + gap / 2 - 60 },
           ];
           const pos = positions[i];
 

@@ -370,10 +370,10 @@ export default function MagazineCollageTemplate({
       />
 
       {/* Scaled Container to fit screen */}
-      <div className="w-screen h-screen flex items-center justify-center overflow-hidden p-4">
+      <div className="w-screen h-screen flex items-center justify-center overflow-hidden">
         <div
           style={{
-            transform: 'scale(0.65)',
+            transform: 'scale(0.55)',
             transformOrigin: 'center center',
           }}
         >

@@ -453,7 +453,9 @@ export async function POST(request: NextRequest) {
 
     try {
       // Use Gemini to generate real inspirational quotes based on keywords
-      const quotePrompt = `Generate 5 short, powerful, inspirational quotes for a 2025 vision board based on these themes: ${keywords.join(", ")}
+      // Grid needs 4, Magazine/Polaroid need 7 - generate 8 to be safe
+      const numQuotesNeeded = selectedTemplate === "grid" ? 4 : 7;
+      const quotePrompt = `Generate ${numQuotesNeeded + 1} short, powerful, inspirational quotes for a 2025 vision board based on these themes: ${keywords.join(", ")}
 
 Requirements:
 - Each quote must be 3-7 words maximum
@@ -468,7 +470,7 @@ Examples of good quotes:
 - "Living my best life"
 - "Unstoppable and fearless"
 
-Return ONLY the 5 quotes, one per line, without quotes or numbering.`;
+Return ONLY the ${numQuotesNeeded + 1} quotes, one per line, without quotes or numbering.`;
 
       const quoteResponse = await genai1.models.generateContent({
         model: "gemini-2.0-flash-lite",
@@ -476,7 +478,7 @@ Return ONLY the 5 quotes, one per line, without quotes or numbering.`;
           role: "user",
           parts: [{ text: quotePrompt }]
         }],
-        config: { temperature: 0.9, topP: 0.95, topK: 40, maxOutputTokens: 200 },
+        config: { temperature: 0.9, topP: 0.95, topK: 40, maxOutputTokens: 300 },
       });
 
       const quoteText = quoteResponse.text?.trim() || "";
@@ -484,7 +486,7 @@ Return ONLY the 5 quotes, one per line, without quotes or numbering.`;
         .split("\n")
         .filter((q: string) => q.trim().length > 0)
         .map((q: string) => q.trim().replace(/^["']|["']$/g, "")) // Remove quotes if present
-        .slice(0, 5);
+        .slice(0, numQuotesNeeded);
 
       allQuotes.push(...generatedQuotes);
       console.log(`✅ Generated ${allQuotes.length} inspirational quotes:`, allQuotes);
