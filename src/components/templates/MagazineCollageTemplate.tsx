@@ -463,39 +463,38 @@ export default function MagazineCollageTemplate({
           );
         })}
 
-        {/* Inspirational Quotes in Containers - Positioned between images toward center (4 quotes) */}
+        {/* Inspirational Quotes in Neon Containers - Positioned between images toward center (4 quotes) */}
 
         {/* Quote 1 - Between top row images (left-center) */}
         <div
           style={{
             position: "absolute",
-            top: "240px",
-            left: "410px",
-            width: "95px",
-            height: "70px",
-            transform: "rotate(-3deg)",
-            backgroundColor: "#ffffff",
-            border: "2px solid #000000",
-            borderRadius: "7px",
-            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
+            top: "220px",
+            left: "385px",
+            width: "150px",
+            height: "100px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "8px",
+            padding: "15px",
             zIndex: 50,
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "15px",
-              color: "#000000",
+              fontSize: "14px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[0].replace("\n", "<br/>"),
+              __html: selectedQuotes[0]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>
@@ -504,33 +503,32 @@ export default function MagazineCollageTemplate({
         <div
           style={{
             position: "absolute",
-            top: "240px",
-            left: "1150px",
-            width: "95px",
-            height: "70px",
-            transform: "rotate(3deg)",
-            backgroundColor: "#ffffff",
-            border: "2px solid #000000",
-            borderRadius: "7px",
-            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
+            top: "220px",
+            left: "1125px",
+            width: "150px",
+            height: "100px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "8px",
+            padding: "15px",
             zIndex: 50,
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "15px",
-              color: "#000000",
+              fontSize: "14px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[1].replace("\n", "<br/>"),
+              __html: selectedQuotes[1]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>
@@ -539,33 +537,32 @@ export default function MagazineCollageTemplate({
         <div
           style={{
             position: "absolute",
-            top: "530px",
-            left: "260px",
-            width: "95px",
-            height: "70px",
-            transform: "rotate(2deg)",
-            backgroundColor: "#ffffff",
-            border: "2px solid #000000",
-            borderRadius: "7px",
-            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
+            top: "510px",
+            left: "235px",
+            width: "150px",
+            height: "100px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "8px",
+            padding: "15px",
             zIndex: 50,
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "15px",
-              color: "#000000",
+              fontSize: "14px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[2].replace("\n", "<br/>"),
+              __html: selectedQuotes[2]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>
@@ -574,33 +571,32 @@ export default function MagazineCollageTemplate({
         <div
           style={{
             position: "absolute",
-            top: "530px",
-            left: "980px",
-            width: "95px",
-            height: "70px",
-            transform: "rotate(-2deg)",
-            backgroundColor: "#ffffff",
-            border: "2px solid #000000",
-            borderRadius: "7px",
-            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
+            top: "510px",
+            left: "955px",
+            width: "150px",
+            height: "100px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "8px",
+            padding: "15px",
             zIndex: 50,
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "15px",
-              color: "#000000",
+              fontSize: "14px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[3].replace("\n", "<br/>"),
+              __html: selectedQuotes[3]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>

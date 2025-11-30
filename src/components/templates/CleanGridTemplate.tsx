@@ -608,7 +608,7 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* 4 Quotes between images - positioned in the gaps */}
+        {/* 4 Quotes between images - positioned in the gaps with neon container */}
         {selectedQuotes.slice(0, 4).map((quote, i) => {
           // Safety check for undefined quotes
           if (!quote) return null;
@@ -616,13 +616,13 @@ export default function CleanGridTemplate({
           // Position quotes in the horizontal and vertical gaps between images
           const positions = [
             // Quote 1: Between Image1 and Image2 (top row, left gap)
-            { top: 20 + gridSize / 2 - 40, left: 20 + gridSize + gap / 2 - 60 },
+            { top: 20 + gridSize / 2 - 50, left: 20 + gridSize + gap / 2 - 75 },
             // Quote 2: Between Image2 and Image3 (top row, right gap)
-            { top: 20 + gridSize / 2 - 40, left: 20 + (gridSize + gap) * 2 + gap / 2 - 60 },
+            { top: 20 + gridSize / 2 - 50, left: 20 + (gridSize + gap) * 2 + gap / 2 - 75 },
             // Quote 3: Between Image6 and Image7 (bottom row, left gap)
-            { top: 20 + (gridSize + gap) * 2 + gridSize / 2 - 40, left: 20 + gridSize + gap / 2 - 60 },
+            { top: 20 + (gridSize + gap) * 2 + gridSize / 2 - 50, left: 20 + gridSize + gap / 2 - 75 },
             // Quote 4: Between Image7 and Image8 (bottom row, right gap)
-            { top: 20 + (gridSize + gap) * 2 + gridSize / 2 - 40, left: 20 + (gridSize + gap) * 2 + gap / 2 - 60 },
+            { top: 20 + (gridSize + gap) * 2 + gridSize / 2 - 50, left: 20 + (gridSize + gap) * 2 + gap / 2 - 75 },
           ];
           const pos = positions[i];
 
@@ -633,30 +633,30 @@ export default function CleanGridTemplate({
                 position: "absolute",
                 top: `${pos.top}px`,
                 left: `${pos.left}px`,
-                width: "120px",
-                height: "80px",
-                backgroundColor: "#ffffff",
-                border: "2px solid #000000",
-                borderRadius: "8px",
-                boxShadow: "2px 2px 8px rgba(0,0,0,0.15)",
+                width: "150px",
+                height: "100px",
+                backgroundImage: "url('/quote container.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "8px",
+                padding: "15px",
                 zIndex: 15,
               }}
             >
               <div
                 style={{
-                  fontFamily: "Telma, Arial, sans-serif",
+                  fontFamily: "Arial, sans-serif",
                   fontWeight: "bold",
-                  fontSize: i % 2 === 0 ? "28px" : "26px",
-                  color: "#000000",
+                  fontSize: "16px",
+                  color: "#ffffff",
                   textAlign: "center",
-                  lineHeight: "1.2",
+                  lineHeight: "1.3",
+                  textShadow: "0 0 10px rgba(255,255,255,0.5)",
                 }}
                 dangerouslySetInnerHTML={{
-                  __html: quote.replace("\n", "<br/>"),
+                  __html: quote.replace(/\n/g, "<br/>"),
                 }}
               />
             </div>

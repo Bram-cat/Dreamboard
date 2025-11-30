@@ -588,32 +588,31 @@ export default function PolaroidScatteredTemplate({
         <div
           style={{
             position: "absolute",
-            top: "220px",
-            left: "1000px",
+            top: "200px",
+            left: "975px",
             width: "200px",
-            height: "130px",
-            transform: "rotate(-3deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
-            borderRadius: "12px",
-            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
+            height: "135px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "12px",
+            padding: "20px",
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "32px",
-              color: "#000000",
+              fontSize: "18px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[0].replace("\n", "<br/>"),
+              __html: selectedQuotes[0]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>
@@ -622,32 +621,31 @@ export default function PolaroidScatteredTemplate({
         <div
           style={{
             position: "absolute",
-            top: "500px",
-            left: "240px",
-            width: "190px",
-            height: "125px",
-            transform: "rotate(4deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
-            borderRadius: "12px",
-            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
+            top: "480px",
+            left: "220px",
+            width: "200px",
+            height: "135px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "12px",
+            padding: "20px",
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "30px",
-              color: "#000000",
+              fontSize: "18px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[1].replace("\n", "<br/>"),
+              __html: selectedQuotes[1]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>
@@ -656,32 +654,31 @@ export default function PolaroidScatteredTemplate({
         <div
           style={{
             position: "absolute",
-            top: "580px",
-            left: "930px",
+            top: "560px",
+            left: "905px",
             width: "200px",
-            height: "130px",
-            transform: "rotate(-2deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
-            borderRadius: "12px",
-            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
+            height: "135px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "12px",
+            padding: "20px",
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "32px",
-              color: "#000000",
+              fontSize: "18px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[2].replace("\n", "<br/>"),
+              __html: selectedQuotes[2]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>
@@ -690,32 +687,31 @@ export default function PolaroidScatteredTemplate({
         <div
           style={{
             position: "absolute",
-            top: "700px",
-            left: "2100px",
-            width: "190px",
-            height: "125px",
-            transform: "rotate(5deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
-            borderRadius: "12px",
-            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
+            top: "680px",
+            left: "2075px",
+            width: "200px",
+            height: "135px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "12px",
+            padding: "20px",
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "30px",
-              color: "#000000",
+              fontSize: "18px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[3].replace("\n", "<br/>"),
+              __html: selectedQuotes[3]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>
@@ -724,32 +720,31 @@ export default function PolaroidScatteredTemplate({
         <div
           style={{
             position: "absolute",
-            top: "1000px",
-            left: "1020px",
+            top: "980px",
+            left: "995px",
             width: "200px",
-            height: "130px",
-            transform: "rotate(2deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
-            borderRadius: "12px",
-            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
+            height: "135px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "12px",
+            padding: "20px",
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "32px",
-              color: "#000000",
+              fontSize: "18px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[4].replace("\n", "<br/>"),
+              __html: selectedQuotes[4]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>
@@ -758,32 +753,31 @@ export default function PolaroidScatteredTemplate({
         <div
           style={{
             position: "absolute",
-            top: "1000px",
-            left: "1500px",
-            width: "190px",
-            height: "125px",
-            transform: "rotate(-4deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
-            borderRadius: "12px",
-            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
+            top: "980px",
+            left: "1475px",
+            width: "200px",
+            height: "135px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "12px",
+            padding: "20px",
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "30px",
-              color: "#000000",
+              fontSize: "18px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[5].replace("\n", "<br/>"),
+              __html: selectedQuotes[5]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>
@@ -792,32 +786,31 @@ export default function PolaroidScatteredTemplate({
         <div
           style={{
             position: "absolute",
-            top: "340px",
-            left: "2140px",
-            width: "190px",
-            height: "125px",
-            transform: "rotate(3deg)",
-            backgroundColor: "#ffffff",
-            border: "3px solid #000000",
-            borderRadius: "12px",
-            boxShadow: "5px 5px 15px rgba(0,0,0,0.25)",
+            top: "320px",
+            left: "2115px",
+            width: "200px",
+            height: "135px",
+            backgroundImage: "url('/quote container.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "12px",
+            padding: "20px",
           }}
         >
           <div
             style={{
-              fontFamily: "Telma, Arial, sans-serif",
+              fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "30px",
-              color: "#000000",
+              fontSize: "18px",
+              color: "#ffffff",
               textAlign: "center",
-              lineHeight: "1.2",
+              lineHeight: "1.3",
+              textShadow: "0 0 10px rgba(255,255,255,0.5)",
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedQuotes[6].replace("\n", "<br/>"),
+              __html: selectedQuotes[6]?.replace(/\n/g, "<br/>") || "",
             }}
           />
         </div>
