@@ -257,46 +257,42 @@ export default function CleanGridTemplate({
         ctx.restore();
       });
 
-      // Draw center card - Centered between rows on LARGER board
+      // Draw center logo image - perfectly rounded circle
       const centerX = 850;
       const centerY = 510;
-      const centerW = 600;
-      const centerH = 300;
+      const logoSize = 300; // Diameter of circular logo
+      const logoRadius = logoSize / 2;
 
-      ctx.save();
-      ctx.fillStyle = '#6366f1'; // Indigo
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-      ctx.shadowBlur = 30;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 4;
+      try {
+        const logoImg = await loadImage('/Gemini_Generated_Image_q3n49dq3n49dq3n4.png');
 
-      // Rounded rectangle
-      const radius = 16;
-      ctx.beginPath();
-      ctx.moveTo(centerX + radius, centerY);
-      ctx.lineTo(centerX + centerW - radius, centerY);
-      ctx.quadraticCurveTo(centerX + centerW, centerY, centerX + centerW, centerY + radius);
-      ctx.lineTo(centerX + centerW, centerY + centerH - radius);
-      ctx.quadraticCurveTo(centerX + centerW, centerY + centerH, centerX + centerW - radius, centerY + centerH);
-      ctx.lineTo(centerX + radius, centerY + centerH);
-      ctx.quadraticCurveTo(centerX, centerY + centerH, centerX, centerY + centerH - radius);
-      ctx.lineTo(centerX, centerY + radius);
-      ctx.quadraticCurveTo(centerX, centerY, centerX + radius, centerY);
-      ctx.closePath();
-      ctx.fill();
+        ctx.save();
 
-      // Center text - Larger, more readable
-      ctx.shadowColor = 'transparent';
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 90px Inter, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('2025', centerX + centerW / 2, centerY + 120);
+        // Create circular clip path
+        ctx.beginPath();
+        ctx.arc(centerX + 300, centerY + 150, logoRadius, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
 
-      ctx.font = '28px Inter, system-ui, sans-serif';
-      ctx.letterSpacing = '5px';
-      ctx.fillText('YOUR VISION BOARD', centerX + centerW / 2, centerY + 170);
+        // Draw shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+        ctx.shadowBlur = 30;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 4;
 
-      ctx.restore();
+        // Draw logo image (will be clipped to circle)
+        ctx.drawImage(
+          logoImg,
+          centerX + 300 - logoRadius,
+          centerY + 150 - logoRadius,
+          logoSize,
+          logoSize
+        );
+
+        ctx.restore();
+      } catch (error) {
+        console.error('Failed to load logo image:', error);
+      }
     };
 
     renderToCanvas();
@@ -571,20 +567,28 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* Center Card - Centered between image rows on LARGER board */}
+        {/* Center Logo - Perfectly Rounded Circle */}
         <div
-          className="absolute bg-indigo-500 shadow-2xl flex flex-col items-center justify-center"
+          className="absolute shadow-2xl"
           style={{
             top: '510px',
-            left: '850px',
-            width: '600px',
+            left: '1150px',
+            width: '300px',
             height: '300px',
-            borderRadius: '24px',
+            borderRadius: '50%',
+            overflow: 'hidden',
             zIndex: 20,
           }}
         >
-          <div className="text-white text-9xl font-bold mb-4">2025</div>
-          <div className="text-white text-3xl tracking-widest">YOUR VISION BOARD</div>
+          <img
+            src="/Gemini_Generated_Image_q3n49dq3n49dq3n4.png"
+            alt="MY 2025 VISION BOARD"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
         </div>
       </div>
     </>

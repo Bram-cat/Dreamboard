@@ -292,71 +292,42 @@ export default function MagazineCollageTemplate({
         ctx.restore();
       });
 
-      // Draw center "2025 VISION BOARD" card - Scaled for new dimensions with border offset
+      // Draw center logo image - perfectly rounded circle
       const centerX = 900;
       const centerY = 450;
-      const centerW = 420;
-      const centerH = 300;
-      const borderRadius = 16;
+      const logoSize = 350; // Diameter of circular logo
+      const logoRadius = logoSize / 2;
 
-      ctx.save();
-      ctx.translate(centerX + centerW / 2, centerY + centerH / 2);
-      ctx.rotate(0); // No rotation for center card
+      try {
+        const logoImg = await loadImage('/Gemini_Generated_Image_q3n49dq3n49dq3n4.png');
 
-      // White background card with rounded corners
-      const x = -centerW / 2;
-      const y = -centerH / 2;
+        ctx.save();
 
-      ctx.beginPath();
-      ctx.moveTo(x + borderRadius, y);
-      ctx.lineTo(x + centerW - borderRadius, y);
-      ctx.quadraticCurveTo(x + centerW, y, x + centerW, y + borderRadius);
-      ctx.lineTo(x + centerW, y + centerH - borderRadius);
-      ctx.quadraticCurveTo(x + centerW, y + centerH, x + centerW - borderRadius, y + centerH);
-      ctx.lineTo(x + borderRadius, y + centerH);
-      ctx.quadraticCurveTo(x, y + centerH, x, y + centerH - borderRadius);
-      ctx.lineTo(x, y + borderRadius);
-      ctx.quadraticCurveTo(x, y, x + borderRadius, y);
-      ctx.closePath();
+        // Create circular clip path
+        ctx.beginPath();
+        ctx.arc(centerX + 210, centerY + 150, logoRadius, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
 
-      ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-      ctx.shadowBlur = 20;
-      ctx.shadowOffsetX = 4;
-      ctx.shadowOffsetY = 4;
-      ctx.fill();
-      ctx.shadowColor = 'transparent';
+        // Draw shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetX = 4;
+        ctx.shadowOffsetY = 4;
 
-      // Gradient border (purple to pink)
-      const gradient = ctx.createLinearGradient(x, y, x + centerW, y + centerH);
-      gradient.addColorStop(0, '#8b5cf6');
-      gradient.addColorStop(1, '#ec4899');
-      ctx.strokeStyle = gradient;
-      ctx.lineWidth = 4;
-      ctx.strokeRect(x + 10, y + 10, centerW - 20, centerH - 20);
+        // Draw logo image (will be clipped to circle)
+        ctx.drawImage(
+          logoImg,
+          centerX + 210 - logoRadius,
+          centerY + 150 - logoRadius,
+          logoSize,
+          logoSize
+        );
 
-      // "2025" text with gradient effect (simulated with solid color)
-      ctx.fillStyle = '#8b5cf6';
-      ctx.font = 'bold 90px Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('2025', 0, -15);
-
-      // "VISION BOARD" text
-      ctx.fillStyle = '#4a5568';
-      ctx.font = 'italic 600 28px Georgia, serif';
-      ctx.fillText('VISION BOARD', 0, 25);
-
-      // Decorative underline with gradient
-      const underlineGradient = ctx.createLinearGradient(-60, 0, 60, 0);
-      underlineGradient.addColorStop(0, 'rgba(139, 92, 246, 0)');
-      underlineGradient.addColorStop(0.3, '#8b5cf6');
-      underlineGradient.addColorStop(0.7, '#ec4899');
-      underlineGradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
-
-      ctx.fillStyle = underlineGradient;
-      ctx.fillRect(-60, 54, 120, 2);
-
-      ctx.restore();
+        ctx.restore();
+      } catch (error) {
+        console.error('Failed to load logo image:', error);
+      }
     };
 
     renderToCanvas();
@@ -626,71 +597,28 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Center "2025 VISION BOARD" Card - Scaled for new dimensions */}
+        {/* Center Logo - Perfectly Rounded Circle */}
         <div
-          className="absolute bg-white shadow-2xl flex flex-col items-center justify-center"
+          className="absolute shadow-2xl"
           style={{
             top: '450px',
-            left: '900px',
-            width: '420px',
-            height: '300px',
+            left: '1110px',
+            width: '350px',
+            height: '350px',
             zIndex: 100,
-            borderRadius: '16px',
+            borderRadius: '50%',
+            overflow: 'hidden',
           }}
         >
-          {/* Gradient Border */}
-          <div
+          <img
+            src="/Gemini_Generated_Image_q3n49dq3n49dq3n4.png"
+            alt="MY 2025 VISION BOARD"
             style={{
-              position: 'absolute',
-              top: '10px',
-              left: '10px',
-              right: '10px',
-              bottom: '10px',
-              border: '4px solid',
-              borderImage: 'linear-gradient(135deg, #8b5cf6, #ec4899) 1',
-              borderRadius: '4px',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
             }}
           />
-
-          {/* Main Text Container */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '4px',
-            marginTop: '0'
-          }}>
-            <div style={{
-              fontSize: '90px',
-              fontWeight: 'bold',
-              background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              lineHeight: '1',
-              letterSpacing: '3px',
-            }}>
-              2025
-            </div>
-            <div style={{
-              fontFamily: 'Georgia, serif',
-              fontStyle: 'italic',
-              fontSize: '28px',
-              color: '#4a5568',
-              letterSpacing: '2px',
-              fontWeight: '600',
-            }}>
-              VISION BOARD
-            </div>
-          </div>
-
-          {/* Decorative underline */}
-          <div style={{
-            position: 'absolute',
-            bottom: '20px',
-            width: '60%',
-            height: '2px',
-            background: 'linear-gradient(to right, transparent, #8b5cf6, #ec4899, transparent)',
-          }} />
         </div>
         </div> {/* End of cork board content area */}
       </div> {/* End of outer container */}

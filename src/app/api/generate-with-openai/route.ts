@@ -16,10 +16,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check API keys - support dual Gemini keys for parallel processing
+    // Check API keys - support 5 Gemini keys for parallel processing
     const openaiApiKey = process.env.OPENAI_API_KEY;
     const geminiApiKey1 = process.env.GEMINI_API_KEY_1 || process.env.GEMINI_API_KEY;
     const geminiApiKey2 = process.env.GEMINI_API_KEY_2;
+    const geminiApiKey3 = process.env.GEMINI_API_KEY_3;
+    const geminiApiKey4 = process.env.GEMINI_API_KEY_4;
+    const geminiApiKey5 = process.env.GEMINI_API_KEY_5;
 
     if (!openaiApiKey) {
       console.error("OPENAI_API_KEY not found");
@@ -31,9 +34,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Gemini API key not configured" }, { status: 500 });
     }
 
-    const useDualKeys = !!geminiApiKey2;
-    if (useDualKeys) {
-      console.log("🚀 Dual Gemini API keys detected - enabling parallel processing!");
+    // Count available API keys
+    const availableKeys = [geminiApiKey1, geminiApiKey2, geminiApiKey3, geminiApiKey4, geminiApiKey5].filter(Boolean);
+    const useParallelProcessing = availableKeys.length > 1;
+
+    if (useParallelProcessing) {
+      console.log(`🚀 ${availableKeys.length} Gemini API keys detected - enabling parallel processing!`);
     }
 
     console.log("🎨 Starting vision board generation...");
@@ -48,9 +54,9 @@ export async function POST(request: NextRequest) {
 
     console.log("📸 User uploads:", { hasSelfie, hasDreamHouse, hasDreamCar, hasDestination });
 
-    // Initialize Gemini clients (one or two depending on available keys)
-    const genai1 = new GoogleGenAI({ apiKey: geminiApiKey1 });
-    const genai2 = geminiApiKey2 ? new GoogleGenAI({ apiKey: geminiApiKey2 }) : null;
+    // Initialize Gemini clients (1 to 5 depending on available keys)
+    const genaiClients = availableKeys.map(key => new GoogleGenAI({ apiKey: key }));
+    const genai1 = genaiClients[0]; // Always have at least one
     const allQuotes: string[] = [];
 
     // ============================================
@@ -287,13 +293,22 @@ export async function POST(request: NextRequest) {
     // Generate Gemini images from combinations
     console.log(`\n📋 Prepared ${combinations.length} image combinations, will generate ${numGeminiImages} for Gemini`);
 
-    if (useDualKeys && genai2) {
-      // PARALLEL PROCESSING: Split workload 50/50 between two API keys
-      const midpoint = Math.ceil(numGeminiImages / 2);
-      const batch1 = combinations.slice(0, midpoint);
-      const batch2 = combinations.slice(midpoint, numGeminiImages);
+    if (useParallelProcessing) {
+      // PARALLEL PROCESSING: Split workload evenly across all available API keys
+      const numKeys = genaiClients.length;
+      const imagesPerKey = Math.ceil(numGeminiImages / numKeys);
+      const batches = [];
 
-      console.log(`🚀 Parallel processing: Batch 1 (${batch1.length} images) with API key 1, Batch 2 (${batch2.length} images) with API key 2`);
+      for (let i = 0; i < numKeys; i++) {
+        const start = i * imagesPerKey;
+        const end = Math.min(start + imagesPerKey, numGeminiImages);
+        batches.push(combinations.slice(start, end));
+      }
+
+      console.log(`🚀 Parallel processing with ${numKeys} API keys:`);
+      batches.forEach((batch, i) => {
+        console.log(`   Batch ${i + 1}: ${batch.length} images with API key ${i + 1}`);
+      });
 
       // Helper function to generate images with a specific client
       const generateBatch = async (batch: typeof combinations, genai: typeof genai1, batchName: string) => {
@@ -344,15 +359,20 @@ export async function POST(request: NextRequest) {
         return results;
       };
 
-      // Run both batches in parallel
-      const [results1, results2] = await Promise.all([
-        generateBatch(batch1, genai1, "Batch1/API1"),
-        generateBatch(batch2, genai2, "Batch2/API2")
-      ]);
+      // Run all batches in parallel
+      const allBatchPromises = batches.map((batch, i) =>
+        generateBatch(batch, genaiClients[i], `Batch${i + 1}/API${i + 1}`)
+      );
 
-      // Combine results from both batches
-      geminiImages.push(...results1, ...results2);
-      console.log(`✅ Parallel processing complete: ${results1.length} from API1, ${results2.length} from API2`);
+      const allResults = await Promise.all(allBatchPromises);
+
+      // Combine results from all batches
+      allResults.forEach((results, i) => {
+        geminiImages.push(...results);
+        console.log(`✅ Batch ${i + 1} complete: ${results.length} images from API key ${i + 1}`);
+      });
+
+      console.log(`✅ Parallel processing complete: ${geminiImages.length} total images generated`);
     } else {
       // SEQUENTIAL PROCESSING: Use single API key
       console.log(`📝 Sequential processing with single API key`);

@@ -334,10 +334,10 @@ export default function PolaroidScatteredTemplate({
         }
       }
 
-      // Draw center card - scrapbook style on MUCH LARGER board
+      // Draw center card - scrapbook style on MUCH LARGER board (moved slightly left)
       const centerW = 550;
       const centerH = 420;
-      const centerX = (2800 - centerW) / 2; // ~1125px - horizontally centered
+      const centerX = (2800 - centerW) / 2 - 100; // ~1025px - moved 100px to the left
       const centerY = (1600 - centerH) / 2; // ~590px - vertically centered
 
       ctx.save();
@@ -814,12 +814,12 @@ export default function PolaroidScatteredTemplate({
           />
         </div>
 
-        {/* Center Card - MUCH LARGER size and centered on bigger board */}
+        {/* Center Card - MUCH LARGER size, moved slightly left */}
         <div
           className="absolute flex flex-col items-center justify-center bg-white"
           style={{
             top: "590px",
-            left: "1125px",
+            left: "1025px",
             width: "550px",
             height: "420px",
             transform: "rotate(-2deg)",
