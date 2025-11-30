@@ -463,35 +463,40 @@ export default function MagazineCollageTemplate({
           );
         })}
 
-        {/* Inspirational Quotes in Neon Containers - Positioned between images toward center (4 quotes) */}
+        {/* Inspirational Quotes in Neon Containers - Positioned between images (4 quotes) */}
 
-        {/* Quote 1 - Between top row images (left-center) */}
+        {/* Quote 1 - Between top row images 1&2 */}
         <div
           style={{
             position: "absolute",
-            top: "220px",
-            left: "385px",
-            width: "150px",
-            height: "100px",
+            top: "270px",
+            left: "630px",
+            width: "200px",
+            height: "140px",
             backgroundImage: "url('/quote container.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
+            borderRadius: "20px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "15px",
+            padding: "25px",
             zIndex: 50,
+            overflow: "hidden",
           }}
         >
           <div
             style={{
               fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "14px",
+              fontSize: "18px",
               color: "#ffffff",
               textAlign: "center",
               lineHeight: "1.3",
               textShadow: "0 0 10px rgba(255,255,255,0.5)",
+              wordWrap: "break-word",
+              overflow: "hidden",
+              maxWidth: "100%",
             }}
             dangerouslySetInnerHTML={{
               __html: selectedQuotes[0]?.replace(/\n/g, "<br/>") || "",
@@ -499,33 +504,38 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 2 - Between top row images (right-center) */}
+        {/* Quote 2 - Between top row images 3&4 */}
         <div
           style={{
             position: "absolute",
-            top: "220px",
-            left: "1125px",
-            width: "150px",
-            height: "100px",
+            top: "270px",
+            left: "1770px",
+            width: "200px",
+            height: "140px",
             backgroundImage: "url('/quote container.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
+            borderRadius: "20px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "15px",
+            padding: "25px",
             zIndex: 50,
+            overflow: "hidden",
           }}
         >
           <div
             style={{
               fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "14px",
+              fontSize: "18px",
               color: "#ffffff",
               textAlign: "center",
               lineHeight: "1.3",
               textShadow: "0 0 10px rgba(255,255,255,0.5)",
+              wordWrap: "break-word",
+              overflow: "hidden",
+              maxWidth: "100%",
             }}
             dangerouslySetInnerHTML={{
               __html: selectedQuotes[1]?.replace(/\n/g, "<br/>") || "",
@@ -533,33 +543,38 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 3 - Between middle row images (left) */}
+        {/* Quote 3 - CENTER position (where logo was) */}
         <div
           style={{
             position: "absolute",
-            top: "510px",
-            left: "235px",
-            width: "150px",
-            height: "100px",
+            top: "550px",
+            left: "1085px",
+            width: "220px",
+            height: "160px",
             backgroundImage: "url('/quote container.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
+            borderRadius: "20px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "15px",
-            zIndex: 50,
+            padding: "30px",
+            zIndex: 100,
+            overflow: "hidden",
           }}
         >
           <div
             style={{
               fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "14px",
+              fontSize: "20px",
               color: "#ffffff",
               textAlign: "center",
               lineHeight: "1.3",
               textShadow: "0 0 10px rgba(255,255,255,0.5)",
+              wordWrap: "break-word",
+              overflow: "hidden",
+              maxWidth: "100%",
             }}
             dangerouslySetInnerHTML={{
               __html: selectedQuotes[2]?.replace(/\n/g, "<br/>") || "",
@@ -567,33 +582,38 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Quote 4 - Between middle row images (right) */}
+        {/* Quote 4 - Between bottom row images 1&2 */}
         <div
           style={{
             position: "absolute",
-            top: "510px",
-            left: "955px",
-            width: "150px",
-            height: "100px",
+            top: "950px",
+            left: "630px",
+            width: "200px",
+            height: "140px",
             backgroundImage: "url('/quote container.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
+            borderRadius: "20px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "15px",
+            padding: "25px",
             zIndex: 50,
+            overflow: "hidden",
           }}
         >
           <div
             style={{
               fontFamily: "Arial, sans-serif",
               fontWeight: "bold",
-              fontSize: "14px",
+              fontSize: "18px",
               color: "#ffffff",
               textAlign: "center",
               lineHeight: "1.3",
               textShadow: "0 0 10px rgba(255,255,255,0.5)",
+              wordWrap: "break-word",
+              overflow: "hidden",
+              maxWidth: "100%",
             }}
             dangerouslySetInnerHTML={{
               __html: selectedQuotes[3]?.replace(/\n/g, "<br/>") || "",
@@ -601,15 +621,15 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Center Logo - Perfectly Rounded Circle */}
+        {/* Logo - Moved to left (where Quote 3 was) */}
         <div
           className="absolute shadow-2xl"
           style={{
-            top: '450px',
-            left: '1110px',
-            width: '350px',
-            height: '350px',
-            zIndex: 100,
+            top: '575px',
+            left: '900px',
+            width: '280px',
+            height: '280px',
+            zIndex: 50,
             borderRadius: '50%',
             overflow: 'hidden',
           }}
