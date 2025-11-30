@@ -14,44 +14,6 @@ export default function CleanGridTemplate({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Pool of inspirational quotes
-  const quotePool = [
-    "DREAM\nBIG",
-    "MAKE IT\nHAPPEN",
-    "BELIEVE",
-    "YOU GOT\nTHIS",
-    "HUSTLE",
-    "NEVER\nGIVE UP",
-    "FOCUS",
-    "STAY\nSTRONG",
-    "BE\nFEARLESS",
-    "RISE\nABOVE",
-    "KEEP\nGOING",
-    "PUSH\nHARDER",
-    "TAKE\nACTION",
-    "STAY\nHUNGRY",
-    "WORK\nHARD",
-    "DREAM\nBOLD",
-    "BE\nGREAT",
-    "THINK\nBIG",
-    "STAY\nFOCUSED",
-    "GRIND\nDAILY",
-    "LEVEL\nUP",
-    "NO\nLIMITS",
-    "STAY\nPOSITIVE",
-    "CHASE\nDREAMS",
-    "MAKE\nMOVES",
-  ];
-
-  // Randomly select 4 quotes from the pool (for gaps between images)
-  const getRandomQuotes = () => {
-    const shuffled = [...quotePool].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 4);
-  };
-
-  // Use useMemo to maintain same quotes on re-renders
-  const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
-
   // 3x3 grid layout - 8 equal-sized images (center is logo)
   const gridSize = 680; // Equal size for all images
   const gap = 10; // Gap between images
@@ -236,53 +198,6 @@ export default function CleanGridTemplate({
         console.error('Failed to load logo image:', error);
       }
 
-      // Load neon quote container image
-      const quoteContainerImg = await loadImage('/quote container.png');
-
-      // Add 4 quotes with neon containers between images
-      const quotePositions = [
-        { x: 20 + gridSize + gap / 2, y: 20 + gridSize / 2, size: 16, width: 150, height: 100 }, // Between Image1 and Image2
-        { x: 20 + (gridSize + gap) * 2 + gap / 2, y: 20 + gridSize / 2, size: 16, width: 150, height: 100 }, // Between Image2 and Image3
-        { x: 20 + gridSize + gap / 2, y: 20 + (gridSize + gap) * 2 + gridSize / 2, size: 16, width: 150, height: 100 }, // Between Image6 and Image7
-        { x: 20 + (gridSize + gap) * 2 + gap / 2, y: 20 + (gridSize + gap) * 2 + gridSize / 2, size: 16, width: 150, height: 100 }, // Between Image7 and Image8
-      ];
-
-      quotePositions.forEach((qPos, index) => {
-        if (!selectedQuotes[index]) return;
-
-        ctx.save();
-
-        // Draw neon container image as background
-        ctx.drawImage(
-          quoteContainerImg,
-          qPos.x - qPos.width / 2,
-          qPos.y - qPos.height / 2,
-          qPos.width,
-          qPos.height
-        );
-
-        // Draw quote text in white with glow effect
-        ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${qPos.size}px Arial, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        // Text shadow for glow effect
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
-        ctx.shadowBlur = 10;
-
-        // Handle multi-line text
-        const lines = selectedQuotes[index].split('\n');
-        const lineHeight = qPos.size * 1.3;
-        const totalHeight = lines.length * lineHeight;
-        const startY = qPos.y - totalHeight / 2 + lineHeight / 2;
-
-        lines.forEach((line, i) => {
-          ctx.fillText(line, qPos.x, startY + i * lineHeight);
-        });
-
-        ctx.restore();
-      });
     };
 
     renderToCanvas();
@@ -328,7 +243,7 @@ export default function CleanGridTemplate({
       <div className="w-screen h-screen flex items-center justify-center overflow-hidden">
         <div
           style={{
-            transform: 'scale(0.75)',
+            transform: 'scale(0.42)',
             transformOrigin: 'center center',
           }}
         >
@@ -421,60 +336,6 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* 4 Quotes between images - positioned in the gaps with neon container */}
-        {selectedQuotes.slice(0, 4).map((quote, i) => {
-          // Safety check for undefined quotes
-          if (!quote) return null;
-
-          // Position quotes in the horizontal and vertical gaps between images
-          const positions = [
-            // Quote 1: Between Image1 and Image2 (top row, left gap)
-            { top: 20 + gridSize / 2 - 50, left: 20 + gridSize + gap / 2 - 75 },
-            // Quote 2: Between Image2 and Image3 (top row, right gap)
-            { top: 20 + gridSize / 2 - 50, left: 20 + (gridSize + gap) * 2 + gap / 2 - 75 },
-            // Quote 3: Between Image6 and Image7 (bottom row, left gap)
-            { top: 20 + (gridSize + gap) * 2 + gridSize / 2 - 50, left: 20 + gridSize + gap / 2 - 75 },
-            // Quote 4: Between Image7 and Image8 (bottom row, right gap)
-            { top: 20 + (gridSize + gap) * 2 + gridSize / 2 - 50, left: 20 + (gridSize + gap) * 2 + gap / 2 - 75 },
-          ];
-          const pos = positions[i];
-
-          return (
-            <div
-              key={i}
-              style={{
-                position: "absolute",
-                top: `${pos.top}px`,
-                left: `${pos.left}px`,
-                width: "150px",
-                height: "100px",
-                backgroundImage: "url('/quote container.png')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "15px",
-                zIndex: 15,
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "Arial, sans-serif",
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  color: "#ffffff",
-                  textAlign: "center",
-                  lineHeight: "1.3",
-                  textShadow: "0 0 10px rgba(255,255,255,0.5)",
-                }}
-                dangerouslySetInnerHTML={{
-                  __html: (quote || "").replace(/\n/g, "<br/>"),
-                }}
-              />
-            </div>
-          );
-        })}
           </div>
         </div>
       </div>
