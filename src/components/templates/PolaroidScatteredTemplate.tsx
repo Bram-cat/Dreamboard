@@ -71,101 +71,101 @@ export default function PolaroidScatteredTemplate({
     "#FFECB3", // amber
   ];
 
-  // Polaroid scrapbook layout - 10 images scattered with vibrant colors and LARGER frames
-  // Scaled to 1200px width for laptop screens - increased sizes by ~35%
+  // Polaroid scrapbook layout - 10 images with MAXIMIZED middle row and aesthetic borders
+  // Middle row frames significantly larger to fill space
   const gridPositions = [
-    // Top scattered row - 3 LARGER frames
+    // Top scattered row - 4 LARGER frames
     {
-      top: 5,
-      left: 5,
-      width: 270,
-      height: 216,
+      top: 10,
+      left: 10,
+      width: 500,
+      height: 400,
       rotation: -8,
       label: "",
       frameColor: frameColors[0],
     },
     {
-      top: 10,
-      left: 285,
-      width: 265,
-      height: 210,
+      top: 15,
+      left: 520,
+      width: 490,
+      height: 390,
       rotation: 5,
       label: "",
       frameColor: frameColors[1],
     },
     {
-      top: 8,
-      left: 560,
-      width: 260,
-      height: 205,
+      top: 12,
+      left: 1020,
+      width: 480,
+      height: 385,
       rotation: -3,
       label: "",
       frameColor: frameColors[2],
     },
     {
-      top: 12,
-      left: 830,
-      width: 370,
-      height: 216,
+      top: 18,
+      left: 1510,
+      width: 590,
+      height: 400,
       rotation: 7,
       label: "",
       frameColor: frameColors[3],
     },
 
-    // Middle scattered row - 3 frames (around center card) - LARGER
+    // Middle scattered row - 2 MAXIMIZED frames (around center card) - MUCH BIGGER
     {
-      top: 185,
-      left: 8,
-      width: 260,
-      height: 205,
+      top: 320,
+      left: 10,
+      width: 570,
+      height: 480,
       rotation: 6,
       label: "",
       frameColor: frameColors[6],
     },
-    // CENTER CARD SPACE (400x200, 240x180)
+    // CENTER CARD SPACE (700x350, 420x315)
     {
-      top: 188,
-      left: 850,
-      width: 350,
-      height: 205,
+      top: 325,
+      left: 1480,
+      width: 620,
+      height: 480,
       rotation: 5,
       label: "",
       frameColor: frameColors[8],
     },
 
-    // Bottom scattered row - 3 LARGER frames
+    // Bottom scattered row - 4 LARGER frames
     {
-      top: 360,
-      left: 10,
-      width: 265,
-      height: 210,
+      top: 630,
+      left: 15,
+      width: 490,
+      height: 390,
       rotation: -7,
       label: "",
       frameColor: frameColors[10],
     },
     {
-      top: 365,
-      left: 285,
-      width: 260,
-      height: 205,
+      top: 638,
+      left: 520,
+      width: 480,
+      height: 385,
       rotation: 6,
       label: "",
       frameColor: frameColors[11],
     },
     {
-      top: 362,
-      left: 555,
-      width: 270,
-      height: 216,
+      top: 635,
+      left: 1010,
+      width: 500,
+      height: 400,
       rotation: -4,
       label: "",
       frameColor: frameColors[12],
     },
     {
-      top: 368,
-      left: 835,
-      width: 365,
-      height: 216,
+      top: 642,
+      left: 1520,
+      width: 580,
+      height: 400,
       rotation: 5,
       label: "",
       frameColor: frameColors[13],
@@ -190,13 +190,13 @@ export default function PolaroidScatteredTemplate({
         console.error('Failed to load Telma font:', error);
       }
 
-      // Set canvas size - Laptop-friendly dimensions (1200x540)
-      canvas.width = 1200;
-      canvas.height = 540;
+      // Set canvas size - LARGER dimensions for bigger board
+      canvas.width = 2100;
+      canvas.height = 945;
 
       // Draw beige background
       ctx.fillStyle = "#f5f1ed";
-      ctx.fillRect(0, 0, 1200, 540);
+      ctx.fillRect(0, 0, 2100, 945);
 
       // Load and draw images
       const loadImage = (src: string): Promise<HTMLImageElement> => {
@@ -225,14 +225,14 @@ export default function PolaroidScatteredTemplate({
           ctx.translate(centerX, centerY);
           ctx.rotate((pos.rotation * Math.PI) / 180);
 
-          // Draw vibrant colored polaroid frame (larger than image)
+          // Draw vibrant colored polaroid frame with enhanced aesthetic border
           const frameWidth = pos.width + 40;
           const frameHeight = pos.height + 60; // Extra space at bottom for label
           ctx.fillStyle = pos.frameColor || "#faf8f3";
-          ctx.shadowColor = "rgba(60, 50, 40, 0.25)";
-          ctx.shadowBlur = 15;
-          ctx.shadowOffsetX = 5;
-          ctx.shadowOffsetY = 5;
+          ctx.shadowColor = "rgba(60, 50, 40, 0.35)";
+          ctx.shadowBlur = 20;
+          ctx.shadowOffsetX = 7;
+          ctx.shadowOffsetY = 7;
           ctx.fillRect(
             -frameWidth / 2,
             -frameHeight / 2,
@@ -241,31 +241,45 @@ export default function PolaroidScatteredTemplate({
           );
           ctx.shadowColor = "transparent";
 
-          // Draw image inside polaroid frame with CONTAIN mode - show entire image
+          // Add subtle decorative border around frame
+          ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
+          ctx.lineWidth = 3;
+          ctx.strokeRect(
+            -frameWidth / 2 + 5,
+            -frameHeight / 2 + 5,
+            frameWidth - 10,
+            frameHeight - 10
+          );
+
+          // Draw image inside polaroid frame with COVER mode - fill entire container
           const imgRatio = img.width / img.height;
           const boxRatio = pos.width / pos.height;
           let drawWidth, drawHeight, offsetX, offsetY;
 
-          // Contain mode - fit entire image within frame while maintaining aspect ratio
+          // Cover mode - fill entire frame while maintaining aspect ratio
           if (imgRatio > boxRatio) {
-            // Image is wider - match width
+            // Image is wider - match height, let width overflow
+            drawHeight = pos.height;
+            drawWidth = drawHeight * imgRatio;
+            offsetX = -(drawWidth - pos.width) / 2;
+            offsetY = 0;
+          } else {
+            // Image is taller - match width, let height overflow
             drawWidth = pos.width;
             drawHeight = drawWidth / imgRatio;
             offsetX = 0;
-            offsetY = (pos.height - drawHeight) / 2;
-          } else {
-            // Image is taller - match height
-            drawHeight = pos.height;
-            drawWidth = drawHeight * imgRatio;
-            offsetX = (pos.width - drawWidth) / 2;
-            offsetY = 0;
+            offsetY = -(drawHeight - pos.height) / 2;
           }
 
           // Center image within frame
           const imgX = -pos.width / 2;
-          const imgY = -frameHeight / 2 + 20; // 20px from top edge
+          const imgY = -frameHeight / 2 + 35; // 35px from top edge for larger frames
 
-          // Draw image - no clipping needed for contain mode
+          // Clip to frame and draw image
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(imgX, imgY, pos.width, pos.height);
+          ctx.clip();
           ctx.drawImage(
             img,
             imgX + offsetX,
@@ -273,6 +287,7 @@ export default function PolaroidScatteredTemplate({
             drawWidth,
             drawHeight
           );
+          ctx.restore();
 
           // Draw label if exists (handwritten style)
           if (pos.label) {
@@ -288,11 +303,11 @@ export default function PolaroidScatteredTemplate({
         }
       }
 
-      // Draw center card - scrapbook style (scaled to 1200px width)
-      const centerW = 240;
-      const centerH = 180;
-      const centerX = (1200 - centerW) / 2; // ~480px - horizontally centered
-      const centerY = (540 - centerH) / 2; // ~180px - vertically centered
+      // Draw center card - scrapbook style on LARGER board
+      const centerW = 420;
+      const centerH = 315;
+      const centerX = (2100 - centerW) / 2; // ~840px - horizontally centered
+      const centerY = (945 - centerH) / 2; // ~315px - vertically centered
 
       ctx.save();
       ctx.translate(centerX + centerW / 2, centerY + centerH / 2);
@@ -307,44 +322,44 @@ export default function PolaroidScatteredTemplate({
       ctx.fillRect(-centerW / 2, -centerH / 2, centerW, centerH);
       ctx.shadowColor = "transparent";
 
-      // Purple border (scaled)
+      // Purple border (scaled for LARGER card)
       ctx.strokeStyle = "#8b5cf6";
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 7;
       ctx.strokeRect(
-        -centerW / 2 + 8,
-        -centerH / 2 + 8,
-        centerW - 16,
-        centerH - 16
+        -centerW / 2 + 14,
+        -centerH / 2 + 14,
+        centerW - 28,
+        centerH - 28
       );
 
-      // Decorative stars - top (scaled for smaller card)
+      // Decorative stars - top (scaled for LARGER card)
       ctx.fillStyle = "#2a2a2a";
-      ctx.font = "18px Arial";
+      ctx.font = "32px Arial";
       ctx.textAlign = "center";
-      ctx.fillText("★", -45, -65);
-      ctx.fillText("★", 45, -65);
+      ctx.fillText("★", -80, -115);
+      ctx.fillText("★", 80, -115);
 
-      // Center text - scaled for smaller card
+      // Center text - scaled for LARGER card
       ctx.fillStyle = "#2a2a2a";
-      ctx.font = "bold 40px Arial, sans-serif";
+      ctx.font = "bold 70px Arial, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("2025", 0, -20);
+      ctx.fillText("2025", 0, -35);
 
-      ctx.font = 'italic 16px "Brush Script MT", cursive, Georgia';
-      ctx.fillText("VISION BOARD", 0, 5);
+      ctx.font = 'italic 28px "Brush Script MT", cursive, Georgia';
+      ctx.fillText("VISION BOARD", 0, 10);
 
-      // Wavy line decoration - below text (scaled)
+      // Wavy line decoration - below text (scaled for LARGER card)
       ctx.strokeStyle = "#2a2a2a";
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.moveTo(-55, 30);
-      ctx.quadraticCurveTo(-28, 26, 0, 30);
-      ctx.quadraticCurveTo(28, 34, 55, 30);
+      ctx.moveTo(-95, 55);
+      ctx.quadraticCurveTo(-48, 48, 0, 55);
+      ctx.quadraticCurveTo(48, 62, 95, 55);
       ctx.stroke();
 
-      // Bottom star (scaled)
-      ctx.font = "18px Arial";
-      ctx.fillText("★", 0, 65);
+      // Bottom star (scaled for LARGER card)
+      ctx.font = "32px Arial";
+      ctx.fillText("★", 0, 115);
 
       ctx.restore();
 
@@ -454,15 +469,15 @@ export default function PolaroidScatteredTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={1200}
-        height={540}
+        width={2100}
+        height={945}
         style={{ display: "none" }}
       />
 
-      {/* Visible Vision Board - Laptop-friendly size (1200x540) */}
+      {/* Visible Vision Board - LARGER dimensions */}
       <div
         ref={containerRef}
-        className="relative w-[1200px] h-[540px] mx-auto overflow-hidden"
+        className="relative w-[2100px] h-[945px] mx-auto overflow-hidden"
         style={{
           backgroundColor: "#f5f1ed",
         }}
@@ -488,22 +503,24 @@ export default function PolaroidScatteredTemplate({
                 transformOrigin: "center center",
               }}
             >
-              {/* Vibrant Colored Polaroid Frame */}
+              {/* Vibrant Colored Polaroid Frame with Enhanced Aesthetic Border */}
               <div
                 className="w-full h-full relative"
                 style={{
                   backgroundColor: pos.frameColor || "#faf8f3",
-                  boxShadow: "5px 5px 15px rgba(60, 50, 40, 0.25)",
+                  boxShadow: "7px 7px 20px rgba(60, 50, 40, 0.35)",
                   padding: "2% 2% 6% 2%", // Extra padding at bottom
+                  border: "3px solid rgba(0, 0, 0, 0.1)",
+                  borderRadius: "2px",
                 }}
               >
-                {/* Image - CONTAIN mode to show entire image */}
+                {/* Image - COVER mode to fill entire container */}
                 <img
                   src={image}
                   alt={`Vision ${idx + 1}`}
                   className="w-full"
                   style={{
-                    objectFit: "contain",
+                    objectFit: "cover",
                     height: "85%",
                   }}
                 />
@@ -767,27 +784,27 @@ export default function PolaroidScatteredTemplate({
           />
         </div>
 
-        {/* Center Card - Properly sized and centered */}
+        {/* Center Card - LARGER size and centered on bigger board */}
         <div
           className="absolute flex flex-col items-center justify-center bg-white"
           style={{
-            top: "180px",
-            left: "480px",
-            width: "240px",
-            height: "180px",
+            top: "315px",
+            left: "840px",
+            width: "420px",
+            height: "315px",
             transform: "rotate(-2deg)",
-            boxShadow: "4px 4px 12px rgba(0, 0, 0, 0.25)",
+            boxShadow: "7px 7px 20px rgba(0, 0, 0, 0.25)",
           }}
         >
           {/* Purple Border */}
           <div
             style={{
               position: "absolute",
-              top: "8px",
-              left: "8px",
-              right: "8px",
-              bottom: "8px",
-              border: "4px solid #8b5cf6",
+              top: "14px",
+              left: "14px",
+              right: "14px",
+              bottom: "14px",
+              border: "7px solid #8b5cf6",
             }}
           />
 
@@ -795,11 +812,11 @@ export default function PolaroidScatteredTemplate({
           <div
             style={{
               position: "absolute",
-              top: "18px",
-              fontSize: "18px",
+              top: "32px",
+              fontSize: "32px",
               color: "#2a2a2a",
               display: "flex",
-              gap: "90px",
+              gap: "160px",
             }}
           >
             <span>★</span>
@@ -812,13 +829,13 @@ export default function PolaroidScatteredTemplate({
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: "4px",
-              marginTop: "-8px",
+              gap: "8px",
+              marginTop: "-14px",
             }}
           >
             <div
               style={{
-                fontSize: "40px",
+                fontSize: "70px",
                 fontWeight: "bold",
                 color: "#2a2a2a",
                 lineHeight: "1",
@@ -830,9 +847,9 @@ export default function PolaroidScatteredTemplate({
               style={{
                 fontFamily: '"Brush Script MT", cursive, Georgia',
                 fontStyle: "italic",
-                fontSize: "16px",
+                fontSize: "28px",
                 color: "#2a2a2a",
-                marginTop: "4px",
+                marginTop: "8px",
               }}
             >
               VISION BOARD
@@ -843,8 +860,8 @@ export default function PolaroidScatteredTemplate({
           <div
             style={{
               position: "absolute",
-              bottom: "20px",
-              fontSize: "18px",
+              bottom: "35px",
+              fontSize: "32px",
               color: "#2a2a2a",
             }}
           >
@@ -855,16 +872,16 @@ export default function PolaroidScatteredTemplate({
           <svg
             style={{
               position: "absolute",
-              bottom: "35px",
+              bottom: "60px",
               width: "50%",
             }}
-            height="12"
+            height="20"
             viewBox="0 0 100 10"
           >
             <path
               d="M0,5 Q25,0 50,5 T100,5"
               stroke="#2a2a2a"
-              strokeWidth="1.5"
+              strokeWidth="2.5"
               fill="none"
             />
           </svg>

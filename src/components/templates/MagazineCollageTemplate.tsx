@@ -52,25 +52,25 @@ export default function MagazineCollageTemplate({
   // Use useMemo to maintain same quotes on re-renders
   const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
 
-  // TIGHT-FIT Magazine collage - 10 visible images LARGER containers arranged around center card
-  // Scaled to 1200px width for laptop screens - increased sizes by ~30%
+  // TIGHT-FIT Magazine collage - 10 visible images MUCH LARGER with no empty space
+  // Middle row images maximized, better spacing and borders
   const collagePositions = [
-    // Top row - 3 LARGER images (increased dimensions significantly)
-    { top: 0, left: 0, width: 310, height: 220, rotate: -3, zIndex: 20 },
-    { top: 5, left: 305, width: 310, height: 220, rotate: 2, zIndex: 21 },
-    { top: 0, left: 610, width: 310, height: 220, rotate: -2, zIndex: 22 },
-    { top: 5, left: 915, width: 285, height: 220, rotate: 3, zIndex: 23 },
+    // Top row - 4 LARGER images
+    { top: 0, left: 0, width: 520, height: 370, rotate: -3, zIndex: 20 },
+    { top: 8, left: 515, width: 520, height: 370, rotate: 2, zIndex: 21 },
+    { top: 0, left: 1030, width: 520, height: 370, rotate: -2, zIndex: 22 },
+    { top: 8, left: 1545, width: 555, height: 370, rotate: 3, zIndex: 23 },
 
-    // Middle row - 3 images around center card (LARGER)
-    { top: 160, left: 0, width: 310, height: 220, rotate: 2, zIndex: 26 },
-    // CENTER CARD SPACE (400x156, 207x148)
-    { top: 165, left: 625, width: 265, height: 200, rotate: 3, zIndex: 27 },
-    { top: 160, left: 890, width: 310, height: 220, rotate: -2, zIndex: 28 },
+    // Middle row - 3 MAXIMIZED images around center card (fill entire row height)
+    { top: 270, left: 0, width: 680, height: 450, rotate: 2, zIndex: 26 },
+    // CENTER CARD SPACE (700x275, 365x260)
+    { top: 290, left: 1090, width: 465, height: 350, rotate: 3, zIndex: 27 },
+    { top: 270, left: 1555, width: 545, height: 450, rotate: -2, zIndex: 28 },
 
     // Bottom row - 3 LARGER images
-    { top: 312, left: 0, width: 385, height: 195, rotate: -2, zIndex: 30 },
-    { top: 315, left: 385, width: 385, height: 195, rotate: 2, zIndex: 31 },
-    { top: 312, left: 815, width: 385, height: 195, rotate: -3, zIndex: 32 },
+    { top: 550, left: 0, width: 700, height: 340, rotate: -2, zIndex: 30 },
+    { top: 555, left: 700, width: 700, height: 340, rotate: 2, zIndex: 31 },
+    { top: 550, left: 1400, width: 700, height: 340, rotate: -3, zIndex: 32 },
   ];
 
   // Canvas rendering for download
@@ -91,18 +91,18 @@ export default function MagazineCollageTemplate({
         console.error('Failed to load Telma font:', error);
       }
 
-      // Set canvas size - Laptop-friendly dimensions (fits 1366px screens)
-      canvas.width = 1200;
-      canvas.height = 460;
+      // Set canvas size - LARGER dimensions for bigger board
+      canvas.width = 2100;
+      canvas.height = 805;
 
       // Draw cork board background
       ctx.fillStyle = '#d4a574';
-      ctx.fillRect(0, 0, 1200, 460);
+      ctx.fillRect(0, 0, 2100, 805);
 
       // Add texture (noise pattern)
-      for (let i = 0; i < 2500; i++) {
-        const x = Math.random() * 1200;
-        const y = Math.random() * 460;
+      for (let i = 0; i < 4000; i++) {
+        const x = Math.random() * 2100;
+        const y = Math.random() * 805;
         const brightness = Math.random() * 30 - 15;
         ctx.fillStyle = `rgba(${120 + brightness}, ${80 + brightness}, ${50 + brightness}, 0.3)`;
         ctx.fillRect(x, y, 2, 2);
@@ -136,38 +136,48 @@ export default function MagazineCollageTemplate({
           ctx.rotate((pos.rotate * Math.PI) / 180);
           ctx.translate(-(pos.width / 2), -(pos.height / 2));
 
-          // Draw warm cream-toned photo border to complement cork background
+          // Draw warm cream-toned photo border with enhanced shadow for depth
           ctx.fillStyle = '#fffef9';
-          ctx.shadowColor = 'rgba(80, 60, 40, 0.35)';
-          ctx.shadowBlur = 15;
-          ctx.shadowOffsetX = 3;
-          ctx.shadowOffsetY = 3;
+          ctx.shadowColor = 'rgba(80, 60, 40, 0.45)';
+          ctx.shadowBlur = 20;
+          ctx.shadowOffsetX = 5;
+          ctx.shadowOffsetY = 5;
           ctx.fillRect(0, 0, pos.width, pos.height);
           ctx.shadowColor = 'transparent';
 
-          // Draw image inside the border - CONTAIN mode to show entire image
-          const padding = 12;
+          // Add subtle inner border for more aesthetic look
+          ctx.strokeStyle = 'rgba(200, 180, 150, 0.3)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(15, 15, pos.width - 30, pos.height - 30);
+
+          // Draw image inside the border - COVER mode to fill entire container
+          const padding = 20;
           const imgRatio = img.width / img.height;
           const boxRatio = (pos.width - padding * 2) / (pos.height - padding * 2);
           let drawWidth, drawHeight, drawX, drawY;
 
-          // Contain mode - fit entire image within frame while maintaining aspect ratio
+          // Cover mode - fill entire frame while maintaining aspect ratio
           if (imgRatio > boxRatio) {
-            // Image is wider - match width
+            // Image is wider - match height, let width overflow
+            drawHeight = pos.height - padding * 2;
+            drawWidth = drawHeight * imgRatio;
+            drawX = padding - (drawWidth - (pos.width - padding * 2)) / 2;
+            drawY = padding;
+          } else {
+            // Image is taller - match width, let height overflow
             drawWidth = pos.width - padding * 2;
             drawHeight = drawWidth / imgRatio;
             drawX = padding;
-            drawY = padding + (pos.height - padding * 2 - drawHeight) / 2;
-          } else {
-            // Image is taller - match height
-            drawHeight = pos.height - padding * 2;
-            drawWidth = drawHeight * imgRatio;
-            drawX = padding + (pos.width - padding * 2 - drawWidth) / 2;
-            drawY = padding;
+            drawY = padding - (drawHeight - (pos.height - padding * 2)) / 2;
           }
 
-          // Draw image - no clipping needed for contain mode
+          // Clip to frame and draw image
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(padding, padding, pos.width - padding * 2, pos.height - padding * 2);
+          ctx.clip();
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+          ctx.restore();
 
           // Draw tape decorations AFTER image (so they appear on top)
           const drawTape = (x: number, y: number, angle: number) => {
@@ -259,12 +269,12 @@ export default function MagazineCollageTemplate({
         ctx.restore();
       });
 
-      // Draw center "2025 VISION BOARD" card - Improved styling
-      const centerX = 400;
-      const centerY = 156;
-      const centerW = 207;
-      const centerH = 148;
-      const borderRadius = 8;
+      // Draw center "2025 VISION BOARD" card - Improved styling on LARGER board
+      const centerX = 700;
+      const centerY = 275;
+      const centerW = 365;
+      const centerH = 260;
+      const borderRadius = 14;
 
       ctx.save();
       ctx.translate(centerX + centerW / 2, centerY + centerH / 2);
@@ -304,14 +314,14 @@ export default function MagazineCollageTemplate({
 
       // "2025" text with gradient effect (simulated with solid color)
       ctx.fillStyle = '#8b5cf6';
-      ctx.font = 'bold 52px Arial, sans-serif';
+      ctx.font = 'bold 90px Arial, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('2025', 0, -10);
+      ctx.fillText('2025', 0, -15);
 
       // "VISION BOARD" text
       ctx.fillStyle = '#4a5568';
-      ctx.font = 'italic 600 16px Georgia, serif';
-      ctx.fillText('VISION BOARD', 0, 15);
+      ctx.font = 'italic 600 28px Georgia, serif';
+      ctx.fillText('VISION BOARD', 0, 25);
 
       // Decorative underline with gradient
       const underlineGradient = ctx.createLinearGradient(-60, 0, 60, 0);
@@ -360,15 +370,15 @@ export default function MagazineCollageTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={1200}
-        height={460}
+        width={2100}
+        height={805}
         style={{ display: 'none' }}
       />
 
-      {/* Visible Vision Board - Laptop-friendly size (1200px) */}
+      {/* Visible Vision Board - LARGER dimensions */}
       <div
         ref={containerRef}
-        className="relative w-[1200px] h-[460px] mx-auto overflow-hidden"
+        className="relative w-[2100px] h-[805px] mx-auto overflow-hidden"
         style={{
           backgroundColor: '#d4a574',
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence baseFrequency="0.9" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.1" /%3E%3C/svg%3E")',
@@ -390,9 +400,10 @@ export default function MagazineCollageTemplate({
                 height: `${pos.height}px`,
                 transform: `rotate(${pos.rotate}deg)`,
                 zIndex: pos.zIndex,
-                padding: '12px',
+                padding: '20px',
                 backgroundColor: '#fffef9',
-                boxShadow: '3px 3px 15px rgba(80, 60, 40, 0.35)',
+                boxShadow: '5px 5px 20px rgba(80, 60, 40, 0.45)',
+                border: '2px solid rgba(200, 180, 150, 0.3)',
               }}
             >
               {/* Tape decoration */}
@@ -417,13 +428,13 @@ export default function MagazineCollageTemplate({
                 }}
               />
 
-              {/* Image - CONTAIN mode to show entire image */}
+              {/* Image - COVER mode to fill entire container */}
               <img
                 src={image}
                 alt={`Vision ${idx + 1}`}
                 className="w-full h-full"
                 style={{
-                  objectFit: 'contain',
+                  objectFit: 'cover',
                   objectPosition: 'center'
                 }}
               />
@@ -573,16 +584,16 @@ export default function MagazineCollageTemplate({
           />
         </div>
 
-        {/* Center "2025 VISION BOARD" Card - Improved Styling */}
+        {/* Center "2025 VISION BOARD" Card - Improved Styling on LARGER board */}
         <div
           className="absolute bg-white shadow-2xl flex flex-col items-center justify-center"
           style={{
-            top: '156px',
-            left: '400px',
-            width: '207px',
-            height: '148px',
+            top: '275px',
+            left: '700px',
+            width: '365px',
+            height: '260px',
             zIndex: 100,
-            borderRadius: '8px',
+            borderRadius: '14px',
           }}
         >
           {/* Gradient Border */}
@@ -608,22 +619,22 @@ export default function MagazineCollageTemplate({
             marginTop: '0'
           }}>
             <div style={{
-              fontSize: '52px',
+              fontSize: '90px',
               fontWeight: 'bold',
               background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               lineHeight: '1',
-              letterSpacing: '2px',
+              letterSpacing: '3px',
             }}>
               2025
             </div>
             <div style={{
               fontFamily: 'Georgia, serif',
               fontStyle: 'italic',
-              fontSize: '16px',
+              fontSize: '28px',
               color: '#4a5568',
-              letterSpacing: '1px',
+              letterSpacing: '2px',
               fontWeight: '600',
             }}>
               VISION BOARD

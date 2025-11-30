@@ -52,17 +52,17 @@ export default function CleanGridTemplate({
   // Use useMemo to maintain same quotes on re-renders
   const selectedQuotes = React.useMemo(() => getRandomQuotes(), []);
 
-  // Simple 2x3 grid layout - 6 images LARGER size to compensate for reduced count
+  // Simple 2x3 grid layout - 6 images MUCH LARGER to fill bigger board
   const gridPositions = [
-    // Top row - 3 LARGER images (increased size)
-    { top: 10, left: 10, width: 530, height: 300, keyword: "" },
-    { top: 10, left: 550, width: 530, height: 300, keyword: "" },
-    { top: 10, left: 1090, width: 245, height: 300, keyword: "" },
+    // Top row - 3 MUCH LARGER images
+    { top: 20, left: 20, width: 780, height: 480, keyword: "" },
+    { top: 20, left: 820, width: 780, height: 480, keyword: "" },
+    { top: 20, left: 1620, width: 460, height: 480, keyword: "" },
 
-    // Bottom row - 3 LARGER images
-    { top: 460, left: 10, width: 530, height: 300, keyword: "" },
-    { top: 460, left: 550, width: 530, height: 300, keyword: "" },
-    { top: 460, left: 1090, width: 245, height: 300, keyword: "" },
+    // Bottom row - 3 MUCH LARGER images
+    { top: 720, left: 20, width: 780, height: 480, keyword: "" },
+    { top: 720, left: 820, width: 780, height: 480, keyword: "" },
+    { top: 720, left: 1620, width: 460, height: 480, keyword: "" },
   ];
 
   // Canvas rendering for download
@@ -83,17 +83,17 @@ export default function CleanGridTemplate({
         console.error('Failed to load Telma font:', error);
       }
 
-      // Set canvas size (3x3 grid optimized)
-      canvas.width = 1345;
-      canvas.height = 760;
+      // Set canvas size - LARGER board dimensions
+      canvas.width = 2100;
+      canvas.height = 1220;
 
       // Draw gradient background (soft, professional)
-      const gradient = ctx.createLinearGradient(0, 0, 1345, 760);
+      const gradient = ctx.createLinearGradient(0, 0, 2100, 1220);
       gradient.addColorStop(0, '#f8fafc');
       gradient.addColorStop(0.5, '#f1f5f9');
       gradient.addColorStop(1, '#e2e8f0');
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 1345, 760);
+      ctx.fillRect(0, 0, 2100, 1220);
 
       // Load and draw images
       const loadImage = (src: string): Promise<HTMLImageElement> => {
@@ -257,11 +257,11 @@ export default function CleanGridTemplate({
         ctx.restore();
       });
 
-      // Draw center card - Centered between rows
-      const centerX = 550;
-      const centerY = 320;
-      const centerW = 400;
-      const centerH = 200;
+      // Draw center card - Centered between rows on LARGER board
+      const centerX = 850;
+      const centerY = 510;
+      const centerW = 600;
+      const centerH = 300;
 
       ctx.save();
       ctx.fillStyle = '#6366f1'; // Indigo
@@ -288,13 +288,13 @@ export default function CleanGridTemplate({
       // Center text - Larger, more readable
       ctx.shadowColor = 'transparent';
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 56px Inter, system-ui, sans-serif';
+      ctx.font = 'bold 90px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('2025', centerX + centerW / 2, centerY + 80);
+      ctx.fillText('2025', centerX + centerW / 2, centerY + 120);
 
-      ctx.font = '18px Inter, system-ui, sans-serif';
-      ctx.letterSpacing = '3px';
-      ctx.fillText('YOUR VISION BOARD', centerX + centerW / 2, centerY + 115);
+      ctx.font = '28px Inter, system-ui, sans-serif';
+      ctx.letterSpacing = '5px';
+      ctx.fillText('YOUR VISION BOARD', centerX + centerW / 2, centerY + 170);
 
       ctx.restore();
     };
@@ -333,15 +333,15 @@ export default function CleanGridTemplate({
       {/* Hidden Canvas for download */}
       <canvas
         ref={canvasRef}
-        width={1345}
-        height={760}
+        width={2100}
+        height={1220}
         style={{ display: 'none' }}
       />
 
-      {/* Visible Vision Board */}
+      {/* Visible Vision Board - LARGER dimensions */}
       <div
         ref={containerRef}
-        className="relative w-[1345px] h-[760px] mx-auto overflow-hidden"
+        className="relative w-[2100px] h-[1220px] mx-auto overflow-hidden"
         style={{ background: 'linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0)' }}
       >
         {/* Grid Images - 6 larger images */}
@@ -364,14 +364,14 @@ export default function CleanGridTemplate({
                 boxShadow: '0 2px 20px rgba(99, 102, 241, 0.15)',
               }}
             >
-              {/* Image - CONTAIN mode to show entire image */}
+              {/* Image - COVER mode to fill entire container */}
               <img
                 src={image}
                 alt={`Vision ${idx + 1}`}
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'contain',
+                  objectFit: 'cover',
                   objectPosition: 'center center',
                   display: 'block'
                 }}
@@ -571,20 +571,20 @@ export default function CleanGridTemplate({
           />
         </div>
 
-        {/* Center Card - Centered between image rows */}
+        {/* Center Card - Centered between image rows on LARGER board */}
         <div
           className="absolute bg-indigo-500 shadow-2xl flex flex-col items-center justify-center"
           style={{
-            top: '320px',
-            left: '550px',
-            width: '400px',
-            height: '200px',
-            borderRadius: '16px',
+            top: '510px',
+            left: '850px',
+            width: '600px',
+            height: '300px',
+            borderRadius: '24px',
             zIndex: 20,
           }}
         >
-          <div className="text-white text-7xl font-bold mb-2">2025</div>
-          <div className="text-white text-xl tracking-widest">YOUR VISION BOARD</div>
+          <div className="text-white text-9xl font-bold mb-4">2025</div>
+          <div className="text-white text-3xl tracking-widest">YOUR VISION BOARD</div>
         </div>
       </div>
     </>
