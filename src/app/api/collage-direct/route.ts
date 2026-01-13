@@ -461,7 +461,7 @@ REMEMBER: This is a PERSONAL vision board for ONE specific person. Every human f
       console.log("Contents array length:", contents.length);
 
       const response = await genai.models.generateContent({
-        model: "gemini-2.5-flash-image",
+        model: "gemini-2.5-flash-preview-image",
         contents: contents,
         config: {
           imageConfig: {
@@ -573,7 +573,7 @@ REMEMBER: This is a PERSONAL vision board for ONE specific person. Every human f
       return NextResponse.json({
         collageUrl: imageDataUri,
         success: true,
-        model: "gemini-2.5-flash-image",
+        model: "gemini-2.5-flash-preview-image",
       });
     } catch (apiError: unknown) {
       console.error("Gemini API error:", apiError);

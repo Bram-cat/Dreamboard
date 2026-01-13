@@ -82,7 +82,7 @@ IMPORTANT: This is a collage assembly task - take the ${images.length} images an
       console.log("Sending stitching request to Gemini...");
 
       const response = await genai.models.generateContent({
-        model: "gemini-2.5-flash-image",
+        model: "gemini-2.5-flash-preview-image",
         contents: contents,
         config: {
           imageConfig: {
@@ -120,7 +120,7 @@ IMPORTANT: This is a collage assembly task - take the ${images.length} images an
         collageUrl: collageDataUri,
         success: true,
         imagesUsed: images.length,
-        model: "gemini-2.5-flash-image"
+        model: "gemini-2.5-flash-preview-image"
       });
 
     } catch (apiError: unknown) {

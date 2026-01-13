@@ -148,7 +148,7 @@ ${elementDescription}
 
     // Generate image with Gemini
     const response = await genai.models.generateContent({
-      model: "gemini-2.5-flash-image",
+      model: "gemini-2.5-flash-preview-image",
       contents: [
         {
           role: "user",
