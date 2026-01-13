@@ -1,5 +1,6 @@
 "use client";
 
+// next js update
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/Button";
@@ -29,45 +30,52 @@ export default function HomePage() {
   const features = [
     {
       title: "AI-Powered Creation",
-      description: "Advanced AI transforms your dreams into stunning visual boards in seconds using cutting-edge technology"
+      description:
+        "Advanced AI transforms your dreams into stunning visual boards in seconds using cutting-edge technology",
     },
     {
       title: "Personalized Images",
-      description: "Upload your photos to create truly personal and meaningful vision boards that reflect your unique journey"
+      description:
+        "Upload your photos to create truly personal and meaningful vision boards that reflect your unique journey",
     },
     {
       title: "Multiple Templates",
-      description: "Choose from magazine, polaroid, scrapbook, and grid layouts designed by professional artists"
+      description:
+        "Choose from magazine, polaroid, scrapbook, and grid layouts designed by professional artists",
     },
     {
       title: "Instant Download",
-      description: "Get your vision board in 4K quality, ready to print or share across all your devices"
-    }
+      description:
+        "Get your vision board in 4K quality, ready to print or share across all your devices",
+    },
   ];
 
   const stats = [
     { number: "10,000+", label: "Vision Boards Created" },
     { number: "5,000+", label: "Happy Dreamers" },
     { number: "4.9/5", label: "User Rating" },
-    { number: "99%", label: "Satisfaction Rate" }
+    { number: "99%", label: "Satisfaction Rate" },
   ];
 
   const testimonials = [
     {
-      quote: "Dreamboard helped me visualize my 2025 goals in ways I never imagined. The AI feature is incredible!",
+      quote:
+        "Dreamboard helped me visualize my 2025 goals in ways I never imagined. The AI feature is incredible!",
       author: "Sarah M.",
-      role: "Entrepreneur"
+      role: "Entrepreneur",
     },
     {
-      quote: "I created my vision board in under 5 minutes. It's now my phone wallpaper and daily inspiration.",
+      quote:
+        "I created my vision board in under 5 minutes. It's now my phone wallpaper and daily inspiration.",
       author: "Michael R.",
-      role: "Software Engineer"
+      role: "Software Engineer",
     },
     {
-      quote: "The templates are beautiful and the personalization options are endless. Highly recommend!",
+      quote:
+        "The templates are beautiful and the personalization options are endless. Highly recommend!",
       author: "Emma L.",
-      role: "Life Coach"
-    }
+      role: "Life Coach",
+    },
   ];
 
   return (
@@ -78,13 +86,18 @@ export default function HomePage() {
       <section className="relative pt-32 pb-24 px-6 overflow-hidden">
         {/* Animated gradient orbs */}
         <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-r from-[#7209B7]/20 to-[#9D4EDD]/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-r from-[#C77DFF]/20 to-[#E0AAFF]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div
+          className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-r from-[#C77DFF]/20 to-[#E0AAFF]/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col items-center text-center">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#7209B7]/10 to-[#9D4EDD]/10 border border-[#9D4EDD]/20 mb-8">
-              <span className="text-[#E0AAFF] text-sm font-semibold">AI-Powered Vision Boards for 2025</span>
+              <span className="text-[#E0AAFF] text-sm font-semibold">
+                AI-Powered Vision Boards for 2025
+              </span>
             </div>
 
             {/* Main Heading */}
@@ -96,14 +109,13 @@ export default function HomePage() {
                 Manifest Your Dreams
               </span>
               <br />
-              <span className="text-white">
-                With AI Vision Boards
-              </span>
+              <span className="text-white">With AI Vision Boards</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed">
-              Create stunning, personalized vision boards in minutes. Transform your goals
-              into beautiful visual reminders that inspire action every single day.
+              Create stunning, personalized vision boards in minutes. Transform
+              your goals into beautiful visual reminders that inspire action
+              every single day.
             </p>
 
             {/* CTA Buttons */}
@@ -131,20 +143,44 @@ export default function HomePage() {
             {/* Trust Indicators */}
             <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-400">
               <span className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#9D4EDD]" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="w-5 h-5 text-[#9D4EDD]"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 No credit card required
               </span>
               <span className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#9D4EDD]" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="w-5 h-5 text-[#9D4EDD]"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 100% secure
               </span>
               <span className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#9D4EDD]" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="w-5 h-5 text-[#9D4EDD]"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 Free forever plan
               </span>
@@ -181,7 +217,9 @@ export default function HomePage() {
                 How It Works
               </span>
             </h2>
-            <p className="text-xl text-gray-400">From idea to manifestation in minutes</p>
+            <p className="text-xl text-gray-400">
+              From idea to manifestation in minutes
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -198,8 +236,13 @@ export default function HomePage() {
                   1
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Share Your Vision</h3>
-                  <p className="text-gray-400 leading-relaxed">Tell us about your goals, dreams, and aspirations for 2025. Upload personal photos or let our AI create perfect images.</p>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Share Your Vision
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed">
+                    Tell us about your goals, dreams, and aspirations for 2025.
+                    Upload personal photos or let our AI create perfect images.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4">
@@ -207,8 +250,13 @@ export default function HomePage() {
                   2
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">AI Does the Magic</h3>
-                  <p className="text-gray-400 leading-relaxed">Our advanced AI generates stunning, personalized images and arranges them in beautiful templates.</p>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    AI Does the Magic
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed">
+                    Our advanced AI generates stunning, personalized images and
+                    arranges them in beautiful templates.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4">
@@ -216,8 +264,13 @@ export default function HomePage() {
                   3
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Download & Manifest</h3>
-                  <p className="text-gray-400 leading-relaxed">Get your high-resolution vision board instantly. Print it, set it as your wallpaper, or share it with friends.</p>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Download & Manifest
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed">
+                    Get your high-resolution vision board instantly. Print it,
+                    set it as your wallpaper, or share it with friends.
+                  </p>
                 </div>
               </div>
             </div>
@@ -237,7 +290,9 @@ export default function HomePage() {
                 Beautiful Examples
               </span>
             </h2>
-            <p className="text-xl text-gray-400">Real vision boards created by our community</p>
+            <p className="text-xl text-gray-400">
+              Real vision boards created by our community
+            </p>
           </div>
 
           {/* Bento Grid Layout */}
@@ -310,7 +365,9 @@ export default function HomePage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#9D4EDD]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
                 <div className="text-white">
-                  <h3 className="text-2xl font-bold mb-2">AI Generated Layout</h3>
+                  <h3 className="text-2xl font-bold mb-2">
+                    AI Generated Layout
+                  </h3>
                   <p className="text-purple-100">Smart & personalized</p>
                 </div>
               </div>
@@ -331,7 +388,9 @@ export default function HomePage() {
                 Everything You Need
               </span>
             </h2>
-            <p className="text-xl text-gray-400">Powerful features to bring your vision to life</p>
+            <p className="text-xl text-gray-400">
+              Powerful features to bring your vision to life
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -342,12 +401,16 @@ export default function HomePage() {
                 onMouseLeave={() => setHoveredFeature(null)}
                 className={`relative p-8 rounded-2xl bg-gradient-to-br from-[#1A1A2E] to-[#16213E] border transition-all duration-300 ${
                   hoveredFeature === index
-                    ? 'border-purple-400/60 shadow-2xl shadow-purple-500/20 scale-105'
-                    : 'border-purple-500/20'
+                    ? "border-purple-400/60 shadow-2xl shadow-purple-500/20 scale-105"
+                    : "border-purple-500/20"
                 }`}
               >
-                <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+                <h3 className="text-2xl font-bold text-white mb-4">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-400 leading-relaxed">
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
@@ -366,7 +429,9 @@ export default function HomePage() {
                 Loved By Dreamers
               </span>
             </h2>
-            <p className="text-xl text-gray-400">Join thousands manifesting their 2025 goals</p>
+            <p className="text-xl text-gray-400">
+              Join thousands manifesting their 2025 goals
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -375,10 +440,16 @@ export default function HomePage() {
                 key={index}
                 className="relative p-8 rounded-2xl bg-gradient-to-br from-[#1A1A2E] to-[#16213E] border border-purple-500/20 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300"
               >
-                <p className="text-gray-300 text-lg mb-6 italic leading-relaxed">&ldquo;{testimonial.quote}&rdquo;</p>
+                <p className="text-gray-300 text-lg mb-6 italic leading-relaxed">
+                  &ldquo;{testimonial.quote}&rdquo;
+                </p>
                 <div>
-                  <div className="text-white font-bold">{testimonial.author}</div>
-                  <div className="text-gray-400 text-sm">{testimonial.role}</div>
+                  <div className="text-white font-bold">
+                    {testimonial.author}
+                  </div>
+                  <div className="text-gray-400 text-sm">
+                    {testimonial.role}
+                  </div>
                 </div>
               </div>
             ))}
@@ -397,10 +468,13 @@ export default function HomePage() {
                 className="text-4xl md:text-6xl font-bold text-white mb-6"
                 style={{ fontFamily: "'Switzer', sans-serif", fontWeight: 700 }}
               >
-                Ready to Manifest<br />Your 2025 Dreams?
+                Ready to Manifest
+                <br />
+                Your 2025 Dreams?
               </h2>
               <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed">
-                Join thousands creating vision boards and turning their dreams into reality
+                Join thousands creating vision boards and turning their dreams
+                into reality
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                 <Link href="/create">
@@ -445,13 +519,22 @@ export default function HomePage() {
                 Built by dreamers, for dreamers.
               </p>
               <div className="flex gap-4">
-                <a href="#" className="w-10 h-10 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white hover:scale-110 transition-transform">
+                <a
+                  href="#"
+                  className="w-10 h-10 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white hover:scale-110 transition-transform"
+                >
                   <span>𝕏</span>
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white hover:scale-110 transition-transform">
+                <a
+                  href="#"
+                  className="w-10 h-10 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white hover:scale-110 transition-transform"
+                >
                   <span>in</span>
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white hover:scale-110 transition-transform">
+                <a
+                  href="#"
+                  className="w-10 h-10 rounded-full bg-gradient-to-r from-[#7209B7] to-[#9D4EDD] flex items-center justify-center text-white hover:scale-110 transition-transform"
+                >
                   <span>ig</span>
                 </a>
               </div>
@@ -459,22 +542,67 @@ export default function HomePage() {
             <div>
               <h4 className="text-white font-semibold mb-4">Product</h4>
               <ul className="space-y-3">
-                <li><Link href="/create" className="text-gray-400 hover:text-white transition">Create Board</Link></li>
-                <li><Link href="/pricing" className="text-gray-400 hover:text-white transition">Pricing</Link></li>
-                <li><Link href="/about" className="text-gray-400 hover:text-white transition">About</Link></li>
+                <li>
+                  <Link
+                    href="/create"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Create Board
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/pricing"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/about"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    About
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Support</h4>
               <ul className="space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Help Center</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Contact Us</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Contact Us
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition"
+                  >
+                    Privacy Policy
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
           <div className="pt-8 border-t border-purple-500/10 text-center text-gray-400">
-            <p>&copy; 2025 Dreamboard AI. All rights reserved. Manifest your dreams.</p>
+            <p>
+              &copy; 2025 Dreamboard AI. All rights reserved. Manifest your
+              dreams.
+            </p>
           </div>
         </div>
       </footer>
