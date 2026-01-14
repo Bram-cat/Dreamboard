@@ -347,7 +347,7 @@ export async function POST(request: NextRequest) {
             : [{ text: aspectRatioPrompt }];
 
           const response = await genai.models.generateContent({
-            model: "gemini-2.5-flash-preview-image",
+            model: "gemini-2.5-flash-image",
             contents: [{
               role: "user",
               parts: contentParts
@@ -407,7 +407,7 @@ export async function POST(request: NextRequest) {
             : [{ text: aspectRatioPrompt }];
 
           const response = await genai1.models.generateContent({
-            model: "gemini-2.5-flash-preview-image",
+            model: "gemini-2.5-flash-image",
             contents: [{
               role: "user",
               parts: contentParts
@@ -666,7 +666,7 @@ Add beige rectangular labels in bottom-right corner of select tiles:
 - [ ] Professional magazine aesthetic`;
 
       const finalResponse = await genai1.models.generateContent({
-        model: "gemini-2.5-flash-preview-image",
+        model: "gemini-2.5-flash-image",
         contents: [{
           role: "user",
           parts: [

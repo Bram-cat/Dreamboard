@@ -137,7 +137,7 @@ VISUAL QUALITY REQUIREMENTS:
         // Generate the image - use 4:5 aspect ratio for smallest payload size
         // 4:5 = 896x1152 which is smaller than 1:1 (1024x1024) or 16:9 (1344x768)
         const response = await genai.models.generateContent({
-          model: "gemini-2.5-flash-preview-image",
+          model: "gemini-2.5-flash-image",
           contents: contents,
           config: {
             imageConfig: {
@@ -247,7 +247,7 @@ IMPORTANT: This is a collage assembly task - arrange the ${generatedImages.lengt
     const stitchContents = [...imageParts, { text: stitchPrompt }];
 
     const stitchResponse = await genai.models.generateContent({
-      model: "gemini-2.5-flash-preview-image",
+      model: "gemini-2.5-flash-image",
       contents: stitchContents,
       config: {
         imageConfig: {
